@@ -1,0 +1,57 @@
+/* Style for the custom toolbar wrapper */
+.wpct_toolbar {
+    width: 100%;
+    display: block;
+    position: relative;
+}
+
+.wpct_toolbar #comment + #qt_comment_toolbar {
+    border: inherit;
+    border-top-left-radius: inherit;
+    border-top-right-radius: inherit;
+}
+
+/* Remove the top border of the comment textarea */
+.wpct_toolbar #comment {
+    border-top: 0;
+    margin-top: 0;
+    border-top-left-radius: 0;
+    border-top-right-radius: 0;
+}
+
+/* Style for the custom toolbar buttons */
+.wpct_toolbar #qt_comment_toolbar {
+    gap: 10px;
+    display: flex;
+    padding: 10px;
+    align-items: center;
+    justify-content: flex-start;
+    background: var(--wpct-toolbar-bg-color);
+    border: solid 1px var(--wpct-toolbar-border-color);
+}
+
+/* Styling buttons inside the toolbar */
+.wpct_toolbar .quicktags-toolbar input[type="button"] {
+    padding: 0;
+    width: 35px;
+    height: 35px;
+    display: flex;
+    font-size: large;
+    align-items: center;
+    justify-content: center;
+}
+
+.wpct_toolbar .quicktags-toolbar input[value="u"],
+.wpct_toolbar .quicktags-toolbar input[value="/u"]{
+    text-decoration: underline
+}
+
+.wpct_toolbar .quicktags-toolbar input[value="i"],
+.wpct_toolbar .quicktags-toolbar input[value="/i"] {
+    font-style: italic
+}
+
+.wpct_toolbar .quicktags-toolbar input[value="b"],
+.wpct_toolbar .quicktags-toolbar input[value="/b"]{
+    font-weight: bold
+}
