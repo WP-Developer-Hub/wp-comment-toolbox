@@ -1,50 +1,8 @@
 <?php
 
-class WP_Comment_Toolbox_Comment_Form_Layout {
+class WP_Comment_Toolbox_Comment_Form {
     public function __construct() {
-        add_action('init', array($this, 'toggle_make_clickable'));
-        add_filter('comment_text', array($this, 'strip_comment_links'));
-        add_filter('preprocess_comment', array($this, 'limit_comment_length'));
-        add_filter('pre_comment_content', array($this, 'strip_comment_links'));
         add_filter('comment_form_fields', array($this, 'reorder_comment_form_fields'));
-        add_filter('get_comment_author_link', array($this, 'remove_comment_author_link_other'), 10, 3);
-    }
-
-    public function toggle_make_clickable() {
-        $disable_clickable = get_option('wpct_disable_clickable_links', '0');
-
-        if ($disable_clickable === '1') {
-            remove_filter('comment_text', 'make_clickable', 9);
-        }
-    }
-
-    public function strip_comment_links($content) {
-        $disable_clickable = get_option('wpct_disable_clickable_links', '1');
-
-        if ($disable_clickable === '1') {
-            $content = preg_replace_callback('/<a[^>]+href=["\']([^"\']+)["\'][^>]*>(.*?)<\/a>/is', function($matches) {
-                return filter_var($matches[2], FILTER_VALIDATE_URL) ? $matches[2] : $matches[1];
-            }, $content);
-        }
-
-        return $content;
-    }
-
-    public function remove_comment_author_link_other($return, $author, $comment_id ) {
-        $comment_form_layout = get_option('wpct_comment_form_layout', '[author] [email] [url] [comment] [cookies]');
-
-        $comment = get_comment($comment_id);
-
-        // Get the user associated with the comment
-        $user = get_user_by('id', $comment->user_id);
-
-        if (!str_contains($comment_form_layout, '[url]')) {
-            // Check if the comment author has the capability to edit the post
-            if (!$user && !user_can($user->ID, 'edit_others_posts')) {
-                $return = $author;
-            }
-        }
-        return $return;
     }
 
     public function reorder_comment_form_fields($fields) {
@@ -130,14 +88,6 @@ class WP_Comment_Toolbox_Comment_Form_Layout {
         }
         return $ordered_fields;
     }
-
-    public function limit_comment_length($comment) {
-        $max_length = esc_html(get_option('wpct_comment_message_limit', 280));
-        if (strlen($comment['comment_content']) > $max_length) {
-            wp_die('<strong>Warning:</strong> Please keep your comment under ' . $max_length . ' characters.', 'Comment Length Warning', array('response' => 500, 'back_link' => true));
-        }
-        return $comment;
-    }
 }
 
-new WP_Comment_Toolbox_Comment_Form_Layout();
+new WP_Comment_Toolbox_Comment_Form();

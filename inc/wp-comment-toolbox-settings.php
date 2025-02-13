@@ -11,60 +11,9 @@ class WP_Comment_Toolbox_Settings {
             'priority' => 200,
         ));
 
-        // Form Layout Section
-        $wp_customize->add_section('wpct_Form', array(
-            'title' => __('Comment Form Setting', 'wpct'),
-            'panel' => 'wpct_comment_form_panel',
-        ));
-
-        // Add setting for author placeholder
-        $wp_customize->add_setting('wpct_author_placeholder', array(
-            'type' => 'option',
-            'default' => 'full_name', // Default is full name
-            'sanitize_callback' => 'sanitize_text_field',
-        ));
-
-        $wp_customize->add_control('wpct_author_placeholder', array(
-            'label' => __('Author Placeholder', 'wpct'),
-            'section' => 'wpct_Form',
-            'type' => 'select', // Use a select dropdown for options
-            'choices' => array(
-                'full_name' => __('Full Name', 'wpct'),
-                'username' => __('Username', 'wpct'),
-                'both' => __('Both', 'wpct'),
-            ),
-            'description' => __('Select what the placeholder should be for the author input field. This will be displayed as a hint to users when filling in their name.', 'wpct'),
-        ));
-
-        $wp_customize->add_setting('wpct_comment_form_layout', array(
-            'type' => 'option',
-            'default' => '[author] [email] [url] [comment] [cookies]',
-            'sanitize_callback' => 'sanitize_textarea_field',
-        ));
-
-        $wp_customize->add_control('wpct_comment_form_layout', array(
-            'label' => __('Comment Form Layout', 'wpct'),
-            'section' => 'wpct_Form',
-            'type' => 'textarea',
-            'description' => __('Define the structure of the comment form using placeholders: <strong>[author]</strong>, <strong>[email]</strong>, <strong>[url]</strong>, <strong>[comment]</strong>, <strong>[cookies]</strong>.', 'wpct'),
-        ));
-
-        $wp_customize->add_setting('wpct_comment_form_cookies_msg', array(
-            'type' => 'option',
-            'default' => '[cookies_msg] [privacy_policy_link]',
-            'sanitize_callback' => 'sanitize_textarea_field',
-        ));
-
-        $wp_customize->add_control('wpct_comment_form_cookies_msg', array(
-            'label' => __('Comment Cookies Message', 'wpct'),
-            'section' => 'wpct_Form',
-            'type' => 'textarea',
-            'description' => __('Customize the cookies message for the comment form. <br> - Use <strong>[cookies_msg]</strong> to include the default cookies text.<br> - Use <strong>[privacy_policy_link]</strong> to insert a link to your privacy policy page.', 'wpct'),
-        ));
-
-        // General Settings Section
-        $wp_customize->add_section('wpct_spam_and_securty', array(
-            'title' => __('Spam & Security Settings', 'wpct'),
+        // Spam and Security Settings Section
+        $wp_customize->add_section('wpct_spam_and_security', array(
+            'title' => __('Spam & Security', 'wpct'),
             'panel' => 'wpct_comment_form_panel',
         ));
 
@@ -76,7 +25,7 @@ class WP_Comment_Toolbox_Settings {
 
         $wp_customize->add_control('wpct_comment_message_limit', array(
             'label' => __('Comment Character Limit', 'wpct'),
-            'section' => 'wpct_spam_and_securty',
+            'section' => 'wpct_spam_and_security',
             'type' => 'number',
             'input_attrs' => array(
                 'min' => '240',
@@ -96,7 +45,7 @@ class WP_Comment_Toolbox_Settings {
 
         $wp_customize->add_control('wpct_disable_clickable_links', array(
             'label' => __('Disable clickable links', 'wpct'),
-            'section' => 'wpct_spam_and_securty',
+            'section' => 'wpct_spam_and_security',
             'type' => 'select',
             'choices' => array(
                 '0' => __('Disable', 'wpct'),
@@ -105,6 +54,7 @@ class WP_Comment_Toolbox_Settings {
             'description' => __('When enabled, links in comments will not be clickable. This can help reduce spam and unwanted external links.', 'wpct'),
         ));
 
+        // Role Setting Section
         $wp_customize->add_section('wpct_role', array(
             'title'    => __('Role Settings', 'wpct'),
             'panel'    => 'wpct_comment_form_panel',
@@ -180,7 +130,99 @@ class WP_Comment_Toolbox_Settings {
             'description' => __('Set the label for admin authors. This will be displayed next to their name in the comment section.', 'wpct'),
         ));
 
-        // Toolbar Settings Section
+        // Comment List Setting Section
+        $wp_customize->add_section('wpct_comment_list', array(
+            'title' => __('Comment List', 'wpct'),
+            'panel' => 'wpct_comment_form_panel',
+        ));
+
+        $wp_customize->add_setting('wpct_author_link_visibility', array(
+            'type' => 'option',
+            'default' => 'all',
+            'sanitize_callback' => 'sanitize_text_field',
+        ));
+
+        $wp_customize->add_control('wpct_author_link_visibility', array(
+            'label' => __('Author Link Visibility', 'wpct'),
+            'section' => 'wpct_comment_list',
+            'type' => 'select',
+            'choices' => array(
+                'none' => __('Disable for all user', 'wpct'),
+                'all' => __('Enable for all user', 'wpct'),
+                'registered' => __('Enable for All Registered Users Only', 'wpct'),
+            ),
+            'description' => __('Control who can have a clickable author link in comments. Users who can edit posts will not be affected at all.', 'wpct'),
+        ));
+
+        $wp_customize->add_setting('wpct_author_link_type', array(
+            'type' => 'option',
+            'default' => 'extrenal',
+            'sanitize_callback' => 'sanitize_text_field',
+        ));
+
+        $wp_customize->add_control('wpct_author_link_type', array(
+            'label' => __('Author Link Type', 'wpct'),
+            'section' => 'wpct_comment_list',
+            'type' => 'select',
+            'choices' => array(
+                'internal' => __('Author Page', 'wpct'),
+                'extrenal' => __('Authoe Website', 'wpct'),
+            ),
+            'description' => __('Control weather author link for users who can edit posts link to there webdite or the wp author page.', 'wpct'),
+        ));
+
+        // Comment Form Setting Section
+        $wp_customize->add_section('wpct_comment_form', array(
+            'title' => __('Comment Form', 'wpct'),
+            'panel' => 'wpct_comment_form_panel',
+        ));
+
+        // Add setting for author placeholder
+        $wp_customize->add_setting('wpct_author_placeholder', array(
+            'type' => 'option',
+            'default' => 'full_name', // Default is full name
+            'sanitize_callback' => 'sanitize_text_field',
+        ));
+
+        $wp_customize->add_control('wpct_author_placeholder', array(
+            'label' => __('Author Placeholder', 'wpct'),
+            'section' => 'wpct_comment_form',
+            'type' => 'select',
+            'choices' => array(
+                'full_name' => __('Full Name', 'wpct'),
+                'username' => __('Username', 'wpct'),
+                'both' => __('Both', 'wpct'),
+            ),
+            'description' => __('Select what the placeholder should be for the author input field. This will be displayed as a hint to users when filling in their name.', 'wpct'),
+        ));
+
+        $wp_customize->add_setting('wpct_comment_form_layout', array(
+            'type' => 'option',
+            'default' => '[author] [email] [url] [comment] [cookies]',
+            'sanitize_callback' => 'sanitize_textarea_field',
+        ));
+
+        $wp_customize->add_control('wpct_comment_form_layout', array(
+            'label' => __('Comment Form Layout', 'wpct'),
+            'section' => 'wpct_comment_form',
+            'type' => 'textarea',
+            'description' => __('Define the structure of the comment form using placeholders: <strong>[author]</strong>, <strong>[email]</strong>, <strong>[url]</strong>, <strong>[comment]</strong>, <strong>[cookies]</strong>.', 'wpct'),
+        ));
+
+        $wp_customize->add_setting('wpct_comment_form_cookies_msg', array(
+            'type' => 'option',
+            'default' => '[cookies_msg]',
+            'sanitize_callback' => 'sanitize_textarea_field',
+        ));
+
+        $wp_customize->add_control('wpct_comment_form_cookies_msg', array(
+            'label' => __('Comment Cookies Message', 'wpct'),
+            'section' => 'wpct_comment_form',
+            'type' => 'textarea',
+            'description' => __('Customize the cookies message for the comment form. <br> - Use <strong>[cookies_msg]</strong> to include the default cookies text.<br> - Use <strong>[privacy_policy_link]</strong> to insert a link to your privacy policy page.', 'wpct'),
+        ));
+
+        // Extra Settings Section
         $wp_customize->add_section('wpct_extra', array(
             'title' => __('Extra Settings', 'wpct'),
             'panel' => 'wpct_comment_form_panel',
