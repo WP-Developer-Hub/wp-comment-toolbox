@@ -147,16 +147,16 @@ class WP_Comment_Toolbox_Settings {
             'section' => 'wpct_comment_list',
             'type' => 'select',
             'choices' => array(
-                'none' => __('Disable for all user', 'wpct'),
-                'all' => __('Enable for all user', 'wpct'),
-                'registered' => __('Enable for All Registered Users Only', 'wpct'),
+                'none' => __('Disable for all users', 'wpct'),
+                'all' => __('Enable for all users', 'wpct'),
+                'registered' => __('Enable for registered users only', 'wpct'),
             ),
-            'description' => __('Control who can have a clickable author link in comments. Users who can edit posts will not be affected at all.', 'wpct'),
+            'description' => __('Control who can have a clickable author link in comments. Users with the ability to edit posts will not be affected.', 'wpct'),
         ));
 
         $wp_customize->add_setting('wpct_author_link_type', array(
             'type' => 'option',
-            'default' => 'extrenal',
+            'default' => 'external',
             'sanitize_callback' => 'sanitize_text_field',
         ));
 
@@ -166,9 +166,9 @@ class WP_Comment_Toolbox_Settings {
             'type' => 'select',
             'choices' => array(
                 'internal' => __('Author Page', 'wpct'),
-                'extrenal' => __('Authoe Website', 'wpct'),
+                'external' => __('Author Website', 'wpct'),
             ),
-            'description' => __('Control weather author link for users who can edit posts link to there webdite or the wp author page.', 'wpct'),
+            'description' => __('Control whether the author link for users who can edit posts links to their website or the WordPress author page.', 'wpct'),
         ));
 
         // Comment Form Setting Section
