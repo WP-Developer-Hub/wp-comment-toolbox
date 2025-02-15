@@ -54,82 +54,6 @@ class WP_Comment_Toolbox_Settings {
             'description' => __('When enabled, links in comments will not be clickable. This can help reduce spam and unwanted external links.', 'wpct'),
         ));
 
-        // Role Setting Section
-        $wp_customize->add_section('wpct_role', array(
-            'title'    => __('Role Settings', 'wpct'),
-            'panel'    => 'wpct_comment_form_panel',
-        ));
-
-        $wp_customize->add_setting('wpct_roles_enabled', array(
-            'type' => 'option',
-            'default' => '0',
-            'sanitize_callback' => 'sanitize_text_field',
-        ));
-
-        $wp_customize->add_control('wpct_roles_enabled', array(
-            'label' => __('Show user role next to user Name', 'wpct'),
-            'section' => 'wpct_role',
-            'type' => 'select',
-            'choices' => array(
-                '0' => __('Hide', 'wpct'),
-                '1' => __('Show', 'wpct'),
-            ),
-            'description' => __('Enable this setting to display the user role (e.g., Admin, Subscriber) next to the comment author’s name.', 'wpct'),
-        ));
-
-        // Add more settings under 'Role Setting' section
-        $wp_customize->add_setting('wpct_guest_label', array(
-            'type' => 'option',
-            'default' => __('Guest', 'wpct'),
-            'sanitize_callback' => 'sanitize_text_field',
-        ));
-
-        $wp_customize->add_control('wpct_guest_label', array(
-            'label' => __('Guest Label', 'wpct'),
-            'section' => 'wpct_role',
-            'type' => 'text',
-            'description' => __('Set the label for guest users. This will be displayed next to their name in the comment section.', 'wpct'),
-        ));
-
-        $wp_customize->add_setting('wpct_subscriber_label', array(
-            'type' => 'option',
-            'default' => __('Subscriber', 'wpct'),
-            'sanitize_callback' => 'sanitize_text_field',
-        ));
-
-        $wp_customize->add_control('wpct_subscriber_label', array(
-            'label' => __('Subscriber Label', 'wpct'),
-            'section' => 'wpct_role',
-            'type' => 'text',
-            'description' => __('Set the label for subscriber users. This will be displayed next to their name in the comment section.', 'wpct'),
-        ));
-
-        $wp_customize->add_setting('wpct_admin_label', array(
-            'type' => 'option',
-            'default' => __('Admin', 'wpct'),
-            'sanitize_callback' => 'sanitize_text_field',
-        ));
-
-        $wp_customize->add_control('wpct_admin_label', array(
-            'label' => __('Admin Label', 'wpct'),
-            'section' => 'wpct_role',
-            'type' => 'text',
-            'description' => __('Set the label for admin users. This will be displayed next to their name in the comment section.', 'wpct'),
-        ));
-
-        $wp_customize->add_setting('wpct_admin_author_label', array(
-            'type' => 'option',
-            'default' => __('Admin/Author', 'wpct'),
-            'sanitize_callback' => 'sanitize_text_field',
-        ));
-
-        $wp_customize->add_control('wpct_admin_author_label', array(
-            'label' => __('Admin Author Label', 'wpct'),
-            'section' => 'wpct_role',
-            'type' => 'text',
-            'description' => __('Set the label for admin authors. This will be displayed next to their name in the comment section.', 'wpct'),
-        ));
-
         // Comment List Setting Section
         $wp_customize->add_section('wpct_comment_list', array(
             'title' => __('Comment List', 'wpct'),
@@ -171,6 +95,25 @@ class WP_Comment_Toolbox_Settings {
             'description' => __('Control whether the author link for users who can edit posts links to their website or the WordPress author page.', 'wpct'),
         ));
 
+        // Add setting and control for wpautop and nl2br options
+        $wp_customize->add_setting('wpct_format_comment_text', array(
+            'type' => 'option',
+            'default' => 'auto',
+            'sanitize_callback' => 'sanitize_text_field',
+        ));
+
+        $wp_customize->add_control('wpct_format_comment_text', array(
+            'label' => __('Format Comment Text', 'wpct'),
+            'section' => 'wpct_comment_list',
+            'type' => 'select',
+            'choices' => array(
+                'auto' => __('Auto (wpautop)', 'wpct'),
+                'nl2br' => __('nl2br (Convert newlines to <br>)', 'wpct'),
+                'none' => __('None (No Formatting)', 'wpct'),
+            ),
+            'description' => __('Choose how to format the comment text: Auto applies wpautop (paragraph tags), nl2br converts newlines to <br> tags, and None means no formatting is applied.', 'wpct'),
+        ));
+
         // Comment Form Setting Section
         $wp_customize->add_section('wpct_comment_form', array(
             'title' => __('Comment Form', 'wpct'),
@@ -194,6 +137,26 @@ class WP_Comment_Toolbox_Settings {
                 'both' => __('Both', 'wpct'),
             ),
             'description' => __('Select what the placeholder should be for the author input field. This will be displayed as a hint to users when filling in their name.', 'wpct'),
+        ));
+
+        $wp_customize->add_setting('wpct_comment_textarea_row_count', array(
+            'type' => 'option',
+            'default' => '8',
+            'sanitize_callback' => 'absint',
+        ));
+
+        $wp_customize->add_control('wpct_comment_textarea_row_count', array(
+            'label' => __('Comment Character Limit', 'wpct'),
+            'section' => 'wpct_comment_form',
+            'type' => 'number',
+            'input_attrs' => array(
+                'min' => '8',
+                'max' => '40',
+                'inputmode' => 'numeric',
+                'pattern' => '[0-9]*',
+                'placeholder' => '280',
+            ),
+            'description' => __('Set the maximum number of characters allowed in the comment text. This helps prevent overly long comments and spammy content.', 'wpct'),
         ));
 
         $wp_customize->add_setting('wpct_comment_form_layout', array(

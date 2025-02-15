@@ -1,7 +1,7 @@
 <?php
 /**
  * Plugin Name: WP Comment Toolbox
- * Description: A comprehensive toolset for enhancing WordPress comment forms. It reorders comment fields, customizes user role visibility, adds a dark/light mode toggle for the comment toolbar, supports link management (including disabling clickable links), and integrates with popular WordPress plugins for user role display.
+ * Description: A comprehensive toolset for enhancing WordPress comment forms. It reorders comment fields, customizes user role visibility, adds a dark/light mode toggle for the comment toolbar, supports link management (including disabling clickable links).
  * Version: 1.1.1
  * Author: DJABHipHop
  * Requires PHP: 7.2
@@ -33,7 +33,6 @@ class WP_Comment_Toolbox {
         require_once(WP_COMMENT_TOOLBOX_PLUGIN_DIR . 'inc/wp-comment-toolbox-settings.php');
         require_once(WP_COMMENT_TOOLBOX_PLUGIN_DIR . 'inc/wp-comment-toolbox-comment-list.php');
         require_once(WP_COMMENT_TOOLBOX_PLUGIN_DIR . 'inc/wp-comment-toolbox-comment-form.php');
-        require_once(WP_COMMENT_TOOLBOX_PLUGIN_DIR . 'inc/wp-comment-toolbox-comment-author-roles.php');
         require_once(WP_COMMENT_TOOLBOX_PLUGIN_DIR . 'inc/wp-comment-toolbox-comment-spam-and-security.php');
 
         add_action('wp_head', array($this, 'add_custom_css'));

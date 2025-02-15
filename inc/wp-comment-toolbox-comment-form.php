@@ -6,9 +6,11 @@ class WP_Comment_Toolbox_Comment_Form {
     }
 
     public function reorder_comment_form_fields($fields) {
+        $max_length = esc_html(get_option('wpct_comment_message_limit', 280));
         $name_or_username = get_option('wpct_author_placeholder', 'full_name');
-        $comment_form_layout = get_option('wpct_comment_form_layout', '[author] [email] [url] [comment] [cookies]');
+        $comment_textarea_row_count = esc_html(get_option('wpct_comment_textarea_row_count'), '8');
         $custom_cookies_msg = esc_html(get_option('wpct_comment_form_cookies_msg'), '');
+        $comment_form_layout = get_option('wpct_comment_form_layout', '[author] [email] [url] [comment] [cookies]');
         $privacy_policy_link = '<a href="' . esc_url(get_privacy_policy_url()) . '" target="_blank">' . __('Privacy Policy', 'wpct') . '</a>';
 
         preg_match_all('/\[(.*?)\]/', $comment_form_layout, $matches);
@@ -47,6 +49,11 @@ class WP_Comment_Toolbox_Comment_Form {
 
         if (isset($ordered_fields['url'])) {
             $ordered_fields['url'] = preg_replace('/\binput/', 'input placeholder="' . esc_attr(get_bloginfo("url") . '/') . '"', $ordered_fields['url'], 1);
+        }
+
+        if (isset($ordered_fields['comment'])) {
+            $ordered_fields['comment'] = preg_replace('/\brows="8"/', 'rows="' . $comment_textarea_row_count . '"', $ordered_fields['comment'], 1);
+            $ordered_fields['comment'] = preg_replace('/\bmaxlength="65525"/', 'maxlength="' . $max_length . '"', $ordered_fields['comment'], 1);
         }
 
         if (isset($ordered_fields['cookies'])) {
