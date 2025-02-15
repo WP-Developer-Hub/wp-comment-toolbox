@@ -1,26 +1,52 @@
-# wp-comment-toolbox
+# WP Comment Toolbox Settings
 
-**This plugin is in the alpha stage, and some features may require setup after the first installation.**
+This plugin provides customization options for comment form settings in WordPress. You can adjust various aspects of comment behavior, including security, formatting, and layout preferences.
 
-A comprehensive toolset for enhancing WordPress comment forms. It includes the following features:
+## Features
 
-- **Reorder Comment Fields:** Customize the order of comment form fields.
-- **User Role Visibility:** Control the visibility of user roles in comments.
-- **Dark/Light Mode Toggle:** A quick toggle for switching the comment toolbar between dark and light modes.
-- **Link Management:** Disable clickable links in comments to reduce spam.
-- **User Role Display Integration:** Seamlessly integrates with popular WordPress plugins for displaying user roles next to comment authors.
+- **Comment Settings Panel**: Manage all comment-related settings from one place.
+- **Spam & Security**: Control comment length, disable clickable links to reduce spam, and more.
+- **Comment List**: Customize the visibility and format of author links, including the link type (internal/external) and comment text formatting.
+- **Comment Form Layout**: Define the structure of the comment form using placeholders.
+- **Quick Tags Toolbar**: Enable a quick tags toolbar in the comment form to make it easier for users to format their comments.
 
-While all features are functional, they may need configuration after installation to work as expected.
+## Installation
 
-### Supported (Untested) Plugins:
+1. Upload the plugin files to the `/wp-content/plugins/wp-comment-toolbox-settings/` directory.
+2. Activate the plugin through the 'Plugins' menu in WordPress.
+3. Go to **Appearance** > **Customize** to configure the plugin settings.
 
-- **bbPress** – Adds user roles to comment authors for topic and reply authors.
-- **BuddyPress** – Adds user roles to BuddyPress member profiles.
-- **WooCommerce** – Adds user roles to WooCommerce customer names.
-- **LearnDash** – Adds user roles to LearnDash user profiles.
-- **Ultimate Member** – Adds user roles to Ultimate Member user names.
-- **WPML** – Adds user roles to WPML translated roles.
-- **MemberPress** – Adds user roles to MemberPress user names.
-- **WP Simple Pay** – Adds user roles to WP Simple Pay user names.
-- **Event Espresso** – Adds user roles to Event Espresso user names.
-- **WooCommerce Subscriptions** – Adds user roles to WooCommerce Subscription user names.
+## Settings
+
+### Spam & Security
+
+- **Comment Character Limit**: Set the maximum number of characters allowed in a comment.
+- **Disable Clickable Links**: Prevent links in comments from being clickable to reduce spam.
+
+### Comment List
+
+- **Author Link Visibility**: Choose who can have a clickable author link in comments.
+- **Author Link Type**: Select whether the author link leads to the author’s website or the WordPress author page.
+- **Format Comment Text**: Choose the format for comment text:
+  - **Auto**: Applies wpautop for paragraph tags.
+  - **nl2br**: Converts newlines to `<br>` tags.
+  - **None**: No formatting.
+
+### Comment Form
+
+- **Author Placeholder**: Choose the placeholder for the author input field (Full Name, Username, or Both).
+- **Comment Textarea Row Count**: Set the number of rows in the comment textarea.
+- **Comment Form Layout**: Define the structure of the comment form using placeholders (`[author]`, `[email]`, `[url]`, `[comment]`, `[cookies]`).
+- **Comment Cookies Message**: Customize the message for cookies consent in the comment form.
+
+### Extra Settings
+
+- **Enable Quick Tags Toolbar**: Add a quick tags toolbar to the comment form for easier comment formatting.
+- **Toolbar Style**: Choose between a light or dark mode for the quick tags toolbar.
+
+## Customizer Options
+
+- **Comment Character Limit**: Control the maximum number of characters in a comment.
+- **Comment Text Format**: Define how comment text is formatted (wpautop, nl2br, or no formatting).
+- **Comment Form Layout**: Structure the comment form using placeholders.
+- **Quick Tags Toolbar**: Enable or disable a toolbar for comment formatting.
