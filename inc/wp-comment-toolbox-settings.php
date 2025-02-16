@@ -120,6 +120,25 @@ class WP_Comment_Toolbox_Settings {
             'panel' => 'wpct_comment_form_panel',
         ));
 
+        if(current_theme_supports('html5')) {
+            $wp_customize->add_setting('wpct_enabled_html5_validation', array(
+                'type' => 'option',
+                'default' => '0',
+                'sanitize_callback' => 'sanitize_text_field',
+            ));
+
+            $wp_customize->add_control('wpct_enabled_html5_validation', array(
+                'label' => __('Enabled HTML5 Validation', 'wpct'),
+                'section' => 'wpct_comment_form',
+                'type' => 'select',
+                'choices' => array(
+                    '0' => __('Disabled', 'wpct'),
+                    '1'  => __('Enabled', 'wpct'),
+                ),
+                'description' => __('Enable or disable HTML5 form validation for comment forms.', 'wpct'),
+            ));
+        }
+
         // Add setting for author placeholder
         $wp_customize->add_setting('wpct_author_placeholder', array(
             'type' => 'option',

@@ -2,7 +2,17 @@
 
 class WP_Comment_Toolbox_Comment_Form {
     public function __construct() {
+        add_filter('wp_footer', array($this, 'toggle_html5_comment_form_validation'));
         add_filter('comment_form_fields', array($this, 'reorder_comment_form_fields'));
+    }
+
+    public function toggle_html5_comment_form_validation() {
+        // Only remove novalidate if the validation is enabled
+        if (get_option('wpct_enabled_html5_validation', '0') === '1') {
+            if (comments_open() && current_theme_supports('html5')) {
+                echo '<script>document.getElementById("commentform").removeAttribute("novalidate");</script>' . PHP_EOL;
+            }
+        }
     }
 
     public function reorder_comment_form_fields($fields) {
