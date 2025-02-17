@@ -164,6 +164,34 @@ class WP_Comment_Toolbox_Settings {
             'sanitize_callback' => 'absint',
         ));
 
+        // Setting for comment_notes_before
+        $wp_customize->add_setting('wpct_comment_notes_before', array(
+            'type' => 'option',
+            'default' => '[default_msg]',
+            'sanitize_callback' => 'wp_kses_post',
+        ));
+
+        $wp_customize->add_control('wpct_comment_notes_before', array(
+            'label' => __('Comment Notes Before', 'wpct'),
+            'section' => 'wpct_comment_form',
+            'type' => 'textarea',
+            'description' => __('Enter custom content to be displayed before the comment form. Use <strong>[default_msg]</strong> to show the default text in comment_notes_before, or leave blank for no message at all. You may include HTML tags, but only safe HTML will be allowed.', 'wpct'),
+        ));
+
+        // Setting for comment_notes_after
+        $wp_customize->add_setting('wpct_comment_notes_after', array(
+            'type' => 'option',
+            'default' => '',
+            'sanitize_callback' => 'wp_kses_post', // Allow safe HTML
+        ));
+
+        $wp_customize->add_control('wpct_comment_notes_after', array(
+            'label' => __('Comment Notes After', 'wpct'),
+            'section' => 'wpct_comment_form',
+            'type' => 'textarea',
+            'description' => __('Enter custom content to be displayed after the comment form. You may include HTML tags, but only safe HTML will be allowed.', 'wpct'),
+        ));
+
         $wp_customize->add_control('wpct_comment_textarea_row_count', array(
             'label' => __('Comment Character Limit', 'wpct'),
             'section' => 'wpct_comment_form',

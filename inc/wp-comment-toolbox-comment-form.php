@@ -4,6 +4,7 @@ class WP_Comment_Toolbox_Comment_Form {
     public function __construct() {
         add_filter('wp_footer', array($this, 'toggle_html5_comment_form_validation'));
         add_filter('comment_form_fields', array($this, 'reorder_comment_form_fields'));
+        add_filter('comment_form_defaults', array($this, 'override_comment_form_defaults'));
     }
 
     public function toggle_html5_comment_form_validation() {
@@ -105,6 +106,32 @@ class WP_Comment_Toolbox_Comment_Form {
         }
         return $ordered_fields;
     }
+
+    public function override_comment_form_defaults($defaults) {
+        // Retrieve custom comment notes from the options
+        $comment_notes_after = get_option('wpct_comment_notes_after', '');
+        $comment_notes_before = get_option('wpct_comment_notes_before', '[default_msg]');
+
+        // Handle comment_notes_after
+        if (empty($comment_notes_after)) {
+            $defaults['wpct_comment_notes_after'] = ''; // Set to empty if no custom note is provided
+        } else {
+            $defaults['wpct_comment_notes_after'] = '<p class="comment-notes">' . $comment_notes_after . '</p>';
+        }
+
+        // Handle comment_notes_before
+        if (empty($comment_notes_before)) {
+            $defaults['comment_notes_before'] = ''; // Set to empty if no custom note is provided
+        } else {
+            // Only wrap comment_notes_before if [default_msg] is not present
+            if (!str_contains($comment_notes_before, '[default_msg]')) {
+                $defaults['comment_notes_before'] = '<p class="comment-notes">' . $comment_notes_before . '</p>';
+            }
+        }
+
+        return $defaults;
+    }
+
 }
 
 new WP_Comment_Toolbox_Comment_Form();
