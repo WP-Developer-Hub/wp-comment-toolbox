@@ -158,10 +158,24 @@ class WP_Comment_Toolbox_Settings {
             'description' => __('Select what the placeholder should be for the author input field. This will be displayed as a hint to users when filling in their name.', 'wpct'),
         ));
 
-        $wp_customize->add_setting('wpct_comment_textarea_row_count', array(
+        $wp_customize->add_setting('wpct_comment_textarea_height', array(
             'type' => 'option',
-            'default' => '8',
+            'default' => '150',
             'sanitize_callback' => 'absint',
+        ));
+
+        $wp_customize->add_control('wpct_comment_textarea_height', array(
+            'label' => __('Comment Form Textarea Height', 'wpct'),
+            'section' => 'wpct_comment_form',
+            'type' => 'number',
+            'input_attrs' => array(
+                'min' => '150',
+                'max' => '500',
+                'pattern' => '[0-9]*',
+                'placeholder' => '150',
+                'inputmode' => 'numeric',
+            ),
+            'description' => __('Set the height of the comment textarea (in pixels). Minimum is 150px, and maximum is 500px.', 'wpct'),
         ));
 
         // Setting for comment_notes_before
@@ -175,7 +189,7 @@ class WP_Comment_Toolbox_Settings {
             'label' => __('Comment Notes Before', 'wpct'),
             'section' => 'wpct_comment_form',
             'type' => 'textarea',
-            'description' => __('Enter custom content to be displayed before the comment form. Use <strong>[default_msg]</strong> to show the default text in comment_notes_before, or leave blank for no message at all. You may include HTML tags, but only safe HTML will be allowed.', 'wpct'),
+            'description' => __('Enter custom content to be displayed before the comment form. Use <strong>[default_msg]</strong> to show the default text in comment_notes_before, or leave blank for no message at all. HTML tags are allowed, but only safe HTML will be permitted. You can also use <strong>[required]</strong> to display the red asterisk.', 'wpct'),
         ));
 
         // Setting for comment_notes_after
@@ -189,21 +203,7 @@ class WP_Comment_Toolbox_Settings {
             'label' => __('Comment Notes After', 'wpct'),
             'section' => 'wpct_comment_form',
             'type' => 'textarea',
-            'description' => __('Enter custom content to be displayed after the comment form. You may include HTML tags, but only safe HTML will be allowed.', 'wpct'),
-        ));
-
-        $wp_customize->add_control('wpct_comment_textarea_row_count', array(
-            'label' => __('Comment Character Limit', 'wpct'),
-            'section' => 'wpct_comment_form',
-            'type' => 'number',
-            'input_attrs' => array(
-                'min' => '8',
-                'max' => '40',
-                'inputmode' => 'numeric',
-                'pattern' => '[0-9]*',
-                'placeholder' => '280',
-            ),
-            'description' => __('Set the maximum number of characters allowed in the comment text. This helps prevent overly long comments and spammy content.', 'wpct'),
+            'description' => __('Enter custom content to be displayed after the comment form. HTML tags are allowed, but only safe HTML will be permitted. You can use <strong>[required]</strong> to display the red asterisk.', 'wpct'),
         ));
 
         $wp_customize->add_setting('wpct_comment_form_layout', array(

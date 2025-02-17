@@ -2,9 +2,17 @@
 
 class WP_Comment_Toolbox_Comment_Form {
     public function __construct() {
+        add_filter('wp_head', array($this, 'wpct_add_custom_comment_css'));
         add_filter('wp_footer', array($this, 'toggle_html5_comment_form_validation'));
         add_filter('comment_form_fields', array($this, 'reorder_comment_form_fields'));
         add_filter('comment_form_defaults', array($this, 'override_comment_form_defaults'));
+    }
+
+    public function wpct_add_custom_comment_css() {
+        $height = get_option('wpct_comment_textarea_height', 150); // Default to 150px
+        ?>
+        <style>.comment-form textarea { height: <?php echo esc_attr($height); ?>px !important; }</style>
+        <?php
     }
 
     public function toggle_html5_comment_form_validation() {
@@ -17,7 +25,6 @@ class WP_Comment_Toolbox_Comment_Form {
     }
 
     public function reorder_comment_form_fields($fields) {
-        $max_length = esc_html(get_option('wpct_comment_message_limit', 280));
         $name_or_username = get_option('wpct_author_placeholder', 'full_name');
         $comment_textarea_row_count = esc_html(get_option('wpct_comment_textarea_row_count'), '8');
         $custom_cookies_msg = esc_html(get_option('wpct_comment_form_cookies_msg'), '');
@@ -63,7 +70,6 @@ class WP_Comment_Toolbox_Comment_Form {
         }
 
         if (isset($ordered_fields['comment'])) {
-            $ordered_fields['comment'] = preg_replace('/\brows="8"/', 'rows="' . $comment_textarea_row_count . '"', $ordered_fields['comment'], 1);
             $ordered_fields['comment'] = preg_replace('/\bmaxlength="65525"/', 'maxlength="' . $max_length . '"', $ordered_fields['comment'], 1);
         }
 
@@ -114,9 +120,10 @@ class WP_Comment_Toolbox_Comment_Form {
 
         // Handle comment_notes_after
         if (empty($comment_notes_after)) {
-            $defaults['wpct_comment_notes_after'] = ''; // Set to empty if no custom note is provided
+            $defaults['comment_notes_after'] = ''; // Set to empty if no custom note is provided
         } else {
-            $defaults['wpct_comment_notes_after'] = '<p class="comment-notes">' . $comment_notes_after . '</p>';
+            $comment_notes_after = str_replace('[required]', '<span class="required">*</span>', $comment_notes_after);
+            $defaults['comment_notes_after'] = '<p class="comment-notes">' . $comment_notes_after . '</p>';
         }
 
         // Handle comment_notes_before
@@ -125,13 +132,12 @@ class WP_Comment_Toolbox_Comment_Form {
         } else {
             // Only wrap comment_notes_before if [default_msg] is not present
             if (!str_contains($comment_notes_before, '[default_msg]')) {
+                $comment_notes_before = str_replace('[required]', '<span class="required">*</span>', $comment_notes_before);
                 $defaults['comment_notes_before'] = '<p class="comment-notes">' . $comment_notes_before . '</p>';
             }
         }
-
         return $defaults;
     }
-
 }
 
 new WP_Comment_Toolbox_Comment_Form();
