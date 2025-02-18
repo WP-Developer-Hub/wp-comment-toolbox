@@ -158,6 +158,20 @@ class WP_Comment_Toolbox_Settings {
             'description' => __('Select what the placeholder should be for the author input field. This will be displayed as a hint to users when filling in their name.', 'wpct'),
         ));
 
+        // Add setting for Comment textarea placeholder
+        $wp_customize->add_setting('wpct_comment_textarea_placeholder', array(
+            'type' => 'option',
+            'default' => '',
+            'sanitize_callback' => 'sanitize_text_field',
+        ));
+
+        $wp_customize->add_control('wpct_comment_textarea_placeholder', array(
+            'label'       => __('Comment Textarea Placeholder', 'wpct'),
+            'section'     => 'wpct_comment_form',
+            'type'        => 'text',
+            'description' => __('Set a placeholder for the comment form textarea if needed. Note: If the toolbar is enabled, using a placeholder may confuse users.', 'wpct'),
+        ));
+
         $wp_customize->add_setting('wpct_comment_textarea_height', array(
             'type' => 'option',
             'default' => '150',
@@ -240,8 +254,8 @@ class WP_Comment_Toolbox_Settings {
 
         $wp_customize->add_setting('wpct_toolbar_enabled', array(
             'type' => 'option',
-            'default' => '0',
-            'sanitize_callback' => 'sanitize_text_field',
+            'default' => 0,
+            'sanitize_callback' => 'absint',
         ));
 
         $wp_customize->add_control('wpct_toolbar_enabled', array(
@@ -249,8 +263,8 @@ class WP_Comment_Toolbox_Settings {
             'section' => 'wpct_extra',
             'type' => 'select',
             'choices' => array(
-                '0' => __('Disable', 'wpct'),
-                '1' => __('Enable', 'wpct'),
+                0 => __('Disable', 'wpct'),
+                1 => __('Enable', 'wpct'),
             ),
             'description' => __('Enabling this setting will add a quick tags toolbar to the comment form, allowing users to easily format their comments (e.g., bold, italics, etc.).', 'wpct'),
         ));
@@ -270,6 +284,23 @@ class WP_Comment_Toolbox_Settings {
                 'dark'  => __('Dark', 'wpct'),
             ),
             'description' => __('Choose the style of the quick tags toolbar. Light mode has a bright background, while dark mode uses a darker background for better visibility in low-light environments.', 'wpct'),
+        ));
+
+        $wp_customize->add_setting('wpct_character_count_enabled', array(
+            'type' => 'option',
+            'default' => 0,
+            'sanitize_callback' => 'absint',
+        ));
+
+        $wp_customize->add_control('wpct_character_count_enabled', array(
+            'label' => __('Enable Character Count', 'wpct'),
+            'section' => 'wpct_extra',
+            'type' => 'select',
+            'choices' => array(
+                0 => __('Disable', 'wpct'),
+                1 => __('Enable', 'wpct'),
+            ),
+            'description' => __('Enabling this setting will add a character counter below the comment textarea.', 'wpct'),
         ));
     }
 }
