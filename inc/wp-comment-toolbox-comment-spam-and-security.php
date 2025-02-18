@@ -9,18 +9,18 @@ class WP_Comment_Toolbox_Comment_Span_And_Security {
     }
 
     public function toggle_make_clickable() {
-        $disable_clickable = get_option('wpct_disable_clickable_links', '0');
+        $disable_clickable = get_option('wpct_disable_clickable_links', 0);
 
-        if ($disable_clickable === '1') {
+        if ($disable_clickable) {
             remove_filter('comment_text', 'make_clickable', 9);
         }
     }
 
     public function strip_comment_links($content) {
-        $disable_clickable = get_option('wpct_disable_clickable_links', '1');
+        $disable_clickable = get_option('wpct_disable_clickable_links', 0);
         $max_length = esc_html(get_option('wpct_comment_message_limit', 280));
 
-        if ($disable_clickable === '1') {
+        if ($disable_clickable) {
             $content = preg_replace_callback('/<a[^>]+href=["\']([^"\']+)["\'][^>]*>(.*?)<\/a>/is', function($matches) {
                 return filter_var($matches[2], FILTER_VALIDATE_URL) ? $matches[2] : $matches[1];
             }, $content);

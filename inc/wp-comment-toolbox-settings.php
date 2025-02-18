@@ -39,8 +39,8 @@ class WP_Comment_Toolbox_Settings {
 
         $wp_customize->add_setting('wpct_disable_clickable_links', array(
             'type' => 'option',
-            'default' => '1',
-            'sanitize_callback' => 'sanitize_text_field',
+            'default' => 1,
+            'sanitize_callback' => 'absint',
         ));
 
         $wp_customize->add_control('wpct_disable_clickable_links', array(
@@ -48,8 +48,8 @@ class WP_Comment_Toolbox_Settings {
             'section' => 'wpct_spam_and_security',
             'type' => 'select',
             'choices' => array(
-                '0' => __('Disable', 'wpct'),
-                '1' => __('Enable', 'wpct'),
+                0 => __('Disable', 'wpct'),
+                1 => __('Enable', 'wpct'),
             ),
             'description' => __('When enabled, links in comments will not be clickable. This can help reduce spam and unwanted external links.', 'wpct'),
         ));
@@ -123,8 +123,8 @@ class WP_Comment_Toolbox_Settings {
         if(current_theme_supports('html5')) {
             $wp_customize->add_setting('wpct_enabled_html5_validation', array(
                 'type' => 'option',
-                'default' => '0',
-                'sanitize_callback' => 'sanitize_text_field',
+                'default' => 0,
+                'sanitize_callback' => 'absint',
             ));
 
             $wp_customize->add_control('wpct_enabled_html5_validation', array(
@@ -132,8 +132,8 @@ class WP_Comment_Toolbox_Settings {
                 'section' => 'wpct_comment_form',
                 'type' => 'select',
                 'choices' => array(
-                    '0' => __('Disabled', 'wpct'),
-                    '1'  => __('Enabled', 'wpct'),
+                    0 => __('Disabled', 'wpct'),
+                    1  => __('Enabled', 'wpct'),
                 ),
                 'description' => __('Enable or disable HTML5 form validation for comment forms.', 'wpct'),
             ));
