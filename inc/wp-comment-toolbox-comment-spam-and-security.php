@@ -1,6 +1,6 @@
 <?php
 if (!defined('ABSPATH')) {
-    exit; // Exit if accessed directly
+    exit;
 }
 
 class WP_Comment_Toolbox_Comment_Span_And_Security {
@@ -11,7 +11,7 @@ class WP_Comment_Toolbox_Comment_Span_And_Security {
         add_filter('preprocess_comment', array($this, 'limit_comment_length'));
         add_filter('pre_comment_content', array($this, 'strip_comment_links'));
     }
-    
+
     public function toggle_make_clickable() {
         $disable_clickable = get_option('wpct_disable_clickable_links', 0);
         
@@ -19,17 +19,15 @@ class WP_Comment_Toolbox_Comment_Span_And_Security {
             remove_filter('comment_text', 'make_clickable', 9);
         }
     }
-    
+
     public function strip_comment_links($content) {
         $disable_clickable = get_option('wpct_disable_clickable_links', 0);
-        $max_length = esc_html(get_option('wpct_comment_message_limit', 280));
-        
         if ($disable_clickable) {
             $content = preg_replace_callback('/<a[^>]+href=["\']([^"\']+)["\'][^>]*>(.*?)<\/a>/is', function($matches) {
                                              return filter_var($matches[2], FILTER_VALIDATE_URL) ? $matches[2] : $matches[1];
                                              }, $content);
         }
-        return substr($content, 0, $max_length);
+        return $content;
     }
 
     public function limit_comment_length($comment) {
@@ -50,4 +48,3 @@ class WP_Comment_Toolbox_Comment_Span_And_Security {
 }
 
 new WP_Comment_Toolbox_Comment_Span_And_Security();
-
