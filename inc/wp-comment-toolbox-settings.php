@@ -1,4 +1,8 @@
 <?php
+if (!defined('ABSPATH')) {
+    exit; // Exit if accessed directly
+}
+
 class WP_Comment_Toolbox_Settings {
     public function __construct() {
         add_action('customize_register', array($this, 'customize_register'));
@@ -39,7 +43,7 @@ class WP_Comment_Toolbox_Settings {
 
         $wp_customize->add_setting('wpct_disable_clickable_links', array(
             'type' => 'option',
-            'default' => 1,
+            'default' => 0,
             'sanitize_callback' => 'absint',
         ));
 
@@ -52,6 +56,23 @@ class WP_Comment_Toolbox_Settings {
                 1 => __('Enable', 'wpct'),
             ),
             'description' => __('When enabled, links in comments will not be clickable. This can help reduce spam and unwanted external links.', 'wpct'),
+        ));
+
+        $wp_customize->add_setting('wpct_enable_spam_protect', array(
+            'type' => 'option',
+            'default' => 0,
+            'sanitize_callback' => 'absint',
+        ));
+
+        $wp_customize->add_control('wpct_enable_spam_protect', array(
+            'label' => __('Enabled spam protect', 'wpct'),
+            'section' => 'wpct_spam_and_security',
+            'type' => 'select',
+            'choices' => array(
+                0 => __('Disable', 'wpct'),
+                1 => __('Enable', 'wpct'),
+            ),
+            'description' => __('When Enabled your wordpress site will be protect from spam comment sent via bots.', 'wpct'),
         ));
 
         // Comment List Setting Section

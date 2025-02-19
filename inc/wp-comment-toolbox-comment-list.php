@@ -1,4 +1,7 @@
 <?php
+if (!defined('ABSPATH')) {
+    exit; // Exit if accessed directly
+}
 
 class WP_Comment_Toolbox_Comment_list {
     public function __construct() {
