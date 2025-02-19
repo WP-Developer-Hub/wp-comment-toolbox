@@ -12,7 +12,7 @@
            buttons: "em,strong",
          });
 
-         QTags.addButton("eg_underline", "u", "<u>", "</u>", "u");
+         QTags.addButton("eg_underline", "u", "<u>", "</u>", "u", "Underline tag");
        }
 
        // Function to update the status bar with remaining characters

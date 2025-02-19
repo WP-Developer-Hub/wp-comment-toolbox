@@ -27,10 +27,10 @@
 
 /* Styling buttons inside the toolbar */
 .wpct_toolbar .quicktags-toolbar input[type="button"] {
-    padding: 0;
-    width: 35px;
+    padding: 5px;
     height: 35px;
     display: flex;
+    min-width: 35px;
     font-size: large;
     align-items: center;
     justify-content: center;
