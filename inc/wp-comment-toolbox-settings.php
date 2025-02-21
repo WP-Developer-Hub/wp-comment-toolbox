@@ -3,328 +3,198 @@ if (!defined('ABSPATH')) {
     exit; // Exit if accessed directly
 }
 
-class WP_Comment_Toolbox_Settings {
+class WP_Comment_Toolbox_Settings_2_0 {
     public function __construct() {
-        add_action('customize_register', array($this, 'customize_register'));
+        add_action('admin_menu', [$this, 'add_comment_settings_submenu']);
+        add_action('admin_enqueue_scripts', [$this, 'enqueue_admin_styles']);
+        require_once(WP_COMMENT_TOOLBOX_PLUGIN_DIR . 'inc/wp-comment-toolbox-helper.php');
     }
 
-    public function customize_register($wp_customize) {
-        // Add a Panel for Comment Form Settings
-        $wp_customize->add_panel('wpct_comment_form_panel', array(
-            'title' => __('Comment Settings', 'wpct'),
-            'priority' => 200,
-        ));
+    public function enqueue_admin_styles($hook) {
+        // Only enqueue on the comment settings page
+        if ($hook === 'comments_page_wpct-comment-settings') {
+            wp_enqueue_style('wpct-style', WP_COMMENT_TOOLBOX_PLUGIN_URL . 'css/wp-comment-toolbox-admin.css');
+        }
+    }
 
-        // Spam and Security Settings Section
-        $wp_customize->add_section('wpct_spam_and_security', array(
-            'title' => __('Spam & Security', 'wpct'),
-            'panel' => 'wpct_comment_form_panel',
-        ));
+    public function add_comment_settings_submenu() {
+        add_submenu_page(
+                         'edit-comments.php',
+                         'Comment Settings',
+                         'Comment Settings',
+                         'manage_options',
+                         'wpct-comment-settings',
+                         [$this, 'comment_settings_page']
+                         );
+    }
 
-        $wp_customize->add_setting('wpct_comment_message_limit', array(
-            'type' => 'option',
-            'default' => '280',
-            'sanitize_callback' => 'absint',
-        ));
+    public function comment_settings_page() {
+        $active_tab = isset($_GET['tab']) ? $_GET['tab'] : 'spam_security';
 
-        $wp_customize->add_control('wpct_comment_message_limit', array(
-            'label' => __('Comment Character Limit', 'wpct'),
-            'section' => 'wpct_spam_and_security',
-            'type' => 'number',
-            'input_attrs' => array(
-                'min' => '240',
-                'max' => '480',
-                'inputmode' => 'numeric',
-                'pattern' => '[0-9]*',
-                'placeholder' => '280',
-            ),
-            'description' => __('Set the maximum number of characters allowed in the comment text. This helps prevent overly long comments and spammy content.', 'wpct'),
-        ));
-
-        $wp_customize->add_setting('wpct_disable_clickable_links', array(
-            'type' => 'option',
-            'default' => 0,
-            'sanitize_callback' => 'absint',
-        ));
-
-        $wp_customize->add_control('wpct_disable_clickable_links', array(
-            'label' => __('Disable clickable links', 'wpct'),
-            'section' => 'wpct_spam_and_security',
-            'type' => 'select',
-            'choices' => array(
-                0 => __('Disable', 'wpct'),
-                1 => __('Enable', 'wpct'),
-            ),
-            'description' => __('When enabled, links in comments will not be clickable. This can help reduce spam and unwanted external links.', 'wpct'),
-        ));
-
-        $wp_customize->add_setting('wpct_enable_spam_protect', array(
-            'type' => 'option',
-            'default' => 0,
-            'sanitize_callback' => 'absint',
-        ));
-
-        $wp_customize->add_control('wpct_enable_spam_protect', array(
-            'label' => __('Enabled spam protect', 'wpct'),
-            'section' => 'wpct_spam_and_security',
-            'type' => 'select',
-            'choices' => array(
-                0 => __('Disable', 'wpct'),
-                1 => __('Enable', 'wpct'),
-            ),
-            'description' => __('When Enabled your wordpress site will be protect from spam comment sent via bots.', 'wpct'),
-        ));
-
-        // Comment List Setting Section
-        $wp_customize->add_section('wpct_comment_list', array(
-            'title' => __('Comment List', 'wpct'),
-            'panel' => 'wpct_comment_form_panel',
-        ));
-
-        $wp_customize->add_setting('wpct_author_link_visibility', array(
-            'type' => 'option',
-            'default' => 'all',
-            'sanitize_callback' => 'sanitize_text_field',
-        ));
-
-        $wp_customize->add_control('wpct_author_link_visibility', array(
-            'label' => __('Author Link Visibility', 'wpct'),
-            'section' => 'wpct_comment_list',
-            'type' => 'select',
-            'choices' => array(
-                'none' => __('Disable for all users', 'wpct'),
-                'all' => __('Enable for all users', 'wpct'),
-                'registered' => __('Enable for registered users only', 'wpct'),
-            ),
-            'description' => __('Control who can have a clickable author link in comments. Users with the ability to edit posts will not be affected.', 'wpct'),
-        ));
-
-        $wp_customize->add_setting('wpct_author_link_type', array(
-            'type' => 'option',
-            'default' => 'external',
-            'sanitize_callback' => 'sanitize_text_field',
-        ));
-
-        $wp_customize->add_control('wpct_author_link_type', array(
-            'label' => __('Author Link Type', 'wpct'),
-            'section' => 'wpct_comment_list',
-            'type' => 'select',
-            'choices' => array(
-                'internal' => __('Author Page', 'wpct'),
-                'external' => __('Author Website', 'wpct'),
-            ),
-            'description' => __('Control whether the author link for users who can edit posts links to their website or the WordPress author page.', 'wpct'),
-        ));
-
-        // Add setting and control for wpautop and nl2br options
-        $wp_customize->add_setting('wpct_format_comment_text', array(
-            'type' => 'option',
-            'default' => 'auto',
-            'sanitize_callback' => 'sanitize_text_field',
-        ));
-
-        $wp_customize->add_control('wpct_format_comment_text', array(
-            'label' => __('Format Comment Text', 'wpct'),
-            'section' => 'wpct_comment_list',
-            'type' => 'select',
-            'choices' => array(
-                'auto' => __('Auto (wpautop)', 'wpct'),
-                'nl2br' => __('nl2br (Convert newlines to <br>)', 'wpct'),
-                'none' => __('None (No Formatting)', 'wpct'),
-            ),
-            'description' => __('Choose how to format the comment text: Auto applies wpautop (paragraph tags), nl2br converts newlines to <br> tags, and None means no formatting is applied.', 'wpct'),
-        ));
-
-        // Comment Form Setting Section
-        $wp_customize->add_section('wpct_comment_form', array(
-            'title' => __('Comment Form', 'wpct'),
-            'panel' => 'wpct_comment_form_panel',
-        ));
-
-        if(current_theme_supports('html5')) {
-            $wp_customize->add_setting('wpct_enabled_html5_validation', array(
-                'type' => 'option',
-                'default' => 0,
-                'sanitize_callback' => 'absint',
-            ));
-
-            $wp_customize->add_control('wpct_enabled_html5_validation', array(
-                'label' => __('Enabled HTML5 Validation', 'wpct'),
-                'section' => 'wpct_comment_form',
-                'type' => 'select',
-                'choices' => array(
-                    0 => __('Disabled', 'wpct'),
-                    1  => __('Enabled', 'wpct'),
-                ),
-                'description' => __('Enable or disable HTML5 form validation for comment forms.', 'wpct'),
-            ));
+        // Handle form submission
+        if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['wpct_settings_nonce']) && wp_verify_nonce($_POST['wpct_settings_nonce'], 'wpct_save_settings')) {
+            $this->save_settings();
         }
 
-        // Add setting for author placeholder
-        $wp_customize->add_setting('wpct_author_placeholder', array(
-            'type' => 'option',
-            'default' => 'full_name', // Default is full name
-            'sanitize_callback' => 'sanitize_text_field',
-        ));
+        echo '<div class="wrap">';
+        echo '<h1>Comment Settings</h1>';
 
-        $wp_customize->add_control('wpct_author_placeholder', array(
-            'label' => __('Author Placeholder', 'wpct'),
-            'section' => 'wpct_comment_form',
-            'type' => 'select',
-            'choices' => array(
-                'full_name' => __('Full Name', 'wpct'),
-                'username' => __('Username', 'wpct'),
-                'both' => __('Both', 'wpct'),
-            ),
-            'description' => __('Select what the placeholder should be for the author input field. This will be displayed as a hint to users when filling in their name.', 'wpct'),
-        ));
+        // Start the form tag to allow submission
+        echo '<form method="POST">';
 
-        // Add setting for Comment textarea placeholder
-        $wp_customize->add_setting('wpct_comment_textarea_placeholder', array(
-            'type' => 'option',
-            'default' => '',
-            'sanitize_callback' => 'sanitize_text_field',
-        ));
+        // Nonce field for security
+        wp_nonce_field('wpct_save_settings', 'wpct_settings_nonce');
 
-        $wp_customize->add_control('wpct_comment_textarea_placeholder', array(
-            'label'       => __('Comment Textarea Placeholder', 'wpct'),
-            'section'     => 'wpct_comment_form',
-            'type'        => 'text',
-            'description' => __('Set a placeholder for the comment form textarea if needed. Note: If the toolbar is enabled, using a placeholder may confuse users.', 'wpct'),
-        ));
+        // Display submit button before the settings
+        WPCT_Helper::wpct_submit_button(0);
 
-        $wp_customize->add_setting('wpct_comment_textarea_height', array(
-            'type' => 'option',
-            'default' => '150',
-            'sanitize_callback' => 'absint',
-        ));
+        // Tabs
+        echo '<h2 class="nav-tab-wrapper">';
+        $tabs = [
+            'spam_security' => 'Spam & Security',
+            'comment_list' => 'Comment List',
+            'comment_form' => 'Comment Form',
+            'extra' => 'Extra',
+            'admin' => 'Admin',
+        ];
 
-        $wp_customize->add_control('wpct_comment_textarea_height', array(
-            'label' => __('Comment Form Textarea Height', 'wpct'),
-            'section' => 'wpct_comment_form',
-            'type' => 'number',
-            'input_attrs' => array(
-                'min' => '150',
-                'max' => '500',
-                'pattern' => '[0-9]*',
-                'placeholder' => '150',
-                'inputmode' => 'numeric',
-            ),
-            'description' => __('Set the height of the comment textarea (in pixels). Minimum is 150px, and maximum is 500px.', 'wpct'),
-        ));
+        foreach ($tabs as $tab => $label) {
+            echo '<a href="?page=wpct-comment-settings&tab=' . $tab . '" class="nav-tab ' . ($active_tab === $tab ? 'nav-tab-active' : '') . '">' . $label . '</a>';
+        }
 
-        // Setting for comment_notes_before
-        $wp_customize->add_setting('wpct_comment_notes_before', array(
-            'type' => 'option',
-            'default' => '[default_msg]',
-            'sanitize_callback' => 'wp_kses_post',
-        ));
+        echo '</h2>';
+        echo '<table class="form-table">';
+        echo '<tbody>';
 
-        $wp_customize->add_control('wpct_comment_notes_before', array(
-            'label' => __('Comment Notes Before', 'wpct'),
-            'section' => 'wpct_comment_form',
-            'type' => 'textarea',
-            'description' => __('Enter custom content to be displayed before the comment form. Use <strong>[default_msg]</strong> to show the default text in comment_notes_before, or leave blank for no message at all. HTML tags are allowed, but only safe HTML will be permitted. You can also use <strong>[required]</strong> to display the red asterisk.', 'wpct'),
-        ));
+        // Tab content
+        $method = $active_tab . '_settings';
+        if (method_exists($this, $method)) {
+            $this->$method();
+        } else {
+            $this->extra_settings(); // Fallback to extra settings if no method found
+        }
 
-        // Setting for comment_notes_after
-        $wp_customize->add_setting('wpct_comment_notes_after', array(
-            'type' => 'option',
-            'default' => '',
-            'sanitize_callback' => 'wp_kses_post', // Allow safe HTML
-        ));
+        echo '</tbody>';
+        echo '</table>';
 
-        $wp_customize->add_control('wpct_comment_notes_after', array(
-            'label' => __('Comment Notes After', 'wpct'),
-            'section' => 'wpct_comment_form',
-            'type' => 'textarea',
-            'description' => __('Enter custom content to be displayed after the comment form. HTML tags are allowed, but only safe HTML will be permitted. You can use <strong>[required]</strong> to display the red asterisk.', 'wpct'),
-        ));
+        // Submit button after form fields
+        WPCT_Helper::wpct_submit_button(1);
 
-        $wp_customize->add_setting('wpct_comment_form_layout', array(
-            'type' => 'option',
-            'default' => '[author] [email] [url] [comment] [cookies]',
-            'sanitize_callback' => 'sanitize_textarea_field',
-        ));
+        echo '</form>'; // Close the form tag
+        echo '</div>';
+    }
 
-        $wp_customize->add_control('wpct_comment_form_layout', array(
-            'label' => __('Comment Form Layout', 'wpct'),
-            'section' => 'wpct_comment_form',
-            'type' => 'textarea',
-            'description' => __('Define the structure of the comment form using placeholders: <strong>[author]</strong>, <strong>[email]</strong>, <strong>[url]</strong>, <strong>[comment]</strong>, <strong>[cookies]</strong>.', 'wpct'),
-        ));
+    public function spam_security_settings() {
+        $this->wpct_load_setting('spam_security');
+    }
 
-        $wp_customize->add_setting('wpct_comment_form_cookies_msg', array(
-            'type' => 'option',
-            'default' => '[cookies_msg]',
-            'sanitize_callback' => 'sanitize_textarea_field',
-        ));
+    public function comment_list_settings() {
+        $this->wpct_load_setting('comment_list');
+    }
 
-        $wp_customize->add_control('wpct_comment_form_cookies_msg', array(
-            'label' => __('Comment Cookies Message', 'wpct'),
-            'section' => 'wpct_comment_form',
-            'type' => 'textarea',
-            'description' => __('Customize the cookies message for the comment form. <br> - Use <strong>[cookies_msg]</strong> to include the default cookies text.<br> - Use <strong>[privacy_policy_link]</strong> to insert a link to your privacy policy page.', 'wpct'),
-        ));
+    public function comment_form_settings() {
+        $this->wpct_load_setting('comment_form');
+    }
 
-        // Extra Settings Section
-        $wp_customize->add_section('wpct_extra', array(
-            'title' => __('Extra Settings', 'wpct'),
-            'panel' => 'wpct_comment_form_panel',
-        ));
+    public function extra_settings() {
+        $this->wpct_load_setting('extra');
+    }
 
-        $wp_customize->add_setting('wpct_toolbar_enabled', array(
-            'type' => 'option',
-            'default' => 0,
-            'sanitize_callback' => 'absint',
-        ));
+    public function admin_settings() {
+        $this->wpct_load_setting('admin');
+    }
 
-        $wp_customize->add_control('wpct_toolbar_enabled', array(
-            'label' => __('Enable Quick Tags Toolbar', 'wpct'),
-            'section' => 'wpct_extra',
-            'type' => 'select',
-            'choices' => array(
-                0 => __('Disable', 'wpct'),
-                1 => __('Enable', 'wpct'),
-            ),
-            'description' => __('Enabling this setting will add a quick tags toolbar to the comment form, allowing users to easily format their comments (e.g., bold, italics, etc.).', 'wpct'),
-        ));
+    public function save_settings() {
+        // Check nonce first for security
+        if (!isset($_POST['wpct_settings_nonce']) || !wp_verify_nonce($_POST['wpct_settings_nonce'], 'wpct_save_settings')) {
+            die('Permission denied');
+        }
 
-        $wp_customize->add_setting('wpct_toolbar_mode', array(
-            'type' => 'option',
-            'default' => 'light',
-            'sanitize_callback' => 'sanitize_text_field',
-        ));
+        // Get the active tab to determine which settings to save
+        $active_tab = isset($_GET['tab']) ? $_GET['tab'] : 'spam_security';
 
-        $wp_customize->add_control('wpct_toolbar_mode', array(
-            'label' => __('Toolbar Style', 'wpct'),
-            'section' => 'wpct_extra',
-            'type' => 'select',
-            'choices' => array(
-                'light' => __('Light', 'wpct'),
-                'dark'  => __('Dark', 'wpct'),
-            ),
-            'description' => __('Choose the style of the quick tags toolbar. Light mode has a bright background, while dark mode uses a darker background for better visibility in low-light environments.', 'wpct'),
-        ));
+        // Save settings for each tab separately
+        switch ($active_tab) {
+            case 'spam_security':
+                $this->save_spam_security_settings();
+                break;
+            case 'comment_list':
+                $this->save_comment_list_settings();
+                break;
+            case 'comment_form':
+                $this->save_comment_form_settings();
+                break;
+            case 'extra':
+                $this->save_extra_settings();
+                break;
+            case 'admin':
+                $this->save_admin_settings();
+                break;
+            default:
+                $this->save_spam_security_settings(); // Fallback to 'spam_security'
+                break;
+        }
 
-        $wp_customize->add_setting('wpct_character_count_enabled', array(
-            'type' => 'option',
-            'default' => 0,
-            'sanitize_callback' => 'absint',
-        ));
+        // Optionally, you can display a success message
+        echo '<div class="updated"><p>Settings saved successfully.</p></div>';
+    }
 
-        $wp_customize->add_control('wpct_character_count_enabled', array(
-            'label' => __('Enable Character Count', 'wpct'),
-            'section' => 'wpct_extra',
-            'type' => 'select',
-            'choices' => array(
-                0 => __('Disable', 'wpct'),
-                1 => __('Enable', 'wpct'),
-            ),
-            'description' => __('Enabling this setting will add a character counter below the comment textarea.', 'wpct'),
-        ));
+    // Save settings specific to Spam & Security tab
+    private function save_spam_security_settings() {
+        update_option('wpct_comment_message_limit', $_POST['wpct_comment_message_limit']);
+        update_option('wpct_disable_clickable_links', $_POST['wpct_disable_clickable_links']);
+        update_option('wpct_enable_wp_kses_post', $_POST['wpct_enable_wp_kses_post']);
+        update_option('wpct_enable_spam_protect', $_POST['wpct_enable_spam_protect']);
+    }
+
+    // Save settings specific to Comment List tab
+    private function save_comment_list_settings() {
+        update_option('wpct_author_link_visibility', $_POST['wpct_author_link_visibility']);
+        update_option('wpct_author_link_type', $_POST['wpct_author_link_type']);
+        update_option('wpct_format_comment_text', $_POST['wpct_format_comment_text']);
+    }
+
+    // Save settings specific to Comment Form tab
+    private function save_comment_form_settings() {
+        update_option('wpct_enabled_html5_validation', $_POST['wpct_enabled_html5_validation']);
+        update_option('wpct_author_placeholder', $_POST['wpct_author_placeholder']);
+        update_option('wpct_comment_textarea_placeholder', $_POST['wpct_comment_textarea_placeholder']);
+        update_option('wpct_comment_textarea_height', $_POST['wpct_comment_textarea_height']);
+        update_option('wpct_comment_notes_before', $_POST['wpct_comment_notes_before']);
+        update_option('wpct_comment_notes_after', $_POST['wpct_comment_notes_after']);
+        update_option('wpct_comment_form_layout', $_POST['wpct_comment_form_layout']);
+        update_option('wpct_comment_form_cookies_msg', $_POST['wpct_comment_form_cookies_msg']);
+    }
+
+    // Save settings specific to Extra tab
+    private function save_extra_settings() {
+        update_option('wpct_toolbar_enabled', $_POST['wpct_toolbar_enabled']);
+        update_option('wpct_toolbar_mode', $_POST['wpct_toolbar_mode']);
+        update_option('wpct_character_count_enabled', $_POST['wpct_character_count_enabled']);
+    }
+
+    // Save settings specific to Admin tab
+    private function save_admin_settings() {
+        update_option('wpct_scam_filter_enabled', $_POST['wpct_scam_filter_enabled']);
+        update_option('wpct_disable_comment_formatting', $_POST['wpct_disable_comment_formatting']);
+    }
+
+    private function wpct_load_setting($name) {
+        // Sanitize the input to ensure it's safe to use in the filename
+        $name = sanitize_text_field($name);
+        
+        // Construct the filename dynamically
+        $file = WP_COMMENT_TOOLBOX_PLUGIN_DIR . 'inc/settings/wpct_' . $name . '_settings.php';
+        
+        // Check if the file exists before including it
+        if (file_exists($file)) {
+            require_once($file); // Include the settings file dynamically
+        } else {
+            // Handle the case when the file doesn't exist
+            // Optionally, show an error or log the issue
+            echo 'Settings file not found: ' . $file;
+        }
     }
 }
 
-// Initialize the class
-new WP_Comment_Toolbox_Settings();
+new WP_Comment_Toolbox_Settings_2_0();

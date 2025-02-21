@@ -1,0 +1,120 @@
+.wpct_settings_toolbar {
+    padding: 5px;
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+}
+
+.wpct-control {
+  gap: 10px;
+  display: flex;
+  position: relative;
+  margin-block: 10px;
+  flex-direction: column;
+  align-items: flex-start;
+  justify-content: center;
+}
+
+/* Hidden Checkbox */
+.wpct-toggle-control input[type="checkbox"] {
+  display: none;
+}
+
+/* Input Container */
+.wpct-control .wpct-control-inner {
+  gap: 10px;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  justify-content: space-between;
+}
+
+.wpct-control .wpct-toggle-control {
+  flex-direction: row !important;
+}
+
+.form-table .wpct-control-info {
+  width: 100%;
+  display: flex;
+  position: relative;
+  flex-direction: column;
+  justify-content: center;
+  align-items: flex-start;
+}
+
+.wpct-control .wpct-control-inner .wpct-input {
+  height: 30px;
+  max-width: 100%;
+}
+
+.wpct-control .wpct-control-inner textarea.wpct-input {
+  height: auto;
+}
+
+/* Switch Container */
+/* Checkbox Indicator */
+.wpct-control .wpct-toggle-switch {
+  width: 50px;
+  height: 22px;
+  padding: 2px;
+  cursor: pointer;
+  position: relative;
+  border-radius: 30px;
+  display: inline-block;
+  border: 1px groove #a8a8a5;
+  background-color: #a8a8a5;
+  transition: background-color 100ms ease, border 100ms ease;
+}
+
+/* Checkbox Head (using ::before pseudo-element) */
+.wpct-control .wpct-toggle-switch::before {
+  content: "";
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  position: absolute;
+  background-color: #fff;
+  transition: transform 100ms ease;
+  box-shadow: 0 0 1px 1px rgba(0, 0, 0, 0.1);
+}
+
+/* Checked State */
+.wpct-control input[type="checkbox"]:checked+.wpct-toggle-switch {
+  color: white;
+  border-color: #0073aa;
+  background-color: #0073aa;
+}
+
+.wpct-control input[type="checkbox"]:checked+.wpct-toggle-switch::before {
+  transform: translateX(26px);
+}
+
+/* Focus State */
+.wpct-control input[type="checkbox"]:hover+.wpct-toggle-switch {
+  border-color: #135e96;
+  background-color: #135e96;
+}
+
+/* Hover State */
+.wpct-control input[type="checkbox"]:hover+.wpct-toggle-switch {
+  border-color: #8a8a8a;
+  background-color: #8a8a8a;
+}
+
+.wpct-control input[type="checkbox"]:checked:hover+.wpct-toggle-switch {
+  border-color: #135e96;
+  background-color: #135e96;
+}
+
+/* Focus and Hover State */
+.wpct-control input[type="checkbox"]:focus:hover+.wpct-toggle-switch {
+  border-color: #005a87;
+  background-color: #005a87;
+}
+
+/* Active State */
+.wpct-control input[type="checkbox"]:active+.wpct-toggle-switch {
+  border-color: #005a87;
+  background-color: #005a87;
+}
