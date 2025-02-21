@@ -8,11 +8,11 @@
        // Function to initialize Quicktags toolbar
        $.fn.initializeQuicktags = function() {
          quicktags({
-           id: "comment",
-           buttons: "em,strong",
+            id: "comment",
+            buttons: "em,strong",
          });
 
-         QTags.addButton("eg_underline", "u", "<u>", "</u>", "u", "Underline tag");
+         QTags.addButton("eg_underline", "u", "<u>", "</u>", "u", "Underline Text");
        }
 
        // Function to update the status bar with remaining characters
