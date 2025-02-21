@@ -5,10 +5,10 @@ if (!defined('ABSPATH')) {
 
 class WP_Comment_Toolbox_Comment_Form {
     public function __construct() {
-        add_filter('wp_head', array($this, 'wpct_add_custom_comment_css'));
-        add_filter('wp_footer', array($this, 'toggle_html5_comment_form_validation'));
-        add_filter('comment_form_fields', array($this, 'reorder_comment_form_fields'));
-        add_filter('comment_form_defaults', array($this, 'override_comment_form_defaults'));
+        add_filter('wp_head', [$this, 'wpct_add_custom_comment_css']);
+        add_filter('wp_footer', [$this, 'toggle_html5_comment_form_validation']);
+        add_filter('comment_form_fields', [$this, 'reorder_comment_form_fields']);
+        add_filter('comment_form_defaults', [$this, 'override_comment_form_defaults']);
     }
 
     public function wpct_add_custom_comment_css() {

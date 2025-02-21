@@ -12,7 +12,7 @@ class WP_Comment_Toolbox_Admin {
         add_filter('comments_clauses', [$this, 'filter_comments_by_scam_query'], 10, 2);
 
         // Add the comment text filter based on the option
-        add_filter('comment_text', [$this, 'filter_comment_text']);
+        add_filter('comment_text', [$this, 'filter_comment_text'], PHP_MAX_INT);
     }
 
     // Check if comment status exists function (since it's not built-in)
@@ -92,9 +92,13 @@ class WP_Comment_Toolbox_Admin {
 
     // Filter comment text based on wpct_disable_comment_formatting option
     public function filter_comment_text($comment_text) {
-        // Check if comment formatting is disabled and we're in the admin area
-        if (is_admin() && '1' === get_option('wpct_disable_comment_formatting')) {
-            // Apply wp_kses_post to sanitize the comment text for non-admin users
+        if (is_admin() && get_option('wpct_disable_comment_formatting')) {
+            // Preserve the actual URLs but strip the anchor tags
+            $comment_text = preg_replace_callback('/<a[^>]+href=["\']([^"\']+)["\'][^>]*>(.*?)<\/a>/is', function($matches) {
+                return filter_var($matches[1], FILTER_VALIDATE_URL) ? $matches[1] : $matches[2];
+            }, $comment_text);
+
+            // Strip all remaining HTML tags
             $comment_text = wp_strip_all_tags($comment_text);
         }
         return $comment_text;

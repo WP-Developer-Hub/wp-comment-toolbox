@@ -5,8 +5,9 @@ if (!defined('ABSPATH')) {
 
 class WP_Comment_Toolbox_Comment_list {
     public function __construct() {
-        add_action('init', array($this, 'initialize_comment_filters'));
-        add_action('wp_loaded', array($this, 'apply_comment_format_filters'), 20); // Apply filters after WP initialization
+        add_action('init', [$this, 'initialize_comment_filters']);
+        add_action('wp_loaded', [$this, 'apply_comment_format_filters'], 20);
+        add_action('comment_text', [$this, 'auto_link_twitter_mentions'], 99);
     }
 
     public function initialize_comment_filters() {
@@ -73,6 +74,20 @@ class WP_Comment_Toolbox_Comment_list {
             }
         }
         return $return;
+    }
+
+    // Function to automatically link Twitter mentions in comments
+    public function auto_link_twitter_mentions($content) {
+        if (get_option('wpct_twitter_mentions_linking', 0)) {
+            return preg_replace_callback(
+                '/(?<!\S)@([0-9a-zA-Z_]+)/',
+                function ($matches) {
+                    return '<a href="https://twitter.com/' . esc_attr($matches[1]) . '" target="_blank" rel="nofollow">@' . esc_html($matches[1]) . '</a>';
+                },
+                $content
+            );
+        }
+        return $content;
     }
 }
 

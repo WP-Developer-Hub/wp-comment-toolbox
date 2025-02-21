@@ -152,6 +152,7 @@ class WP_Comment_Toolbox_Settings_2_0 {
         update_option('wpct_author_link_visibility', $_POST['wpct_author_link_visibility']);
         update_option('wpct_author_link_type', $_POST['wpct_author_link_type']);
         update_option('wpct_format_comment_text', $_POST['wpct_format_comment_text']);
+        update_option('wpct_twitter_mentions_linking', $_POST['wpct_twitter_mentions_linking']);
     }
 
     // Save settings specific to Comment Form tab

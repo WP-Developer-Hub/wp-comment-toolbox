@@ -3,33 +3,29 @@ if (!defined('ABSPATH')) {
     exit;
 }
 
-class WP_Comment_Toolbox_Comment_Span_And_Security {
+class WP_Comment_Toolbox_Span_And_Security {
     public function __construct() {
-        add_action('init', array($this, 'toggle_make_clickable'));
-        add_action('check_comment_flood', array($this, 'check_referrer'), 5);
-        add_filter('preprocess_comment', array($this, 'limit_comment_length'));
-        add_filter('comment_text', array($this, 'strip_bad_html_form_comment'));
-        add_filter('pre_comment_content', array($this, 'strip_bad_html_form_comment'));
+        add_action('init', [$this, 'toggle_make_clickable']);
+        add_action('check_comment_flood', [$this, 'check_referrer'], 5);
+        add_filter('preprocess_comment', [$this, 'limit_comment_length']);
+        add_filter('comment_text', [$this, 'strip_bad_html_form_comment'], 0);
+        add_filter('pre_comment_content', [$this, 'strip_bad_html_form_comment'], 0);
     }
 
     public function toggle_make_clickable() {
-        $disable_clickable = get_option('wpct_disable_clickable_links', 0);
-        
-        if ($disable_clickable) {
+        if (get_option('wpct_disable_clickable_links', 0)) {
             remove_filter('comment_text', 'make_clickable', 9);
         }
     }
 
     public function strip_bad_html_form_comment($content) {
-        $disable_clickable = get_option('wpct_disable_clickable_links', 0);
-        $wpct_enable_wp_kses_post = get_option('wpct_enable_wp_kses_post', 0);
-        if ($disable_clickable) {
+        if (get_option('wpct_disable_clickable_links', 0)) {
             $content = preg_replace_callback('/<a[^>]+href=["\']([^"\']+)["\'][^>]*>(.*?)<\/a>/is', function($matches) {
-                                             return filter_var($matches[2], FILTER_VALIDATE_URL) ? $matches[2] : $matches[1];
-                                             }, $content);
+                return filter_var($matches[1], FILTER_VALIDATE_URL) ? $matches[1] : $matches[2];
+            }, $content);
         }
 
-        if($wpct_enable_wp_kses_post){
+        if(get_option('wpct_enable_wp_kses_post', 0)){
             $content = wp_kses_post($content);
         }
 
@@ -53,4 +49,4 @@ class WP_Comment_Toolbox_Comment_Span_And_Security {
     }
 }
 
-new WP_Comment_Toolbox_Comment_Span_And_Security();
+new WP_Comment_Toolbox_Span_And_Security();

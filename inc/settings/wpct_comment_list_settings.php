@@ -37,3 +37,15 @@ WPCT_Helper::wpct_select_box(
         'none' => __('None (No Formatting)', 'wpct'),
     )
 );
+
+// Select box for enabling/disabling auto-linking of Twitter mentions
+WPCT_Helper::wpct_select_box(
+    'wpct_twitter_mentions_linking',
+    __('Enable Twitter Mentions Linking', 'wpct'),
+    0,
+    __('Enable or disable auto-linking of Twitter mentions (@username) in comment text.', 'wpct'),
+    array(
+        0 => __('Disabled', 'wpct'),
+        1 => __('Enabled', 'wpct'),
+    )
+);
