@@ -11,7 +11,6 @@ class WP_Comment_Toolbox_Comment_list {
     }
 
     public function initialize_comment_filters() {
-        // Initial filter application
         $this->apply_comment_format_filters();
     }
 
@@ -22,14 +21,14 @@ class WP_Comment_Toolbox_Comment_list {
         // Apply filters based on the selected format
         switch ($comment_format) {
             case 'nl2br':
-                // Apply nl2br formatting
-                remove_filter('comment_text', 'wpautop', 30); // Remove wpautop
-                add_filter('comment_text', 'nl2br', 30); // Apply nl2br
+                // Swap wpautop for nl2br formatting
+                remove_filter('comment_text', 'wpautop', 30);
+                add_filter('comment_text', 'nl2br', 30);
                 break;
             case 'none':
                 // Remove both wpautop and nl2br
-                remove_filter('comment_text', 'wpautop', 30); // Remove wpautop
-                remove_filter('comment_text', 'nl2br', 30); // Remove nl2br
+                remove_filter('comment_text', 'wpautop', 30);
+                remove_filter('comment_text', 'nl2br', 30);
                 break;
             case 'auto':
             default:

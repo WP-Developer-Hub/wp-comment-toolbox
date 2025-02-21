@@ -8,8 +8,8 @@ class WP_Comment_Toolbox_Span_And_Security {
         add_action('init', [$this, 'toggle_make_clickable']);
         add_action('check_comment_flood', [$this, 'check_referrer'], 5);
         add_filter('preprocess_comment', [$this, 'limit_comment_length']);
-        add_filter('comment_text', [$this, 'strip_bad_html_form_comment'], 0);
-        add_filter('pre_comment_content', [$this, 'strip_bad_html_form_comment'], 0);
+        add_filter('comment_text', [$this, 'strip_bad_html_form_comment'], 9);
+        add_filter('pre_comment_content', [$this, 'strip_bad_html_form_comment'], 9);
     }
 
     public function toggle_make_clickable() {
