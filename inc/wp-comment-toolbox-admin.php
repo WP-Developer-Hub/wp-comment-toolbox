@@ -12,7 +12,7 @@ class WP_Comment_Toolbox_Admin {
         add_filter('comments_clauses', [$this, 'filter_comments_by_scam_query'], 10, 2);
 
         // Add the comment text filter based on the option
-        add_filter('comment_text', [$this, 'filter_comment_text'], PHP_MAX_INT);
+        add_filter('comment_text', [$this, 'filter_comment_text'], PHP_INT_MAX);
     }
 
     // Check if comment status exists function (since it's not built-in)
