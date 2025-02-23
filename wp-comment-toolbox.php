@@ -61,19 +61,19 @@ class WP_Comment_Toolbox {
 
     public function add_custom_toolbar_script() {
         // Check if comments are open and toolbar is enabled
-        if (comments_open() && (get_option('wpct_toolbar_enabled', 'disable') || get_option('wpct_character_count_enabled', 'disable'))) {
+        if (is_singular() && comments_open() && (get_option('wpct_toolbar_enabled', 'disable') || get_option('wpct_character_count_enabled', 'disable'))) {
             wp_enqueue_script('quicktags');
             wp_enqueue_script('wpct-script', WP_COMMENT_TOOLBOX_PLUGIN_URL . 'js/wp-comment-toolbox.js', array('jquery', 'quicktags'), null, true);
             wp_enqueue_style('wpct-style', WP_COMMENT_TOOLBOX_PLUGIN_URL . 'css/wp-comment-toolbox.css');
         }
 
         // Check if the character count feature is enabled
-        if (comments_open() && get_option('wpct_toolbar_enabled', 'disable')) {
+        if (is_singular() && comments_open() && get_option('wpct_toolbar_enabled', 'disable')) {
             // Add inline script to initialize Quicktags
             wp_add_inline_script('wpct-script', '(function($){$(function(){$.fn.initializeQuicktags();});})(jQuery);');
         }
 
-        if (comments_open() && get_option('wpct_character_count_enabled', 'disable')) {
+        if (is_singular() && comments_open() && get_option('wpct_character_count_enabled', 'disable')) {
             // Add inline script to initialize the status bar for character count
             wp_add_inline_script('wpct-script', '(function($){$(function(){$.fn.initializeStatusBar();});})(jQuery);');
         }
