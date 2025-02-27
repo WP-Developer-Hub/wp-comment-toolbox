@@ -6,11 +6,12 @@ if (!defined('ABSPATH')) {
 class WP_Comment_Toolbox_Span_And_Security {
     public function __construct() {
         add_action('init', [$this, 'toggle_make_clickable']);
-        add_action('comment_form', [$this, 'add_wp_nonce_field']);
+        add_action('pre_comment_approved', [$this, 'check_honeypot']);
         add_action('check_comment_flood', [$this, 'check_referrer'], 5);
         add_filter('preprocess_comment', [$this, 'limit_comment_length']);
         add_action('pre_comment_on_post', [$this, 'verify_wp_nonce_field']);
         add_filter('comment_text', [$this, 'strip_bad_html_form_comment'], 9);
+        add_action('comment_form', [$this, 'add_wp_nonce_and_huonoy_pot_field']);
         add_filter('pre_comment_content', [$this, 'strip_bad_html_form_comment'], 9);
     }
 
@@ -20,9 +21,20 @@ class WP_Comment_Toolbox_Span_And_Security {
         }
     }
 
-    public function add_wp_nonce_field() {
+    public function add_wp_nonce_and_huonoy_pot_field() {
         if (get_option('wpct_enable_spam_protect', 0)) {
+            $textarea_name = uniqid('wpct_comment_honeypot_');
+
             wp_nonce_field('comment_nonce', 'wpct_comment_nonce');
+
+            // Set a cookie for the textarea name (expires in 1 hour)
+            setcookie('wpct_comment_honeypot_name', $textarea_name, time() + 3600, COOKIEPATH, COOKIE_DOMAIN);
+
+            // Output the hidden textarea field
+            echo '<p style="display:none">';
+            echo '<textarea name="' . esc_attr($textarea_name) . '" cols="100%" rows="10"></textarea>';
+            echo '<label for="' . esc_attr($textarea_name) . '">' . esc_html__('If you are a human, do not fill in this field.', 'wpct') . '</label>';
+            echo '</p>';
         }
     }
 
@@ -111,6 +123,31 @@ class WP_Comment_Toolbox_Span_And_Security {
             }
         }
     }
-}
 
+    public function check_honeypot($approved) {
+        // Retrieve the textarea name from the cookie
+        if (isset($_COOKIE['wpct_comment_honeypot_name'])) {
+            // Sanitize the cookie value to prevent potential issues
+            $textarea_name = sanitize_text_field($_COOKIE['wpct_comment_honeypot_name']); // Get the value of textarea name from the cookie
+            
+            // Get the submit button name from settings
+            $submit_name = sanitize_text_field(get_option('wpct_submit_button_name'));
+            
+            // Check if the hidden textarea field is filled out
+            $textarea_filled_out = !empty($_POST[$textarea_name]);
+            
+            // Check if the submit button name is missing
+            $submit_name_missing = !empty($submit_name) && empty($_POST[$submit_name]);
+            
+            if ($textarea_filled_out || $submit_name_missing) {
+                // Mark as spam if the honeypot field is filled or the submit button is missing
+                $approved = 'spam';
+            }
+
+            // Expire the cookie after the check is done
+            setcookie('wpct_comment_honeypot_name', '', time() - 3600, COOKIEPATH, COOKIE_DOMAIN); // Expire the cookie by setting a past time
+        }
+        return $approved;
+    }
+}
 new WP_Comment_Toolbox_Span_And_Security();

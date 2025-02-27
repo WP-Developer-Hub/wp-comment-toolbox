@@ -49,3 +49,14 @@ WPCT_Helper::wpct_select_box(
     )
 );
 
+// Submit Button Field Name
+WPCT_Helper::wpct_input_field(
+    'wpct_submit_button_name',
+    __( 'Submit Button Name', 'wpct' ),
+    'text',
+    'submit',
+    __( 'This name will be used when performing the honeypot check. Set the name for the submit button.', 'wpct' ),
+    array( 'placeholder' => 'Submit Button Name Go Here' )
+);
+
+

@@ -145,6 +145,7 @@ class WP_Comment_Toolbox_Settings_2_0 {
         update_option('wpct_disable_clickable_links', $_POST['wpct_disable_clickable_links']);
         update_option('wpct_enable_wp_kses_post', $_POST['wpct_enable_wp_kses_post']);
         update_option('wpct_enable_spam_protect', $_POST['wpct_enable_spam_protect']);
+        update_option('wpct_submit_button_name', $_POST['wpct_submit_button_name']);
     }
 
     // Save settings specific to Comment List tab
