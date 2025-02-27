@@ -42,7 +42,7 @@ WPCT_Helper::wpct_select_box(
     'wpct_enable_spam_protect',
     __( 'Enable Spam Protection', 'wpct' ),
     0,
-    __( 'When enabled, your WordPress site will be protected from spam comments sent via bots. It checks the referrer header to ensure that the comment is coming from a valid source. If spam protection is enabled and the referrer is missing, comments will be blocked, preventing bot submissions.', 'wpct' ),
+    __( 'When enabled, your WordPress site will be protected from spam comments sent via bots. It checks the referrer header to ensure that the comment is coming from a valid source. If spam protection is enabled and the referrer is missing, comments will be blocked, preventing bot submissions. Additionally, a honeypot mechanism will be added to the comment form. This includes a hidden textarea field that bots are likely to fill out, and if detected, the comment will be marked as spam. You can also customize the submit button name used for honeypot checks.', 'wpct' ),
     array(
         0 => __( 'No', 'wpct' ),
         1 => __( 'Yes', 'wpct' ),
@@ -55,8 +55,7 @@ WPCT_Helper::wpct_input_field(
     __( 'Submit Button Name', 'wpct' ),
     'text',
     'submit',
-    __( 'This name will be used when performing the honeypot check. Set the name for the submit button.', 'wpct' ),
+    __( 'This name will be used when performing the honeypot check. Set the name for the submit button. If your theme changes the default name for the submit button, you can inspect the HTML of the comment form or consult your theme\'s documentation to find the appropriate name attribute for the submit button. Typically, it is something like "submit" or "comment-submit".', 'wpct' ),
     array( 'placeholder' => 'Submit Button Name Go Here' )
 );
-
 
