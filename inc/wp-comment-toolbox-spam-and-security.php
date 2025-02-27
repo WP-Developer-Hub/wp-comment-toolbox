@@ -6,8 +6,10 @@ if (!defined('ABSPATH')) {
 class WP_Comment_Toolbox_Span_And_Security {
     public function __construct() {
         add_action('init', [$this, 'toggle_make_clickable']);
+        add_action('comment_form', [$this, 'add_wp_nonce_field']);
         add_action('check_comment_flood', [$this, 'check_referrer'], 5);
         add_filter('preprocess_comment', [$this, 'limit_comment_length']);
+        add_action('pre_comment_on_post', [$this, 'verify_wp_nonce_field']);
         add_filter('comment_text', [$this, 'strip_bad_html_form_comment'], 9);
         add_filter('pre_comment_content', [$this, 'strip_bad_html_form_comment'], 9);
     }
@@ -15,6 +17,28 @@ class WP_Comment_Toolbox_Span_And_Security {
     public function toggle_make_clickable() {
         if (get_option('wpct_disable_clickable_links', 0)) {
             remove_filter('comment_text', 'make_clickable', 9);
+        }
+    }
+
+    public function add_wp_nonce_field() {
+        if (get_option('wpct_enable_spam_protect', 0)) {
+            wp_nonce_field('comment_nonce', 'wpct_comment_nonce');
+        }
+    }
+
+    public function verify_wp_nonce_field() {
+        if (get_option('wpct_enable_spam_protect', 0)) {
+            if (!isset($_SERVER['HTTP_REFERER']) || $_SERVER['HTTP_REFERER'] == "") {
+                if (!isset($_POST['wpct_comment_nonce']) || !wp_verify_nonce($_POST['wpct_comment_nonce'], 'comment_nonce')) {
+                    // Log the error
+                    error_log('WPCT Nonce Verification Failed: ' . print_r($_POST, true));
+
+                    // Send response
+                    header('HTTP/1.1 403 Forbidden');
+                    header('Content-Type: text/plain; charset=UTF-8');
+                    die(__('Error: Nonce verification failed.', 'wpct'));
+                }
+            }
         }
     }
 
