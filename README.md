@@ -52,3 +52,9 @@ This plugin provides customization options for comment form settings in WordPres
 - **Comment Text Format**: Define how comment text is formatted (`wpautop`, `nl2br`, or no formatting).
 - **Comment Form Layout**: Structure the comment form using placeholders.
 - **Quick Tags Toolbar**: Enable or disable a toolbar for comment formatting.
+
+
+
+
+## Credit
+- Elazar for the WP Spam Honeypot idea: https://github.com/elazar/wp-spam-honeypot
