@@ -9,6 +9,11 @@ This plugin provides customization options for comment form settings in WordPres
 - **Comment List**: Customize the visibility and format of author links, including the link type (internal/external) and comment text formatting.
 - **Comment Form Layout**: Define the structure of the comment form using placeholders.
 - **Quick Tags Toolbar**: Enable a quick tags toolbar in the comment form to make it easier for users to format their comments.
+- **Inline Tooltips**: Get brief explanations for certain options in settings for better understanding.
+- **Advanced Spam Protection**: Enhanced spam measures using `wp-comments-post.php` restrictions, and support for Honeypot-style techniques.
+- **Preview Option for Comment Layout**: See live previews of comment form layout changes in the customizer.
+- **Custom CSS/JS**: Add custom CSS or JavaScript to tweak the appearance and behavior of the comment form.
+- **Multilingual Support**: Fully compatible with translation tools to reach a wider audience.
 
 ## Installation
 
@@ -45,6 +50,7 @@ This plugin provides customization options for comment form settings in WordPres
 - **Enable Quick Tags Toolbar**: Add a quick tags toolbar to the comment form for easier formatting with Bold, Italic, and Underline text.
 - **Toolbar Style**: Choose between a light or dark mode for the quick tags toolbar.
 - **Enable Character Count**: Add a Twitter-style character counter below the comment textarea, showing the number of characters remaining.
+- **CSS/JS Customization**: Add custom CSS or JavaScript to further personalize the comment form’s appearance and behavior.
 
 ## Customizer Options
 
@@ -52,9 +58,8 @@ This plugin provides customization options for comment form settings in WordPres
 - **Comment Text Format**: Define how comment text is formatted (`wpautop`, `nl2br`, or no formatting).
 - **Comment Form Layout**: Structure the comment form using placeholders.
 - **Quick Tags Toolbar**: Enable or disable a toolbar for comment formatting.
-
-
-
+- **Preview Comment Layout**: See changes to the comment form layout in real-time as you customize it.
 
 ## Credit
+
 - Elazar for the WP Spam Honeypot idea: https://github.com/elazar/wp-spam-honeypot
