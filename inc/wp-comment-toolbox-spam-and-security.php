@@ -28,23 +28,41 @@ class WP_Comment_Toolbox_Span_And_Security {
 
     public function verify_wp_nonce_field() {
         if (get_option('wpct_enable_spam_protect', 0)) {
+            // Check if the HTTP_REFERER header is set and non-empty
             if (!isset($_SERVER['HTTP_REFERER']) || $_SERVER['HTTP_REFERER'] == "") {
-                if (!isset($_POST['wpct_comment_nonce']) || !wp_verify_nonce($_POST['wpct_comment_nonce'], 'comment_nonce')) {
-                    // Check for cURL and wget in the User-Agent header
-                    $is_curl_request = (isset($_SERVER['HTTP_USER_AGENT']) && strpos($_SERVER['HTTP_USER_AGENT'], 'curl') !== false);
-                    $is_wget_request = (isset($_SERVER['HTTP_USER_AGENT']) && strpos($_SERVER['HTTP_USER_AGENT'], 'Wget') !== false);
+                // Handle the absence of referer header
+                $is_curl_request = (isset($_SERVER['HTTP_USER_AGENT']) && strpos($_SERVER['HTTP_USER_AGENT'], 'curl') !== false);
+                $is_wget_request = (isset($_SERVER['HTTP_USER_AGENT']) && strpos($_SERVER['HTTP_USER_AGENT'], 'Wget') !== false);
 
-                    // Store the error message in a variable
-                    $error_message = __('Error: Nonce verification failed.', 'wpct');
+                // Store the error message for invalid referer
+                $error_message = __('Error: No referer header or invalid referer.', 'wpct');
 
-                    // Send response: For cURL/automated requests, output plain text
-                    if ($is_curl_request || $is_wget_request) {
-                        header('HTTP/1.1 403 Forbidden');
-                        header('Content-Type: text/plain; charset=UTF-8');
-                        die($error_message);
-                    } else {
-                        wp_die($error_message, 'Security Check', array('response' => 403));
-                    }
+                // Handle cURL/Wget requests differently
+                if ($is_curl_request || $is_wget_request) {
+                    header('HTTP/1.1 403 Forbidden');
+                    header('Content-Type: text/plain; charset=UTF-8');
+                    die($error_message);
+                } else {
+                    wp_die($error_message, 'Security Check', array('response' => 403));
+                }
+            }
+
+            // After checking referer, check for nonce
+            if (!isset($_POST['wpct_comment_nonce']) || !wp_verify_nonce($_POST['wpct_comment_nonce'], 'comment_nonce')) {
+                // Handle nonce verification failure for cURL/Wget requests
+                $is_curl_request = (isset($_SERVER['HTTP_USER_AGENT']) && strpos($_SERVER['HTTP_USER_AGENT'], 'curl') !== false);
+                $is_wget_request = (isset($_SERVER['HTTP_USER_AGENT']) && strpos($_SERVER['HTTP_USER_AGENT'], 'Wget') !== false);
+
+                // Store the error message for nonce failure
+                $error_message = __('Error: Nonce verification failed.', 'wpct');
+
+                // Handle cURL/Wget requests differently
+                if ($is_curl_request || $is_wget_request) {
+                    header('HTTP/1.1 403 Forbidden');
+                    header('Content-Type: text/plain; charset=UTF-8');
+                    die($error_message);
+                } else {
+                    wp_die($error_message, 'Security Check', array('response' => 403));
                 }
             }
         }
