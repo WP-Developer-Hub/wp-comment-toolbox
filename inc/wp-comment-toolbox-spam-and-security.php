@@ -30,13 +30,21 @@ class WP_Comment_Toolbox_Span_And_Security {
         if (get_option('wpct_enable_spam_protect', 0)) {
             if (!isset($_SERVER['HTTP_REFERER']) || $_SERVER['HTTP_REFERER'] == "") {
                 if (!isset($_POST['wpct_comment_nonce']) || !wp_verify_nonce($_POST['wpct_comment_nonce'], 'comment_nonce')) {
-                    // Log the error
-                    error_log('WPCT Nonce Verification Failed: ' . print_r($_POST, true));
+                    // Check for cURL and wget in the User-Agent header
+                    $is_curl_request = (isset($_SERVER['HTTP_USER_AGENT']) && strpos($_SERVER['HTTP_USER_AGENT'], 'curl') !== false);
+                    $is_wget_request = (isset($_SERVER['HTTP_USER_AGENT']) && strpos($_SERVER['HTTP_USER_AGENT'], 'Wget') !== false);
 
-                    // Send response
-                    header('HTTP/1.1 403 Forbidden');
-                    header('Content-Type: text/plain; charset=UTF-8');
-                    die(__('Error: Nonce verification failed.', 'wpct'));
+                    // Store the error message in a variable
+                    $error_message = __('Error: Nonce verification failed.', 'wpct');
+
+                    // Send response: For cURL/automated requests, output plain text
+                    if ($is_curl_request || $is_wget_request) {
+                        header('HTTP/1.1 403 Forbidden');
+                        header('Content-Type: text/plain; charset=UTF-8');
+                        die($error_message);
+                    } else {
+                        wp_die($error_message, 'Security Check', array('response' => 403));
+                    }
                 }
             }
         }
@@ -67,7 +75,21 @@ class WP_Comment_Toolbox_Span_And_Security {
     public function check_referrer() {
         if (get_option('wpct_enable_spam_protect', 0)) {
             if (!isset($_SERVER['HTTP_REFERER']) || $_SERVER['HTTP_REFERER'] == "") {
-                wp_die(__('Please enable referrers in your browser, or, if you\'re a spammer, bugger off!', 'wpct'));
+                // Check for cURL and wget in the User-Agent header
+                $is_curl_request = (isset($_SERVER['HTTP_USER_AGENT']) && strpos($_SERVER['HTTP_USER_AGENT'], 'curl') !== false);
+                $is_wget_request = (isset($_SERVER['HTTP_USER_AGENT']) && strpos($_SERVER['HTTP_USER_AGENT'], 'Wget') !== false);
+
+                // Store the error message in a variable for easier customization
+                $error_message = __('Please enable referrers in your browser, or, if you\'re a spammer, bugger off!', 'wpct');
+
+                // Check if it's a cURL or wget request
+                if ($is_curl_request || $is_wget_request) {
+                    header('HTTP/1.1 403 Forbidden');
+                    header('Content-Type: text/plain; charset=UTF-8');
+                    die($error_message);
+                } else {
+                    wp_die($error_message, 'Security Check', array('response' => 403));
+                }
             }
         }
     }
