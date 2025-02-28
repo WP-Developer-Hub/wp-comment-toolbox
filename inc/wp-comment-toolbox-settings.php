@@ -146,6 +146,8 @@ class WP_Comment_Toolbox_Settings_2_0 {
         update_option('wpct_enable_wp_kses_post', $_POST['wpct_enable_wp_kses_post']);
         update_option('wpct_enable_spam_protect', $_POST['wpct_enable_spam_protect']);
         update_option('wpct_submit_button_name', $_POST['wpct_submit_button_name']);
+        update_option('wpct_enable_math_captcha', $_POST['wpct_enable_math_captcha']);
+        update_option('wpct_math_captcha_level', $_POST['wpct_math_captcha_level']);
     }
 
     // Save settings specific to Comment List tab

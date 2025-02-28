@@ -59,3 +59,29 @@ WPCT_Helper::wpct_input_field(
     array( 'placeholder' => 'Submit Button Name Go Here' )
 );
 
+// Enable Math Captcha
+WPCT_Helper::wpct_select_box(
+    'wpct_enable_math_captcha',
+    __( 'Enable Math Captcha', 'wpct' ),
+    0,
+    __('When enabled, the user will have to solve a math question to submit a comment. This helps prevent spam and automated submissions from bots.', 'wpct'),
+    array(
+        0 => __('No', 'wpct'),
+        1 => __('Yes', 'wpct'),
+    )
+);
+
+// Math Captcha Difficulty Level
+WPCT_Helper::wpct_select_box(
+    'wpct_math_captcha_level',
+    __('Math Captcha Difficulty Level', 'wpct'),
+    'easy',
+    __('Choose from four different difficulty levels.', 'wpct'),
+    array(
+        'easy' => __('Easy (1-10)', 'wpct'),
+        'medium' => __('Medium (1-15)', 'wpct'),
+        'hard' => __('Hard (1-20)', 'wpct'),
+        'extreme' => __('Extreme (1-50)', 'wpct'),
+    )
+);
+

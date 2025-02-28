@@ -37,19 +37,13 @@
 }
 
 .wpct_toolbar .quicktags-toolbar input[value="b"],
-.wpct_toolbar .quicktags-toolbar input[value="/b"] {
-    font-weight: bold;
-}
+.wpct_toolbar .quicktags-toolbar input[value="/b"] { font-weight: bold; }
 
 .wpct_toolbar .quicktags-toolbar input[value="i"],
-.wpct_toolbar .quicktags-toolbar input[value="/i"] {
-    font-style: italic;
-}
+.wpct_toolbar .quicktags-toolbar input[value="/i"] { font-style: italic; }
 
 .wpct_toolbar .quicktags-toolbar input[value="u"],
-.wpct_toolbar .quicktags-toolbar input[value="/u"] {
-    text-decoration: underline;
-}
+.wpct_toolbar .quicktags-toolbar input[value="/u"] { text-decoration: underline; }
 
 .wpct_toolbar .wpct-character-count {
     display: flex;
@@ -59,3 +53,5 @@
     align-items: center;
     justify-content: flex-start;
 }
+
+.wptc-math-captcha .wptc-captcha-label .wptc-captcha-problem { font-family: monospace !important; font-size: 0.9rem; }

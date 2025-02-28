@@ -77,6 +77,18 @@ class WP_Comment_Toolbox {
             // Add inline script to initialize the status bar for character count
             wp_add_inline_script('wpct-script', '(function($){$(function(){$.fn.initializeStatusBar();});})(jQuery);');
         }
+
+        if (is_singular() && comments_open() && get_option('wpct_enabled_html5_validation', 0)) {
+            // Add inline script to initialize the CAPTCHA validation with custom error messages
+            wp_add_inline_script('wpct-script', '(function($){$(function(){$.fn.initializeCaptchaValidation();});})(jQuery);');
+
+            // Pass PHP data to the script
+            wp_localize_script('wpct-script', 'wpctCaptchaMessage', array(
+                'wpctCaptchaErrorMessage' => __('Please answer the CAPTCHA question.', 'wpct'),
+                'wpctCaptchaSuccessMessage' =>  __('Your CAPTCHA answer was incorrect. Please try again.', 'wpct')
+            ));
+        }
+
     }
 
     public function add_custom_css() {

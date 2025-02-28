@@ -37,5 +37,33 @@
          updateStatusBar(); // Call the function initially to set the remaining characters
          $commentField.on("input", updateStatusBar); // Update remaining characters when the user types
        }
+
+      function isEmpty(str) {
+          return !str.trim().length;
+      }
+
+      $.fn.initializeCaptchaValidation = function(options) {
+          var captchaField = $('input[name="wpct_math_captcha"]');
+
+          captchaField.on('focus', function(e) {
+              var num1 = parseInt($('input[name="wpct_math_num1"]').val());
+              var num2 = parseInt($('input[name="wpct_math_num2"]').val());
+              var correctAnswer = num1 + num2;
+
+              // Check if CAPTCHA field is empty
+              if (isEmpty(captchaField.val())) {
+                  captchaField[0].setCustomValidity(wpctCaptchaMessage.wpctCaptchaErrorMessage);
+                  e.preventDefault();  // Prevent form submission
+              }
+              // Check if the answer is incorrect
+              else if (parseInt(captchaField.val()) !== correctAnswer) {
+                  captchaField[0].setCustomValidity(wpctCaptchaMessage.wpctCaptchaSuccessMessage);
+                  e.preventDefault();  // Prevent form submission
+              } else {
+                  // Reset custom validity if the answer is correct
+                  captchaField[0].setCustomValidity('');
+              }
+          });
+      };
   });
 })(jQuery);

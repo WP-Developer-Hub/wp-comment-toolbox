@@ -12,7 +12,9 @@ class WP_Comment_Toolbox_Span_And_Security {
         add_action('pre_comment_on_post', [$this, 'verify_wp_nonce_field']);
         add_filter('comment_text', [$this, 'strip_bad_html_form_comment'], 9);
         add_action('comment_form', [$this, 'add_wp_nonce_and_huonoy_pot_field']);
+        add_filter('preprocess_comment', [$this, 'wpct_verify_math_captcha'], 8);
         add_filter('pre_comment_content', [$this, 'strip_bad_html_form_comment'], 9);
+        add_filter('comment_form_field_comment', [$this, 'wpct_math_captcha_field'], 9);
     }
 
     public function toggle_make_clickable() {
@@ -32,7 +34,7 @@ class WP_Comment_Toolbox_Span_And_Security {
 
             // Output the hidden textarea field
             echo '<p style="display:none">';
-            echo '<textarea name="' . esc_attr($textarea_name) . '" cols="100%" rows="10"></textarea>';
+            echo '<textarea name="' . esc_attr($textarea_name) . '" id="' . esc_attr($textarea_name) . '" cols="100" rows="10"></textarea>';
             echo '<label for="' . esc_attr($textarea_name) . '">' . esc_html__('If you are a human, do not fill in this field.', 'wpct') . '</label>';
             echo '</p>';
         }
@@ -148,6 +150,83 @@ class WP_Comment_Toolbox_Span_And_Security {
             setcookie('wpct_comment_honeypot_name', '', time() - 3600, COOKIEPATH, COOKIE_DOMAIN); // Expire the cookie by setting a past time
         }
         return $approved;
+    }
+
+    // Add the math question only for guest users
+    public function wpct_math_captcha_field(string $field) {
+        if (get_option('wpct_enable_math_captcha', 0)) {
+            if (is_user_logged_in()) {
+                return $field;
+            }
+
+            if (session_status() === PHP_SESSION_NONE) {
+                session_start();
+            }
+
+            $captcha_level = $this->wpct_ren_math_captcha_level();
+
+            $num1 = rand(1, $captcha_level);
+            $num2 = rand(1, $captcha_level);
+            $_SESSION['wptc_captcha_answer'] = $num1 + $num2;
+
+            $problem = "<span class=\"wptc-captcha-label\">{$num1} + {$num2}</span>";
+
+            // Append the CAPTCHA after the comment box
+            $field .= '<p>
+                <label for="wpct_math_captcha" class="wptc-captcha-label">' . 
+                sprintf(__('What is %s?', 'wpct'), $problem) .
+                '</label>
+                <input type="text" name="wpct_math_captcha" required autocomplete="off">
+            </p>';
+        }
+        return $field;
+    }
+
+    // Validate the math CAPTCHA (only for guests)
+    public function wpct_verify_math_captcha($commentdata) {
+        if (get_option('wpct_enable_math_captcha', 0)) {
+            if (is_user_logged_in()) {
+                return $commentdata;
+            }
+
+            if (session_status() === PHP_SESSION_NONE) {
+                session_start();
+            }
+
+            $error_message = __('CAPTCHA Failed', 'wpct');
+
+            // Define custom error messages
+            $missing_fields_message = __('Please answer the CAPTCHA question.', 'wpct');
+            $incorrect_answer_message = __('Your CAPTCHA answer was incorrect. Please try again.', 'wpct');
+
+            // Check if CAPTCHA fields are missing
+            if (!isset($_POST['wpct_math_captcha']) || !isset($_SESSION['wptc_captcha_answer'])) {
+                wp_die($missing_fields_message, $error_message, array('response' => 403, 'back_link' => true));
+            }
+
+            // Check if the CAPTCHA answer is correct
+            if (intval($_SESSION['wptc_captcha_answer']) !== intval($_POST['wpct_math_captcha'])) {
+                wp_die($incorrect_answer_message, $error_message, array('response' => 403, 'back_link' => true));
+            }
+
+            // Unset session variable after successful validation
+            unset($_SESSION['wptc_captcha_answer']);
+        }
+        return $commentdata;
+    }
+
+    // Generate a random operator based on difficulty level
+    private function wpct_ren_math_captcha_level() {
+        switch (get_option('wpct_math_captcha_level', 'easy')) {
+            case 'medium':
+                return 15;
+            case 'hard':
+                return 20;
+            case 'extreme':
+                return 50;
+            default:
+                return 10;
+        }
     }
 }
 new WP_Comment_Toolbox_Span_And_Security();
