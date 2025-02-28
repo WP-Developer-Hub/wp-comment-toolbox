@@ -23,23 +23,6 @@ class WP_Comment_Toolbox_Span_And_Security {
         }
     }
 
-    public function add_wp_nonce_and_huonoy_pot_field() {
-        if (get_option('wpct_enable_spam_protect', 0)) {
-            $textarea_name = uniqid('wpct_comment_honeypot_');
-
-            wp_nonce_field('comment_nonce', 'wpct_comment_nonce');
-
-            // Set a cookie for the textarea name (expires in 1 hour)
-            setcookie('wpct_comment_honeypot_name', $textarea_name, time() + 3600, COOKIEPATH, COOKIE_DOMAIN);
-
-            // Output the hidden textarea field
-            echo '<p style="display:none">';
-            echo '<textarea name="' . esc_attr($textarea_name) . '" id="' . esc_attr($textarea_name) . '" cols="100" rows="10"></textarea>';
-            echo '<label for="' . esc_attr($textarea_name) . '">' . esc_html__('If you are a human, do not fill in this field.', 'wpct') . '</label>';
-            echo '</p>';
-        }
-    }
-
     public function verify_wp_nonce_field() {
         if (get_option('wpct_enable_spam_protect', 0)) {
             // Check if the HTTP_REFERER header is set and non-empty
@@ -126,29 +109,59 @@ class WP_Comment_Toolbox_Span_And_Security {
         }
     }
 
+    public function add_wp_nonce_and_huonoy_pot_field() {
+        if (get_option('wpct_enable_spam_protect', 0)) {
+            $textarea_name = uniqid('wpct_comment_honeypot_');
+
+            wp_nonce_field('comment_nonce', 'wpct_comment_nonce');
+
+            // Start the session if it's not already started
+            if (session_status() == PHP_SESSION_NONE) {
+                session_start();
+            }
+
+            // Store the textarea name in the session variable
+            $_SESSION['wpct_comment_honeypot_name'] = $textarea_name;
+
+            $textarea_section_name = sanitize_text_field($_SESSION['wpct_comment_honeypot_name']);
+
+            // Output the hidden textarea field
+            echo '<p style="display:none">';
+            echo '<textarea name="' . esc_attr($textarea_section_name) . '" id="' . esc_attr($textarea_section_name) . '" cols="100" rows="10"></textarea>';
+            echo '<label for="' . esc_attr($textarea_section_name) . '">' . esc_html__('If you are a human, do not fill in this field.', 'wpct') . '</label>';
+            echo '</p>';
+        }
+    }
+
     public function check_honeypot($approved) {
-        // Retrieve the textarea name from the cookie
-        if (isset($_COOKIE['wpct_comment_honeypot_name'])) {
-            // Sanitize the cookie value to prevent potential issues
-            $textarea_name = sanitize_text_field($_COOKIE['wpct_comment_honeypot_name']); // Get the value of textarea name from the cookie
-            
+        // Start the session if it's not already started
+        if (session_status() == PHP_SESSION_NONE) {
+            session_start();
+        }
+
+        // Retrieve the textarea name from the session
+        if (isset($_SESSION['wpct_comment_honeypot_name'])) {
+            // Sanitize the session value
+            $textarea_name = sanitize_text_field($_SESSION['wpct_comment_honeypot_name']);
+
             // Get the submit button name from settings
             $submit_name = sanitize_text_field(get_option('wpct_submit_button_name'));
-            
+
             // Check if the hidden textarea field is filled out
             $textarea_filled_out = !empty($_POST[$textarea_name]);
-            
+
             // Check if the submit button name is missing
             $submit_name_missing = !empty($submit_name) && empty($_POST[$submit_name]);
-            
+
             if ($textarea_filled_out || $submit_name_missing) {
                 // Mark as spam if the honeypot field is filled or the submit button is missing
                 $approved = 'spam';
             }
 
-            // Expire the cookie after the check is done
-            setcookie('wpct_comment_honeypot_name', '', time() - 3600, COOKIEPATH, COOKIE_DOMAIN); // Expire the cookie by setting a past time
+            // Unset the session variable after the check
+            unset($_SESSION['wpct_comment_honeypot_name']);
         }
+
         return $approved;
     }
 
