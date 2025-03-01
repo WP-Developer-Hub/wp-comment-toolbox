@@ -25,14 +25,15 @@ class WP_Comment_Toolbox_Span_And_Security {
 
     public function verify_wp_nonce_field() {
         if (get_option('wpct_enable_spam_protect', 0)) {
+            // Define custom error messages
+            $error_title = __('Security Check', 'wpct');
+            $error_message = __('An issue occurred while processing your request. If this continues, please contact support.', 'wpct');
+
             // Check if the HTTP_REFERER header is set and non-empty
             if (!isset($_SERVER['HTTP_REFERER']) || $_SERVER['HTTP_REFERER'] == "") {
                 // Handle the absence of referer header
                 $is_curl_request = (isset($_SERVER['HTTP_USER_AGENT']) && strpos($_SERVER['HTTP_USER_AGENT'], 'curl') !== false);
                 $is_wget_request = (isset($_SERVER['HTTP_USER_AGENT']) && strpos($_SERVER['HTTP_USER_AGENT'], 'Wget') !== false);
-
-                // Store the error message for invalid referer
-                $error_message = __('Error: No referer header or invalid referer.', 'wpct');
 
                 // Handle cURL/Wget requests differently
                 if ($is_curl_request || $is_wget_request) {
@@ -40,7 +41,7 @@ class WP_Comment_Toolbox_Span_And_Security {
                     header('Content-Type: text/plain; charset=UTF-8');
                     die($error_message);
                 } else {
-                    wp_die($error_message, 'Security Check', array('response' => 403));
+                    wp_die($error_message, $error_title, array('response' => 403));
                 }
             }
 
@@ -50,16 +51,13 @@ class WP_Comment_Toolbox_Span_And_Security {
                 $is_curl_request = (isset($_SERVER['HTTP_USER_AGENT']) && strpos($_SERVER['HTTP_USER_AGENT'], 'curl') !== false);
                 $is_wget_request = (isset($_SERVER['HTTP_USER_AGENT']) && strpos($_SERVER['HTTP_USER_AGENT'], 'Wget') !== false);
 
-                // Store the error message for nonce failure
-                $error_message = __('Error: Nonce verification failed.', 'wpct');
-
                 // Handle cURL/Wget requests differently
                 if ($is_curl_request || $is_wget_request) {
                     header('HTTP/1.1 403 Forbidden');
                     header('Content-Type: text/plain; charset=UTF-8');
                     die($error_message);
                 } else {
-                    wp_die($error_message, 'Security Check', array('response' => 403));
+                    wp_die($error_message, $error_title, array('response' => 403));
                 }
             }
         }
@@ -82,20 +80,21 @@ class WP_Comment_Toolbox_Span_And_Security {
     public function limit_comment_length($comment) {
         $max_length = esc_html(get_option('wpct_comment_message_limit', 280));
         if (strlen($comment['comment_content']) > $max_length) {
-            wp_die('<strong>Warning:</strong> Please keep your comment under ' . $max_length . ' characters.', 'Comment Length Warning', array('response' => 500, 'back_link' => true));
+            wp_die(sprintf( '<strong>%s</strong> %s', __('Warning:', 'wpct'), __('Please keep your comment under ', 'wpct') . $max_length . __(' characters.', 'wpct') ), __('Comment Length Warning', 'wpct'), array('response' => 500, 'back_link' => true));
         }
         return $comment;
     }
 
     public function check_referrer() {
         if (get_option('wpct_enable_spam_protect', 0)) {
+            // Define custom error messages
+            $error_title = __('Security Check', 'wpct');
+            $error_message = __('An issue occurred while processing your request. If this continues, please contact support.', 'wpct');
+
             if (!isset($_SERVER['HTTP_REFERER']) || $_SERVER['HTTP_REFERER'] == "") {
                 // Check for cURL and wget in the User-Agent header
                 $is_curl_request = (isset($_SERVER['HTTP_USER_AGENT']) && strpos($_SERVER['HTTP_USER_AGENT'], 'curl') !== false);
                 $is_wget_request = (isset($_SERVER['HTTP_USER_AGENT']) && strpos($_SERVER['HTTP_USER_AGENT'], 'Wget') !== false);
-
-                // Store the error message in a variable for easier customization
-                $error_message = __('Please enable referrers in your browser, or, if you\'re a spammer, bugger off!', 'wpct');
 
                 // Check if it's a cURL or wget request
                 if ($is_curl_request || $is_wget_request) {
@@ -103,7 +102,7 @@ class WP_Comment_Toolbox_Span_And_Security {
                     header('Content-Type: text/plain; charset=UTF-8');
                     die($error_message);
                 } else {
-                    wp_die($error_message, 'Security Check', array('response' => 403));
+                    wp_die($error_message, $error_title, array('response' => 403));
                 }
             }
         }
@@ -201,6 +200,11 @@ class WP_Comment_Toolbox_Span_And_Security {
     // Validate the math CAPTCHA (only for guests)
     public function wpct_verify_math_captcha($commentdata) {
         if (get_option('wpct_enable_math_captcha', 0)) {
+            // Define custom error messages
+            $error_message = __('CAPTCHA Failed', 'wpct');
+            $missing_fields_message = __('Please answer the CAPTCHA question.', 'wpct');
+            $incorrect_answer_message = __('Your CAPTCHA answer was incorrect. Please try again.', 'wpct');
+
             if (is_user_logged_in()) {
                 return $commentdata;
             }
@@ -208,12 +212,6 @@ class WP_Comment_Toolbox_Span_And_Security {
             if (session_status() === PHP_SESSION_NONE) {
                 session_start();
             }
-
-            $error_message = __('CAPTCHA Failed', 'wpct');
-
-            // Define custom error messages
-            $missing_fields_message = __('Please answer the CAPTCHA question.', 'wpct');
-            $incorrect_answer_message = __('Your CAPTCHA answer was incorrect. Please try again.', 'wpct');
 
             // Check if CAPTCHA fields are missing
             if (!isset($_POST['wpct_math_captcha']) || !isset($_SESSION['wptc_captcha_answer'])) {
