@@ -126,8 +126,8 @@ class WP_Comment_Toolbox_Span_And_Security {
 
             // Output the hidden textarea field
             echo '<p style="display:none">';
-            echo '<textarea name="' . esc_attr($textarea_section_name) . '" id="' . esc_attr($textarea_section_name) . '" cols="100" rows="10"></textarea>';
-            echo '<label for="' . esc_attr($textarea_section_name) . '">' . esc_html__('If you are a human, do not fill in this field.', 'wpct') . '</label>';
+            echo '<textarea name="' . esc_attr($textarea_section_name) . '" cols="100" rows="10"></textarea>';
+            echo '<label>' . esc_html__('If you are a human, do not fill in this field.', 'wpct') . '</label>';
             echo '</p>';
         }
     }
@@ -192,7 +192,7 @@ class WP_Comment_Toolbox_Span_And_Security {
                 <label for="wpct_math_captcha" class="wptc-captcha-label">' . 
                 sprintf(__('What is %s?', 'wpct'), $problem) .
                 '</label>
-                <input type="text" name="wpct_math_captcha" required autocomplete="off">
+                <input type="text" name="wpct_math_captcha" id="wpct_math_captcha" required autocomplete="off">
             </p>';
         }
         return $field;

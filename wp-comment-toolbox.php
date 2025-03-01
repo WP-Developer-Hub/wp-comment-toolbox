@@ -90,7 +90,7 @@ class WP_Comment_Toolbox {
         }
 
         if (is_singular() && comments_open() && get_option('wpct_enable_spam_protect', 0)) {
-            wp_add_inline_style('wpct-style', "#".esc_attr(get_option('wpct_submit_button_name'))." { display: none; }");
+            wp_add_inline_style('', "#".esc_attr(get_option('wpct_submit_button_name'))." { display: none; }");
             wp_add_inline_script('wpct-script', '(function($){$(function(){setTimeout(function() { $("#'.esc_js(get_option('wpct_submit_button_name')).'").show(); }, 8000);});})(jQuery);');
         }
     }
