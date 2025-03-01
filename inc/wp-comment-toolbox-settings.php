@@ -56,6 +56,7 @@ class WP_Comment_Toolbox_Settings_2_0 {
             'comment_form' => 'Comment Form',
             'extra' => 'Extra',
             'admin' => 'Admin',
+            'test_commends' => 'Test Commends',
         ];
 
         foreach ($tabs as $tab => $label) {
@@ -102,6 +103,10 @@ class WP_Comment_Toolbox_Settings_2_0 {
 
     public function admin_settings() {
         $this->wpct_load_setting('admin');
+    }
+
+    public function test_commends_settings() {
+        $this->wpct_load_setting('test_commends');
     }
 
     public function save_settings() {

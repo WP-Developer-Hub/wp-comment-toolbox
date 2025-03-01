@@ -110,7 +110,7 @@ class WP_Comment_Toolbox_Span_And_Security {
 
     public function add_wp_nonce_and_huonoy_pot_field() {
         if (get_option('wpct_enable_spam_protect', 0)) {
-            $textarea_name = uniqid('wpct_comment_honeypot_');
+            $textarea_name = uniqid('wpct_comment_honeypot_' . str_replace( '-', '_', wp_generate_uuid4()));
 
             wp_nonce_field('comment_nonce', 'wpct_comment_nonce');
 
@@ -133,37 +133,38 @@ class WP_Comment_Toolbox_Span_And_Security {
     }
 
     public function check_honeypot($approved) {
-        // Start the session if it's not already started
-        if (session_status() == PHP_SESSION_NONE) {
-            session_start();
-        }
-
-        // Retrieve the textarea name from the session
-        if (isset($_SESSION['wpct_comment_honeypot_name'])) {
-            // Sanitize the session value
-            $textarea_name = sanitize_text_field($_SESSION['wpct_comment_honeypot_name']);
-
-            // Get the submit button name from settings
-            $submit_name = sanitize_text_field(get_option('wpct_submit_button_name'));
-
-            // Check if the hidden textarea field is filled out
-            $textarea_filled_out = !empty($_POST[$textarea_name]);
-
-            // Check if the submit button name is missing
-            $submit_name_missing = !empty($submit_name) && empty($_POST[$submit_name]);
-
-            if ($textarea_filled_out || $submit_name_missing) {
-                // Mark as spam if the honeypot field is filled or the submit button is missing
-                $approved = 'spam';
+        if (get_option('wpct_enable_spam_protect', 0)) {
+            // Start the session if it's not already started
+            if (session_status() == PHP_SESSION_NONE) {
+                session_start();
             }
 
-            // Unset the session variable after the check
-            unset($_SESSION['wpct_comment_honeypot_name']);
+            // Retrieve the textarea name from the session
+            if (isset($_SESSION['wpct_comment_honeypot_name'])) {
+                // Sanitize the session value
+                $textarea_name = sanitize_text_field($_SESSION['wpct_comment_honeypot_name']);
 
-            session_unset();
-            session_destroy();
+                // Get the submit button name from settings
+                $submit_name = sanitize_text_field(get_option('wpct_submit_button_name'));
+
+                // Check if the hidden textarea field is filled out
+                $textarea_filled_out = !empty($_POST[$textarea_name]);
+
+                // Check if the submit button name is missing
+                $submit_name_missing = !empty($submit_name) && empty($_POST[$submit_name]);
+
+                if ($textarea_filled_out || $submit_name_missing) {
+                    // Mark as spam if the honeypot field is filled or the submit button is missing
+                    $approved = 'spam';
+                }
+
+                // Unset the session variable after the check
+                unset($_SESSION['wpct_comment_honeypot_name']);
+
+                session_unset();
+                session_destroy();
+            }
         }
-
         return $approved;
     }
 

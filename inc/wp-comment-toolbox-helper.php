@@ -120,5 +120,34 @@ class WPCT_Helper {
         </tr>
         <?php
     }
+
+    // Test Code Field
+    public static function wpct_test_code($name, $label, $value = '', $description = '', $attr = array()) {
+        // Prepare additional attributes
+        $additional_attributes = '';
+        if (!empty($attr)) {
+            foreach ($attr as $key => $val) {
+                $additional_attributes .= ' ' . esc_attr($key) . '="' . esc_attr($val) . '"';
+            }
+        }
+        
+        ?>
+        <tr>
+            <th scope="row">
+                <?php if ($label): ?>
+                    <label for="<?php echo esc_attr($name); ?>" class="status-label"><?php echo esc_html($label); ?></label>
+                <?php endif; ?>
+            </th>
+            <td>
+                <textarea class="widefat wpct-input"
+                          id="<?php echo esc_attr($name); ?>"
+                          <?php echo $additional_attributes; ?> ><?php echo esc_textarea($value); ?></textarea>
+                <?php if ($description): ?>
+                    <p class="description"><?php echo esc_html($description); ?></p>
+                <?php endif; ?>
+            </td>
+        </tr>
+        <?php
+    }
 }
 ?>

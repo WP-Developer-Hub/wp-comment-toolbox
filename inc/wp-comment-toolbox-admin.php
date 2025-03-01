@@ -103,7 +103,6 @@ class WP_Comment_Toolbox_Admin {
         }
         return $comment_text;
     }
-
 }
 
 // Instantiate the class
