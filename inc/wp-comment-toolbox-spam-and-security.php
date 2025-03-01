@@ -160,6 +160,9 @@ class WP_Comment_Toolbox_Span_And_Security {
 
             // Unset the session variable after the check
             unset($_SESSION['wpct_comment_honeypot_name']);
+
+            session_unset();
+            session_destroy();
         }
 
         return $approved;
@@ -224,6 +227,9 @@ class WP_Comment_Toolbox_Span_And_Security {
 
             // Unset session variable after successful validation
             unset($_SESSION['wptc_captcha_answer']);
+
+            session_unset();
+            session_destroy();
         }
         return $commentdata;
     }
