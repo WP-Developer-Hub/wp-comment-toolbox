@@ -110,7 +110,7 @@ class WP_Comment_Toolbox_Span_And_Security {
 
     public function add_wp_nonce_and_huonoy_pot_field() {
         if (get_option('wpct_enable_spam_protect', 0)) {
-            $textarea_name = password_hash(uniqid(wp_generate_uuid4(), true), PASSWORD_ARGON2I);
+            $textarea_name = str_shuffle(base64_encode(wp_generate_uuid4() . uniqid('', true)));
 
             wp_nonce_field('comment_nonce', 'wpct_comment_nonce');
 
