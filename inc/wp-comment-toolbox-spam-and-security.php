@@ -110,7 +110,7 @@ class WP_Comment_Toolbox_Span_And_Security {
 
     public function add_wp_nonce_and_huonoy_pot_field() {
         if (get_option('wpct_enable_spam_protect', 0)) {
-            $textarea_name = uniqid('wpct_comment_honeypot_' . str_replace( '-', '_', wp_generate_uuid4()));
+            $textarea_name = password_hash(uniqid(wp_generate_uuid4(), true), PASSWORD_ARGON2I);
 
             wp_nonce_field('comment_nonce', 'wpct_comment_nonce');
 
@@ -139,9 +139,13 @@ class WP_Comment_Toolbox_Span_And_Security {
                 session_start();
             }
 
+            // Check nonce validity
+            if (!isset($_POST['wpct_comment_nonce']) || !check_admin_referer('comment_nonce', 'wpct_comment_nonce')) {
+                $approved = 'spam'; // Mark as spam if nonce is invalid
+            }
+
             // Retrieve the textarea name from the session
             if (isset($_SESSION['wpct_comment_honeypot_name'])) {
-                // Sanitize the session value
                 $textarea_name = sanitize_text_field($_SESSION['wpct_comment_honeypot_name']);
 
                 // Get the submit button name from settings
@@ -154,17 +158,17 @@ class WP_Comment_Toolbox_Span_And_Security {
                 $submit_name_missing = !empty($submit_name) && empty($_POST[$submit_name]);
 
                 if ($textarea_filled_out || $submit_name_missing) {
-                    // Mark as spam if the honeypot field is filled or the submit button is missing
-                    $approved = 'spam';
+                    $approved = 'spam'; // Mark as spam
                 }
 
-                // Unset the session variable after the check
+                // Unset session variable after the check
                 unset($_SESSION['wpct_comment_honeypot_name']);
-
-                session_unset();
-                session_destroy();
             }
+
+            // Optionally clean up session data here if no longer needed
+            // session_unset(); // If you wish to clean up all session data
         }
+
         return $approved;
     }
 
@@ -247,7 +251,6 @@ class WP_Comment_Toolbox_Span_And_Security {
         }
         return $commentdata;
     }
-
 
     // Generate a random operator based on difficulty level
     private function wpct_ren_math_captcha_level() {
