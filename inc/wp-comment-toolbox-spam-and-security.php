@@ -180,10 +180,13 @@ class WP_Comment_Toolbox_Span_And_Security {
             }
 
             $captcha_level = $this->wpct_ren_math_captcha_level();
-
             $num1 = rand(1, $captcha_level);
             $num2 = rand(1, $captcha_level);
-            $_SESSION['wptc_captcha_answer'] = $num1 + $num2;
+
+            // Store the correct CAPTCHA answer (MD5 hash of the sum) in the session
+            $_SESSION['wptc_captcha_answer'] = md5($num1 + $num2);
+            $_SESSION['wptc_captcha_num1'] = $num1;
+            $_SESSION['wptc_captcha_num2'] = $num2;
 
             $problem = "<span class=\"wptc-captcha-label\">{$num1} + {$num2}</span>";
 
@@ -194,7 +197,7 @@ class WP_Comment_Toolbox_Span_And_Security {
             $field .= '</label>';
             $field .= '<input type="text" name="wpct_math_captcha" id="wpct_math_captcha" required autocomplete="off">';
             $field .= '<input type="hidden" name="wpct_math_num1" value="' . $num1 . '">';
-            $field .= '<input type="hidden" name="wpct_math_num2" value="' . $num2 . ' ">';
+            $field .= '<input type="hidden" name="wpct_math_num2" value="' . $num2 . '">';
             $field .= '</p>';
         }
         return $field;
@@ -206,8 +209,10 @@ class WP_Comment_Toolbox_Span_And_Security {
             // Define custom error messages
             $error_message = __('CAPTCHA Failed', 'wpct');
             $missing_fields_message = __('Please answer the CAPTCHA question.', 'wpct');
+            $tamper_answer_message = __('CAPTCHA validation error: Possible tampering detected.', 'wpct');
             $incorrect_answer_message = __('Your CAPTCHA answer was incorrect. Please try again.', 'wpct');
 
+            // Skip validation for logged-in users
             if (is_user_logged_in()) {
                 return $commentdata;
             }
@@ -216,24 +221,33 @@ class WP_Comment_Toolbox_Span_And_Security {
                 session_start();
             }
 
-            // Check if CAPTCHA fields are missing
+            // Check if CAPTCHA fields or session variables are missing
             if (!isset($_POST['wpct_math_captcha']) || !isset($_SESSION['wptc_captcha_answer'])) {
                 wp_die($missing_fields_message, $error_message, array('response' => 403, 'back_link' => true));
             }
 
-            // Check if the CAPTCHA answer is correct
-            if (intval($_SESSION['wptc_captcha_answer']) !== intval($_POST['wpct_math_captcha'])) {
+            // Check if hidden fields match session values (to prevent tampering)
+            if ($_POST['wpct_math_num1'] != $_SESSION['wptc_captcha_num1'] || $_POST['wpct_math_num2'] != $_SESSION['wptc_captcha_num2']) {
+                wp_die($tamper_answer_message, $error_message, array('response' => 403, 'back_link' => true));
+            }
+
+            // Validate if the answer provided matches the MD5 hash stored in the session
+            $user_answer = trim($_POST['wpct_math_captcha']);
+            $user_answer = sanitize_text_field($user_answer);  // Sanitizing user input
+
+            // MD5 validation
+            if (md5($user_answer) !== $_SESSION['wptc_captcha_answer']) {
                 wp_die($incorrect_answer_message, $error_message, array('response' => 403, 'back_link' => true));
             }
 
-            // Unset session variable after successful validation
+            // Unset session variables after successful validation
             unset($_SESSION['wptc_captcha_answer']);
-
-            session_unset();
-            session_destroy();
+            unset($_SESSION['wptc_captcha_num1']);
+            unset($_SESSION['wptc_captcha_num2']);
         }
         return $commentdata;
     }
+
 
     // Generate a random operator based on difficulty level
     private function wpct_ren_math_captcha_level() {
