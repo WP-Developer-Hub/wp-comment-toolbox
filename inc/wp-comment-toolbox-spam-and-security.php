@@ -188,12 +188,14 @@ class WP_Comment_Toolbox_Span_And_Security {
             $problem = "<span class=\"wptc-captcha-label\">{$num1} + {$num2}</span>";
 
             // Append the CAPTCHA after the comment box
-            $field .= '<p>
-                <label for="wpct_math_captcha" class="wptc-captcha-label">' . 
-                sprintf(__('What is %s?', 'wpct'), $problem) .
-                '</label>
-                <input type="text" name="wpct_math_captcha" id="wpct_math_captcha" required autocomplete="off">
-            </p>';
+            $field .= '<p>';
+            $field .= '<label for="wpct_math_captcha" class="wptc-captcha-label">';
+            $field .= sprintf(__('What is %s?', 'wpct'), $problem);
+            $field .= '</label>';
+            $field .= '<input type="text" name="wpct_math_captcha" id="wpct_math_captcha" required autocomplete="off">';
+            $field .= '<input type="hidden" name="wpct_math_num1" value="' . $num1 . '">';
+            $field .= '<input type="hidden" name="wpct_math_num2" value="' . $num2 . ' ">';
+            $field .= '</p>';
         }
         return $field;
     }

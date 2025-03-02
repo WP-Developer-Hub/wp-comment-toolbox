@@ -53,12 +53,12 @@
               // Check if CAPTCHA field is empty
               if (isEmpty(captchaField.val())) {
                   captchaField[0].setCustomValidity(wpctCaptchaMessage.wpctCaptchaErrorMessage);
-                  e.preventDefault();  // Prevent form submission
+                  e.preventDefault();
               }
               // Check if the answer is incorrect
               else if (parseInt(captchaField.val()) !== correctAnswer) {
                   captchaField[0].setCustomValidity(wpctCaptchaMessage.wpctCaptchaSuccessMessage);
-                  e.preventDefault();  // Prevent form submission
+                  e.preventDefault();
               } else {
                   // Reset custom validity if the answer is correct
                   captchaField[0].setCustomValidity('');
