@@ -54,4 +54,4 @@
     justify-content: flex-start;
 }
 
-.wptc-math-captcha .wptc-captcha-label .wptc-captcha-problem { font-family: monospace !important; font-size: 0.9rem; }
+.wptc-math-captcha .wptc-captcha-label .wptc-captcha-problem { font-family: monospace !important; font-size: 0.9rem; word-spacing: -6px; font-weight: 600;}

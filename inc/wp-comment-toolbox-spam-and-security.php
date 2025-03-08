@@ -192,10 +192,10 @@ class WP_Comment_Toolbox_Span_And_Security {
             $_SESSION['wptc_captcha_num1'] = $num1;
             $_SESSION['wptc_captcha_num2'] = $num2;
 
-            $problem = "<span class=\"wptc-captcha-label\">{$num1} + {$num2}</span>";
+            $problem = "<span class=\"wptc-captcha-problem\">{$num1} + {$num2}</span>";
 
             // Append the CAPTCHA after the comment box
-            $field .= '<p>';
+            $field .= '<p class="wptc-math-captcha">';
             $field .= '<label for="wpct_math_captcha" class="wptc-captcha-label">';
             $field .= sprintf(__('What is %s?', 'wpct'), $problem);
             $field .= '</label>';
