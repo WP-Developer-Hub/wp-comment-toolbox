@@ -20,7 +20,7 @@ class WP_Comment_Toolbox_Comment_Form {
 
     public function toggle_html5_comment_form_validation() {
         // Only remove novalidate if the validation is enabled
-        if (is_singular() && comments_open() && get_option('wpct_enabled_html5_validation', '0') === '1') {
+        if (is_singular() && comments_open() && get_option('wpct_enabled_html5_validation', '0') === '1' && !post_password_required()) {
             if (comments_open() && current_theme_supports('html5')) {
                 echo '<script>document.getElementById("commentform").removeAttribute("novalidate");</script>' . PHP_EOL;
             }

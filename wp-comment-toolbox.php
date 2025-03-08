@@ -60,38 +60,57 @@ class WP_Comment_Toolbox {
     }
 
     public function add_custom_toolbar_script() {
-        // Check if comments are open and toolbar is enabled
-        if (is_singular() && comments_open() && (get_option('wpct_toolbar_enabled', 'disable') || get_option('wpct_character_count_enabled', 'disable'))) {
-            wp_enqueue_script('quicktags');
-            wp_enqueue_script('wpct-script', WP_COMMENT_TOOLBOX_PLUGIN_URL . 'js/wp-comment-toolbox.js', array('jquery', 'quicktags'), null, true);
-            wp_enqueue_style('wpct-style', WP_COMMENT_TOOLBOX_PLUGIN_URL . 'css/wp-comment-toolbox.css');
-        }
+        // Ensure that comments are open and the post is not password protected
+        if (is_singular() && comments_open() && !post_password_required()) {
+            // Check if specific features are enabled through options
+            $toolbar_enabled = get_option('wpct_toolbar_enabled', 0);
+            $math_captcha_enable = get_option('wpct_enable_math_captcha', 0);
+            $spam_protect_enabled = get_option('wpct_enable_spam_protect', 0);
+            $char_count_enabled = get_option('wpct_character_count_enabled', 0);
+            $html5_validation_enabled = get_option('wpct_enabled_html5_validation', 0);
 
-        // Check if the character count feature is enabled
-        if (is_singular() && comments_open() && get_option('wpct_toolbar_enabled', 'disable')) {
-            // Add inline script to initialize Quicktags
-            wp_add_inline_script('wpct-script', '(function($){$(function(){$.fn.initializeQuicktags();});})(jQuery);');
-        }
+            // Enqueue the script and style if any relevant feature is enabled
+            // This ensures the script is loaded for any necessary feature
+            if ($toolbar_enabled || $char_count_enabled || ($html5_validation_enabled && $math_captcha_enable)) {
+                wp_enqueue_script('wpct-script', WP_COMMENT_TOOLBOX_PLUGIN_URL . 'js/wp-comment-toolbox.js', array('jquery', 'quicktags'), null, true);
+            }
 
-        if (is_singular() && comments_open() && get_option('wpct_character_count_enabled', 'disable')) {
-            // Add inline script to initialize the status bar for character count
-            wp_add_inline_script('wpct-script', '(function($){$(function(){$.fn.initializeStatusBar();});})(jQuery);');
-        }
+            // Enqueue styles if the toolbar or character count feature is enabled
+            // This ensures the proper styles are applied to the toolbar or character count
+            if ($toolbar_enabled || $char_count_enabled || $math_captcha_enable) {
+                wp_enqueue_style('wpct-style', WP_COMMENT_TOOLBOX_PLUGIN_URL . 'css/wp-comment-toolbox.css');
+            }
 
-        if (is_singular() && comments_open() && get_option('wpct_enabled_html5_validation', 0)) {
-            // Add inline script to initialize the CAPTCHA validation with custom error messages
-            wp_add_inline_script('wpct-script', '(function($){$(function(){$.fn.initializeCaptchaValidation();});})(jQuery);');
+            // Initialize Quicktags if the toolbar feature is enabled
+            // Quicktags adds the editor buttons to the comment textarea
+            if ($toolbar_enabled) {
+                wp_enqueue_script('quicktags');
+                wp_add_inline_script('wpct-script', '(function($){$(function(){$.fn.initializeQuicktags();});})(jQuery);');
+            }
 
-            // Pass PHP data to the script
-            wp_localize_script('wpct-script', 'wpctCaptchaMessage', array(
-                'wpctCaptchaErrorMessage' => __('Please answer the CAPTCHA question.', 'wpct'),
-                'wpctCaptchaSuccessMessage' =>  __('Your CAPTCHA answer was incorrect. Please try again.', 'wpct')
-            ));
-        }
+            // Initialize the character count status bar if enabled
+            // Displays a real-time character count in the comment form
+            if ($char_count_enabled) {
+                wp_add_inline_script('wpct-script', '(function($){$(function(){$.fn.initializeStatusBar();});})(jQuery);');
+            }
 
-        if (is_singular() && comments_open() && get_option('wpct_enable_spam_protect', 0)) {
-            wp_add_inline_style('', "#".esc_attr(get_option('wpct_submit_button_name'))." { display: none; }");
-            wp_add_inline_script('wpct-script', '(function($){$(function(){setTimeout(function() { $("#'.esc_js(get_option('wpct_submit_button_name')).'").show(); }, 8000);});})(jQuery);');
+            // Initialize CAPTCHA validation if HTML5 validation is enabled
+            // Adds CAPTCHA validation to prevent spam submissions
+            if ($html5_validation_enabled) {
+                wp_add_inline_script('wpct-script', '(function($){$(function(){$.fn.initializeCaptchaValidation();});})(jQuery);');
+                wp_localize_script('wpct-script', 'wpctCaptchaMessage', array(
+                    'wpctCaptchaErrorMessage' => __('Please answer the CAPTCHA question.', 'wpct'),
+                    'wpctCaptchaSuccessMessage' => __('Your CAPTCHA answer was incorrect. Please try again.', 'wpct')
+                ));
+            }
+
+            // Enable spam protection if the feature is enabled
+            // This hides the submit button initially and displays it after a timeout to prevent spam bots
+            if ($spam_protect_enabled) {
+                $submit_button_name = esc_attr(get_option('wpct_submit_button_name'));
+                wp_add_inline_style('', "#$submit_button_name { display: none; }");
+                wp_add_inline_script('wpct-script', '(function($){$(function(){setTimeout(function() { $("#' . esc_js($submit_button_name) . '").show(); }, 8000);});})(jQuery);');
+            }
         }
     }
 
