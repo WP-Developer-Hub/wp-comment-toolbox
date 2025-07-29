@@ -31,6 +31,7 @@ class WP_Comment_Toolbox {
         
         // Include required files
         require_once(WP_COMMENT_TOOLBOX_PLUGIN_DIR . 'inc/wp-comment-toolbox-admin.php');
+        require_once(WP_COMMENT_TOOLBOX_PLUGIN_DIR . 'inc/wp-comment-toolbox-updates.php');
         require_once(WP_COMMENT_TOOLBOX_PLUGIN_DIR . 'inc/wp-comment-toolbox-settings.php');
         require_once(WP_COMMENT_TOOLBOX_PLUGIN_DIR . 'inc/wp-comment-toolbox-comment-list.php');
         require_once(WP_COMMENT_TOOLBOX_PLUGIN_DIR . 'inc/wp-comment-toolbox-comment-form.php');
@@ -40,7 +41,7 @@ class WP_Comment_Toolbox {
         add_action('wp_footer', array($this, 'add_custom_toolbar_script'));
 
         // Add customizer link in plugin actions
-        add_filter('plugin_action_links_' . plugin_basename(__FILE__), [$this, 'add_customizer_link']);
+        add_filter('plugin_action_links_' . plugin_basename(__FILE__), [$this, 'add_settings_link']);
     }
 
     /**
@@ -51,11 +52,18 @@ class WP_Comment_Toolbox {
     }
 
     /**
-     * Add a Customizer link to the plugin action links.
+     * Add a custom settings tab link to the plugin action links.
      */
-    public function add_customizer_link($links) {
-        $customizer_link = '<a href="' . esc_url(admin_url('customize.php')) . '">' . __('Customizer', 'wpct') . '</a>';
-        array_push($links, $customizer_link);
+    public function add_settings_link($links) {
+        // Build the URL to your plugin's comment form tab
+        $url = esc_url(admin_url('edit-comments.php?page=wpct-comment-settings'));
+
+        // Construct the link HTML
+        $custom_link = '<a href="' . $url . '">' . __('Settings', 'wpct') . '</a>';
+
+        // Add the link to the existing array of links
+        array_push($links, $custom_link);
+
         return $links;
     }
 
