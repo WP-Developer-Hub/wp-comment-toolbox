@@ -129,7 +129,7 @@ if (!class_exists('WP_Comment_Toolbox_Plugin_Auto_Updates')) {
                     'package' => $info->package,
                     'url' => $info->url,
                 );
-                error_log('[Updater] Update array set in transient for ' . $this->plugin_file);
+                error_log('[Updater] Update array set in transient for ' . $this->$plugin_slug);
             } else {
                 error_log('[Updater] No update set in transient.');
             }
