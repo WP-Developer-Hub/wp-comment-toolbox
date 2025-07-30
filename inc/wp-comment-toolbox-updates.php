@@ -8,39 +8,35 @@ if (!defined('ABSPATH')) {
     exit;
 }
 
-// plugin Data
+// Plugin Data
 $api_url = 'https://api.github.com/repos/WP-Developer-Hub/wp-comment-toolbox/releases/latest';
+$plugin_file = 'wp-comment-toolbox/wp-comment-toolbox.php';
 $plugin_slug = 'wp-comment-toolbox';
 
 if (!class_exists('WP_Comment_Toolbox_Plugin_Auto_Updates')) {
     class WP_Comment_Toolbox_Plugin_Auto_Updates {
         private $api_endpoint = null;
         private $plugin_slug = null;
+        private $plugin_file = null;
 
-        public function __construct($api_url = '', $plugin_slug = '') {
+        public function __construct($api_url = '', $plugin_slug = '', $plugin_file = '') {
             $this->api_endpoint = $api_url;
             $this->plugin_slug = $plugin_slug;
+            $this->plugin_file = $plugin_file;
 
             add_filter('pre_set_site_transient_update_plugins', array($this, 'check_for_update'));
         }
 
         private function get_local_version() {
-            if ( is_admin() ) {
-                if( ! function_exists('get_plugin_data') ){
-                    require_once( ABSPATH . 'wp-admin/includes/plugin.php' );
-                }
-                $plugin_data = get_plugin_data( __FILE__ );
-
-                error_log('[Updater] Local plugin version: ' . $version);
-                return $version;
+            if (!function_exists('get_plugin_data')) {
+                require_once(ABSPATH . 'wp-admin/includes/plugin.php');
             }
+            $plugin_data = get_plugin_data(WP_PLUGIN_DIR . '/' . $this->plugin_file);
+            $version = isset($plugin_data['Version']) ? $plugin_data['Version'] : '';
+            error_log('[Updater] Local plugin version: ' . $version);
+            return $version;
         }
 
-        /**
-         * Makes a call to the GitHub API
-         *
-         * @return object|bool The API response
-         */
         private function call_api() {
             $args = array(
                 'headers' => array(
@@ -59,11 +55,6 @@ if (!class_exists('WP_Comment_Toolbox_Plugin_Auto_Updates')) {
             return json_decode($response_body);
         }
 
-        /**
-         * Gets the latest release info from GitHub
-         *
-         * @return object|bool   The release data, or false if API call fails.
-         */
         public function get_license_info() {
             $release = $this->call_api();
             if (!$release || empty($release->tag_name)) {
@@ -123,13 +114,13 @@ if (!class_exists('WP_Comment_Toolbox_Plugin_Auto_Updates')) {
             }
             $info = $this->is_update_available();
             if ($info !== false) {
-                // Fix: Use the plugin file string as the key in the transient response
+                // Use the plugin file as the key in the transient response
                 $transient->response[$this->plugin_file] = (object) array(
                     'new_version' => $info->version,
                     'package' => $info->package,
                     'url' => $info->url,
                 );
-                error_log('[Updater] Update array set in transient for ' . $this->$plugin_slug);
+                error_log('[Updater] Update array set in transient for ' . $this->plugin_file);
             } else {
                 error_log('[Updater] No update set in transient.');
             }
@@ -138,4 +129,5 @@ if (!class_exists('WP_Comment_Toolbox_Plugin_Auto_Updates')) {
     }
 }
 
-new WP_Comment_Toolbox_Plugin_Auto_Updates($api_url, $plugin_slug);
+// Instantiate with all required parameters
+new WP_Comment_Toolbox_Plugin_Auto_Updates($api_url, $plugin_slug, $plugin_file);
