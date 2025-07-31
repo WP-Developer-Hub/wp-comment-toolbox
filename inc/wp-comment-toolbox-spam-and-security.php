@@ -115,8 +115,8 @@ class WP_Comment_Toolbox_Span_And_Security {
             wp_nonce_field('comment_nonce', 'wpct_comment_nonce');
 
             // Start the session if it's not already started
-            if (session_status() == PHP_SESSION_NONE) {
-                session_start();
+            if (session_status() == PHP_SESSION_NONE && !headers_sent()) {
+                @session_start();
             }
 
             // Store the textarea name in the session variable
@@ -135,8 +135,8 @@ class WP_Comment_Toolbox_Span_And_Security {
     public function check_honeypot($approved) {
         if (get_option('wpct_enable_spam_protect', 0)) {
             // Start the session if it's not already started
-            if (session_status() == PHP_SESSION_NONE) {
-                session_start();
+            if (session_status() == PHP_SESSION_NONE && !headers_sent()) {
+                @session_start();
             }
 
             // Check nonce validity
@@ -179,8 +179,8 @@ class WP_Comment_Toolbox_Span_And_Security {
                 return $field;
             }
 
-            if (session_status() === PHP_SESSION_NONE) {
-                session_start();
+            if (session_status() == PHP_SESSION_NONE && !headers_sent()) {
+                @session_start();
             }
 
             $captcha_level = $this->wpct_ren_math_captcha_level();
@@ -221,8 +221,8 @@ class WP_Comment_Toolbox_Span_And_Security {
                 return $commentdata;
             }
 
-            if (session_status() === PHP_SESSION_NONE) {
-                session_start();
+            if (session_status() == PHP_SESSION_NONE && !headers_sent()) {
+                @session_start();
             }
 
             // Check if CAPTCHA fields or session variables are missing
