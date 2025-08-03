@@ -17,8 +17,11 @@ if (!defined('ABSPATH')) {
 }
 
 // Define plugin constants for easy reference
-define('WP_COMMENT_TOOLBOX_PLUGIN_DIR', plugin_dir_path(__FILE__)); // Plugin directory path
-define('WP_COMMENT_TOOLBOX_PLUGIN_URL', plugin_dir_url(__FILE__));  // Plugin directory URL
+define('WP_COMMENT_TOOLBOX_PLUGIN_ORG', 'WP-Developer-Hub');
+define('WP_COMMENT_TOOLBOX_PLUGIN_SLUG', 'wp-comment-toolbox');
+define('WP_COMMENT_TOOLBOX_PLUGIN_DIR', plugin_dir_path(__FILE__));
+define('WP_COMMENT_TOOLBOX_PLUGIN_URL', plugin_dir_url(__FILE__));
+define('WP_COMMENT_TOOLBOX_PLUGIN_BASENAME', plugin_basename(__FILE__));
 
 class WP_Comment_Toolbox {
 

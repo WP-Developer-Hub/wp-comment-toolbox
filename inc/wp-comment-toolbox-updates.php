@@ -9,8 +9,9 @@ if (!defined('ABSPATH')) {
 }
 
 // Plugin Data
-$api_url = 'https://api.github.com/repos/WP-Developer-Hub/wp-comment-toolbox/releases/latest';
-$plugin_slug = 'wp-comment-toolbox';
+$plugin_org = WP_COMMENT_TOOLBOX_PLUGIN_ORG;
+$plugin_slug = WP_COMMENT_TOOLBOX_PLUGIN_SLUG;
+$api_url = 'https://api.github.com/repos/' . $plugin_org . '/' . $plugin_slug . '/releases/latest';
 
 if (!class_exists('WP_Comment_Toolbox_Plugin_Auto_Updates')) {
     class WP_Comment_Toolbox_Plugin_Auto_Updates {
@@ -18,10 +19,10 @@ if (!class_exists('WP_Comment_Toolbox_Plugin_Auto_Updates')) {
         private $plugin_slug = null;
         private $plugin_file = null;
 
-        public function __construct($api_url = '', $plugin_slug = '') {
+        public function __construct($api_url = '', $plugin_slug = '', $plugin_file = '') {
             $this->api_endpoint = $api_url;
             $this->plugin_slug = $plugin_slug;
-            $this->plugin_file = plugin_basename(__FILE__);;
+            $this->plugin_file = $plugin_file;
 
             add_filter('pre_set_site_transient_update_plugins', array($this, 'check_for_update'));
         }
@@ -131,7 +132,7 @@ if (!class_exists('WP_Comment_Toolbox_Plugin_Auto_Updates')) {
         }
 
         private function get_icon_urls() {
-            $base_url = plugin_dir_url(__FILE__) . 'assets/';
+            $base_url = WP_COMMENT_TOOLBOX_PLUGIN_URL . 'assets/';
 
             return array(
                 '1x'  => $base_url . 'icon-128x128.png',
@@ -143,4 +144,4 @@ if (!class_exists('WP_Comment_Toolbox_Plugin_Auto_Updates')) {
 }
 
 // Instantiate with all required parameters
-new WP_Comment_Toolbox_Plugin_Auto_Updates($api_url, $plugin_slug);
+new WP_Comment_Toolbox_Plugin_Auto_Updates($api_url, $plugin_slug, WP_COMMENT_TOOLBOX_PLUGIN_BASENAME);
