@@ -10,7 +10,6 @@ if (!defined('ABSPATH')) {
 
 // Plugin Data
 $api_url = 'https://api.github.com/repos/WP-Developer-Hub/wp-comment-toolbox/releases/latest';
-$plugin_file = 'wp-comment-toolbox/wp-comment-toolbox.php';
 $plugin_slug = 'wp-comment-toolbox';
 
 if (!class_exists('WP_Comment_Toolbox_Plugin_Auto_Updates')) {
@@ -19,10 +18,10 @@ if (!class_exists('WP_Comment_Toolbox_Plugin_Auto_Updates')) {
         private $plugin_slug = null;
         private $plugin_file = null;
 
-        public function __construct($api_url = '', $plugin_slug = '', $plugin_file = '') {
+        public function __construct($api_url = '', $plugin_slug = '') {
             $this->api_endpoint = $api_url;
             $this->plugin_slug = $plugin_slug;
-            $this->plugin_file = $plugin_file;
+            $this->plugin_file = plugin_basename(__FILE__);;
 
             add_filter('pre_set_site_transient_update_plugins', array($this, 'check_for_update'));
         }
@@ -80,6 +79,8 @@ if (!class_exists('WP_Comment_Toolbox_Plugin_Auto_Updates')) {
                 'version' => ltrim($release->tag_name, 'v'),
                 'package' => $package_url,
                 'url' => $release->html_url,
+                'slug' => $this->plugin_slug,
+                'icons' => $this->get_icon_urls(),
             );
         }
 
@@ -119,6 +120,8 @@ if (!class_exists('WP_Comment_Toolbox_Plugin_Auto_Updates')) {
                     'new_version' => $info->version,
                     'package' => $info->package,
                     'url' => $info->url,
+                    'slug' => $this->plugin_slug,
+                    'icons' => $this->get_icon_urls(),
                 );
                 error_log('[Updater] Update array set in transient for ' . $this->plugin_file);
             } else {
@@ -126,8 +129,18 @@ if (!class_exists('WP_Comment_Toolbox_Plugin_Auto_Updates')) {
             }
             return $transient;
         }
+
+        private function get_icon_urls() {
+            $base_url = plugin_dir_url(__FILE__) . 'assets/';
+
+            return array(
+                '1x'  => $base_url . 'icon-128x128.png',
+                '2x'  => $base_url . 'icon-256x256.png',
+                'svg' => $base_url . 'icon.svg',
+            );
+        }
     }
 }
 
 // Instantiate with all required parameters
-new WP_Comment_Toolbox_Plugin_Auto_Updates($api_url, $plugin_slug, $plugin_file);
+new WP_Comment_Toolbox_Plugin_Auto_Updates($api_url, $plugin_slug);
