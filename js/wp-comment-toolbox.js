@@ -38,14 +38,14 @@
          $commentField.on("input", updateStatusBar); // Update remaining characters when the user types
        }
 
-      function isEmpty(str) {
-          return !str.trim().length;
+      function isEmpty(value) {
+          return (!value || value.trim() === '');
       }
 
       $.fn.initializeCaptchaValidation = function(options) {
           var captchaField = $('input[name="wpct_math_captcha"]');
 
-          captchaField.on('focus', function(e) {
+          captchaField.on('input', function(e) {
               var num1 = parseInt($('input[name="wpct_math_num1"]').val());
               var num2 = parseInt($('input[name="wpct_math_num2"]').val());
               var correctAnswer = num1 + num2;

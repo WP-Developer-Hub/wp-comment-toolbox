@@ -160,13 +160,12 @@ class WP_Comment_Toolbox_Span_And_Security {
                 if ($textarea_filled_out || $submit_name_missing) {
                     $approved = 'spam'; // Mark as spam
                 }
-
-                // Unset session variable after the check
-                unset($_SESSION['wpct_comment_honeypot_name']);
             }
 
-            // Optionally clean up session data here if no longer needed
-            // session_unset(); // If you wish to clean up all session data
+            // Unset session variable after the check
+            if (session_status() == PHP_SESSION_ACTIVE) {
+                session_destroy();
+            }
         }
 
         return $approved;
@@ -244,10 +243,10 @@ class WP_Comment_Toolbox_Span_And_Security {
                 wp_die($incorrect_answer_message, $error_message, array('response' => 403, 'back_link' => true));
             }
 
-            // Unset session variables after successful validation
-            unset($_SESSION['wptc_captcha_answer']);
-            unset($_SESSION['wptc_captcha_num1']);
-            unset($_SESSION['wptc_captcha_num2']);
+            // Unset session variable after the check
+            if (session_status() == PHP_SESSION_ACTIVE) {
+                session_destroy();
+            }
         }
         return $commentdata;
     }
