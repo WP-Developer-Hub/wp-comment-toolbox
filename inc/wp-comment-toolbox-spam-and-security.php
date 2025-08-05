@@ -277,7 +277,7 @@ class WP_Comment_Toolbox_Span_And_Security {
         }
 
         // Check if the difference between last and new comment time is less than delay
-        if (($time_new - $time_last) < $delay) {
+        if (($time_new - $time_last) < $delay || $dam_it) {
             return true;
         }
 
