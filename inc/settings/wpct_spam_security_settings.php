@@ -13,6 +13,22 @@ WPCT_Helper::wpct_input_field(
     array( 'min' => 240, 'max' => 480, 'inputmode' => 'numeric', 'pattern' => '[0-9]*', 'placeholder' => '280' )
 );
 
+// Comment Flood Timeout (Seconds) including option for no delay (0 seconds)
+WPCT_Helper::wpct_select_box(
+    'wpct_comment_flood_delay',
+    __('Comment Flood Delay', 'wpct'),
+    '15',
+    __('Set the minimum wait time between user comments.', 'wpct'),
+    array(
+        '00' => __('No Delay', 'wpct'),
+        '15' => __('15 seconds', 'wpct'),
+        '30' => __('30 seconds', 'wpct'),
+        '45' => __('45 seconds', 'wpct'),
+        '60' => __('1 minute', 'wpct'),
+        '120' => __('2 minutes', 'wpct'),
+    )
+);
+
 // Disable Clickable Links in Comments
 WPCT_Helper::wpct_select_box(
     'wpct_disable_clickable_links',

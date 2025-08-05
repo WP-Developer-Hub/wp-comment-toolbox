@@ -14,6 +14,7 @@ class WP_Comment_Toolbox_Span_And_Security {
         add_action('comment_form', [$this, 'add_wp_nonce_and_huonoy_pot_field']);
         add_filter('preprocess_comment', [$this, 'wpct_verify_math_captcha'], 8);
         add_filter('pre_comment_content', [$this, 'strip_bad_html_form_comment'], 9);
+        add_filter('comment_flood_filter', [$this, 'wpct_comment_flood_delay'], 10, 3);
         add_filter('comment_form_field_comment', [$this, 'wpct_math_captcha_field'], 9);
     }
 
@@ -264,6 +265,23 @@ class WP_Comment_Toolbox_Span_And_Security {
             default:
                 return 10;
         }
+    }
+
+    // Blocks top-level comments posted faster than the configured delay to prevent spam.
+    public function wpct_comment_flood_delay($dam_it, $time_last, $time_new) {
+        $delay = intval(get_option('wpct_comment_flood_delay', 15));
+
+        // If delay is 0, disable flood protection (allow rapid comments)
+        if ($delay === '00') {
+            return false;
+        }
+
+        // Check if the difference between last and new comment time is less than delay
+        if (($time_new - $time_last) < $delay) {
+            return true;
+        }
+
+        return false;
     }
 }
 new WP_Comment_Toolbox_Span_And_Security();

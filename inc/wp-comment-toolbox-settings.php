@@ -149,6 +149,7 @@ class WP_Comment_Toolbox_Settings_2_0 {
         update_option('wpct_comment_message_limit', $_POST['wpct_comment_message_limit']);
         update_option('wpct_disable_clickable_links', $_POST['wpct_disable_clickable_links']);
         update_option('wpct_enable_wp_kses_post', $_POST['wpct_enable_wp_kses_post']);
+        update_option('wpct_comment_flood_delay', $_POST['wpct_comment_flood_delay']);
         update_option('wpct_enable_spam_protect', $_POST['wpct_enable_spam_protect']);
         update_option('wpct_submit_button_name', $_POST['wpct_submit_button_name']);
         update_option('wpct_enable_math_captcha', $_POST['wpct_enable_math_captcha']);
