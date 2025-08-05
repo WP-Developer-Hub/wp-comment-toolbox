@@ -267,17 +267,21 @@ class WP_Comment_Toolbox_Span_And_Security {
         }
     }
 
-    // Blocks top-level comments posted faster than the configured delay to prevent spam.
     public function wpct_comment_flood_delay($dam_it, $time_last, $time_new) {
         $delay = intval(get_option('wpct_comment_flood_delay', 15));
 
-        // If delay is 0, disable flood protection (allow rapid comments)
-        if ($delay === '00') {
+        // If delay is 00, disable flood protection (allow rapid comments)
+        if ($delay === 0) {
             return false;
         }
 
-        // Check if the difference between last and new comment time is less than delay
-        if (($time_new - $time_last) < $delay || $dam_it) {
+        // Respect existing flood status first
+        if ($dam_it) {
+            return true;
+        }
+
+        // Then check if time difference is less than delay
+        if (($time_new - $time_last) < $delay) {
             return true;
         }
 

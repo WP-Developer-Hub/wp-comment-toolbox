@@ -20,7 +20,7 @@ WPCT_Helper::wpct_select_box(
     '15',
     __('Set the minimum wait time between user comments.', 'wpct'),
     array(
-        '00' => __('No Delay', 'wpct'),
+        '0' => __('No Delay', 'wpct'),
         '15' => __('15 seconds', 'wpct'),
         '30' => __('30 seconds', 'wpct'),
         '45' => __('45 seconds', 'wpct'),

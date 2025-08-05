@@ -17,7 +17,7 @@ class WPCT_Helper {
     // Input Field
     public static function wpct_input_field($name, $label, $type = 'text', $value = '', $description = '', $attr = array()) {
         // Fetch the stored value for this option (default to $value if not set)
-        $input_value = empty(get_option($name, $value)) ? $value : get_option($name, $value);
+        $input_value = get_option($name, $value);
 
         // Prepare additional attributes
         $additional_attributes = '';
@@ -52,7 +52,7 @@ class WPCT_Helper {
     // Select Box
     public static function wpct_select_box($name, $label, $value = '', $description = '', $choices = array(), $attr = array()) {
         // Fetch the stored value for this option (default to $value if not set)
-        $input_value = empty(get_option($name, $value)) ? $value : get_option($name, $value);
+        $input_value = get_option($name, $value);
 
         // Prepare additional attributes
         $additional_attributes = '';
@@ -90,7 +90,7 @@ class WPCT_Helper {
     // Text Area Field
     public static function wpct_text_area($name, $label, $value = '', $description = '', $attr = array()) {
         // Fetch the stored value for this option (default to $value if not set)
-        $text_value = empty(get_option($name, $value)) ? $value : get_option($name, $value);
+        $text_value = get_option($name, $value);
         
         // Prepare additional attributes
         $additional_attributes = '';
