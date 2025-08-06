@@ -167,11 +167,11 @@ class WPCT_Helper {
             @session_start();
 
             if (defined('WP_COMMENT_TOOLBOX_PLUGIN_IS_DEBUG_ON') && WP_COMMENT_TOOLBOX_PLUGIN_IS_DEBUG_ON) {
-                error_log("[WPCT] Session started by '{$by}' at " . date('Y-m-d H:i:s'));
+                error_log("WPCT: session started by {$by}");
             }
         } else {
             if (defined('WP_COMMENT_TOOLBOX_PLUGIN_IS_DEBUG_ON') && WP_COMMENT_TOOLBOX_PLUGIN_IS_DEBUG_ON) {
-                error_log("[WPCT] Session not started by '{$by}'. Status: " . session_status() . ", Headers sent: " . (headers_sent() ? 'true' : 'false'));
+                error_log("WPCT: session NOT started by {$by}");
             }
         }
     }
@@ -179,13 +179,9 @@ class WPCT_Helper {
     // Destroys the PHP session only if it's currently active, with optional cleanup and logging
     public static function wpct_destroy_session($by = 'unknown') {
         if (session_status() == PHP_SESSION_ACTIVE) {
-            // Clear all session variables
             $_SESSION = [];
-
-            // Destroy the session
             session_destroy();
 
-            // Also delete the PHPSESSID cookie to fully clear the session client-side
             if (ini_get("session.use_cookies")) {
                 $params = session_get_cookie_params();
                 setcookie(session_name(), '', time() - 42000,
@@ -195,11 +191,11 @@ class WPCT_Helper {
             }
 
             if (defined('WP_COMMENT_TOOLBOX_PLUGIN_IS_DEBUG_ON') && WP_COMMENT_TOOLBOX_PLUGIN_IS_DEBUG_ON) {
-                error_log("[WPCT] Session destroyed by '{$by}' at " . date('Y-m-d H:i:s'));
+                error_log("WPCT: session destroyed by {$by}");
             }
         } else {
             if (defined('WP_COMMENT_TOOLBOX_PLUGIN_IS_DEBUG_ON') && WP_COMMENT_TOOLBOX_PLUGIN_IS_DEBUG_ON) {
-                error_log("[WPCT] Session not destroyed by '{$by}'. Current status: " . session_status());
+                error_log("WPCT: session NOT destroyed by {$by}");
             }
         }
     }
