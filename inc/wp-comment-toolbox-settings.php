@@ -52,6 +52,7 @@ class WP_Comment_Toolbox_Settings_2_0 {
         echo '<h2 class="nav-tab-wrapper">';
         $tabs = [
             'spam_security' => 'Spam & Security',
+            'privacy' => 'Privacy',
             'comment_list' => 'Comment List',
             'comment_form' => 'Comment Form',
             'extra' => 'Extra',
@@ -89,6 +90,10 @@ class WP_Comment_Toolbox_Settings_2_0 {
         $this->wpct_load_setting('spam_security');
     }
 
+    public function privacy_settings() {
+        $this->wpct_load_setting('privacy');
+    }
+
     public function comment_list_settings() {
         $this->wpct_load_setting('comment_list');
     }
@@ -123,6 +128,9 @@ class WP_Comment_Toolbox_Settings_2_0 {
             case 'spam_security':
                 $this->save_spam_security_settings();
                 break;
+            case 'privacy':
+                $this->save_privacy_settings();
+                break;
             case 'comment_list':
                 $this->save_comment_list_settings();
                 break;
@@ -154,6 +162,10 @@ class WP_Comment_Toolbox_Settings_2_0 {
         update_option('wpct_submit_button_name', $_POST['wpct_submit_button_name']);
         update_option('wpct_enable_math_captcha', $_POST['wpct_enable_math_captcha']);
         update_option('wpct_math_captcha_level', $_POST['wpct_math_captcha_level']);
+    }
+
+    private function save_privacy_settings() {
+        update_option('wpct_comment_cookie_lifetime', $_POST['wpct_comment_cookie_lifetime']);
     }
 
     // Save settings specific to Comment List tab

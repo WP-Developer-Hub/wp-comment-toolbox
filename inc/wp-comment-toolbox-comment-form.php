@@ -116,7 +116,11 @@ class WP_Comment_Toolbox_Comment_Form {
                 $custom_cookies_msg = $cookies_msg . $privacy_policy_link;
             }
 
-            $ordered_fields['cookies'] = '<p class="comment-form-cookies-consent"><label for="wp-comment-cookies-consent"><input id="wp-comment-cookies-consent" name="wp-comment-cookies-consent" type="checkbox" value="yes"' . $consent . '>' . $custom_cookies_msg . '</label></p>';
+            if (WPCT_Helper::wpct_get_comment_cookie_lifetime() === 0) {
+                unset($ordered_fields['cookies']);
+            } else {
+                $ordered_fields['cookies'] = '<p class="comment-form-cookies-consent"><label for="wp-comment-cookies-consent"><input id="wp-comment-cookies-consent" name="wp-comment-cookies-consent" type="checkbox" value="yes"' . $consent . '>' . $custom_cookies_msg . '</label></p>';
+            }
         }
         return $ordered_fields;
     }

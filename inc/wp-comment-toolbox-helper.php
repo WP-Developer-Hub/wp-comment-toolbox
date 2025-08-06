@@ -149,5 +149,17 @@ class WPCT_Helper {
         </tr>
         <?php
     }
+
+    public static function wpct_get_comment_cookie_lifetime() {
+        // Get the raw option value for cookie lifetime, default to 259200 (3 days)
+        $lifetime_value = intval(get_option('wpct_comment_cookie_lifetime', 259200));
+        
+        // Apply filter to allow dynamic modification
+        $lifetime = apply_filters('wpct_comment_cookie_lifetime_value', $lifetime_value);
+        
+        // Optional: sanitize again in case filter returns unexpected value
+        return intval($lifetime);
+    }
+
 }
 ?>
