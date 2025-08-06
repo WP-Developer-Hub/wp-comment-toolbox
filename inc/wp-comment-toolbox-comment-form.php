@@ -12,7 +12,7 @@ class WP_Comment_Toolbox_Comment_Form {
     }
 
     public function wpct_add_custom_comment_css() {
-        $height = get_option('wpct_comment_textarea_height', 150); // Default to 150px
+        $height = intval(get_option('wpct_comment_textarea_height', 150));
         ?>
         <style>.comment-form textarea { min-height: <?php echo esc_attr($height); ?>px !important; }</style>
         <?php
@@ -28,7 +28,7 @@ class WP_Comment_Toolbox_Comment_Form {
     }
 
     public function reorder_comment_form_fields($fields) {
-        $max_length = esc_html(get_option('wpct_comment_message_limit', 280));
+        $max_length = esc_html(intval(get_option('wpct_comment_message_limit', 280)));
         $name_or_username = get_option('wpct_author_placeholder', 'full_name');
         $custom_cookies_msg = esc_html(get_option('wpct_comment_form_cookies_msg'), '');
         $comment_textarea_placeholder = get_option('wpct_comment_textarea_placeholder');
