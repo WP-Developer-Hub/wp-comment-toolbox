@@ -24,6 +24,7 @@ define('WP_COMMENT_TOOLBOX_PLUGIN_SLUG', 'wp-comment-toolbox');
 define('WP_COMMENT_TOOLBOX_PLUGIN_DIR', plugin_dir_path(__FILE__));
 define('WP_COMMENT_TOOLBOX_PLUGIN_URL', plugin_dir_url(__FILE__));
 define('WP_COMMENT_TOOLBOX_PLUGIN_BASENAME', plugin_basename(__FILE__));
+define('WP_COMMENT_TOOLBOX_PLUGIN_IS_DEBUG_ON', (defined('WP_DEBUG') && WP_DEBUG));
 
 class WP_Comment_Toolbox {
 
@@ -39,7 +40,7 @@ class WP_Comment_Toolbox {
         require_once(WP_COMMENT_TOOLBOX_PLUGIN_DIR . 'inc/wp-comment-toolbox-privacy.php');
         require_once(WP_COMMENT_TOOLBOX_PLUGIN_DIR . 'inc/wp-comment-toolbox-settings.php');
 
-        if (!(defined('WP_DEBUG') && WP_DEBUG)) {
+        if (defined('WP_COMMENT_TOOLBOX_PLUGIN_IS_DEBUG_ON') && !WP_COMMENT_TOOLBOX_PLUGIN_IS_DEBUG_ON) {
             require_once(WP_COMMENT_TOOLBOX_PLUGIN_DIR . 'inc/wp-comment-toolbox-updates.php');
         }
 

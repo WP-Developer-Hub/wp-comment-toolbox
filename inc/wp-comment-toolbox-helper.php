@@ -161,5 +161,48 @@ class WPCT_Helper {
         return intval($lifetime);
     }
 
+    // Starts a PHP session if not already started and headers allow it
+    public static function wpct_start_session($by = 'unknown') {
+        if (session_status() == PHP_SESSION_NONE && !headers_sent()) {
+            @session_start();
+
+            if (defined('WP_COMMENT_TOOLBOX_PLUGIN_IS_DEBUG_ON') && WP_COMMENT_TOOLBOX_PLUGIN_IS_DEBUG_ON) {
+                error_log("[WPCT] Session started by '{$by}' at " . date('Y-m-d H:i:s'));
+            }
+        } else {
+            if (defined('WP_COMMENT_TOOLBOX_PLUGIN_IS_DEBUG_ON') && WP_COMMENT_TOOLBOX_PLUGIN_IS_DEBUG_ON) {
+                error_log("[WPCT] Session not started by '{$by}'. Status: " . session_status() . ", Headers sent: " . (headers_sent() ? 'true' : 'false'));
+            }
+        }
+    }
+
+    // Destroys the PHP session only if it's currently active, with optional cleanup and logging
+    public static function wpct_destroy_session($by = 'unknown') {
+        if (session_status() == PHP_SESSION_ACTIVE) {
+            // Clear all session variables
+            $_SESSION = [];
+
+            // Destroy the session
+            session_destroy();
+
+            // Also delete the PHPSESSID cookie to fully clear the session client-side
+            if (ini_get("session.use_cookies")) {
+                $params = session_get_cookie_params();
+                setcookie(session_name(), '', time() - 42000,
+                    $params["path"], $params["domain"],
+                    $params["secure"], $params["httponly"]
+                );
+            }
+
+            if (defined('WP_COMMENT_TOOLBOX_PLUGIN_IS_DEBUG_ON') && WP_COMMENT_TOOLBOX_PLUGIN_IS_DEBUG_ON) {
+                error_log("[WPCT] Session destroyed by '{$by}' at " . date('Y-m-d H:i:s'));
+            }
+        } else {
+            if (defined('WP_COMMENT_TOOLBOX_PLUGIN_IS_DEBUG_ON') && WP_COMMENT_TOOLBOX_PLUGIN_IS_DEBUG_ON) {
+                error_log("[WPCT] Session not destroyed by '{$by}'. Current status: " . session_status());
+            }
+        }
+    }
+
 }
 ?>
