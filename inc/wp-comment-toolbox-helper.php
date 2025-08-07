@@ -164,8 +164,8 @@ if (!class_exists('WPCT_Helper')) {
 
         // Starts a PHP session if not already started and headers allow it
         public static function wpct_start_session($by = 'unknown') {
-            if (session_status() == PHP_SESSION_NONE && !headers_sent()) {
-                @session_start();
+            if (session_status() == PHP_SESSION_NONE) {
+                session_start();
     
                 if (defined('WP_COMMENT_TOOLBOX_PLUGIN_IS_DEBUG_ON') && WP_COMMENT_TOOLBOX_PLUGIN_IS_DEBUG_ON) {
                     error_log("WPCT: session started by {$by}");

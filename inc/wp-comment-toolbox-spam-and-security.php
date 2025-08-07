@@ -116,7 +116,6 @@ if (!class_exists('WP_Comment_Toolbox_Span_And_Security')) {
                 wp_nonce_field('comment_nonce', 'wpct_comment_nonce');
 
                 // Start PHP session
-                WPCT_Helper::wpct_destroy_session('add_wp_nonce_and_honeypot_field');
                 WPCT_Helper::wpct_start_session('add_wp_nonce_and_honeypot_field');
 
                 // Store the textarea name in the session variable
@@ -140,7 +139,7 @@ if (!class_exists('WP_Comment_Toolbox_Span_And_Security')) {
 
                 // Check nonce validity
                 if (!isset($_POST['wpct_comment_nonce']) || !check_admin_referer('comment_nonce', 'wpct_comment_nonce')) {
-                    $approved = 'spam'; // Mark as spam if nonce is invalid
+                    $approved = 'spam';
                 }
 
                 // Retrieve the textarea name from the session
@@ -176,7 +175,6 @@ if (!class_exists('WP_Comment_Toolbox_Span_And_Security')) {
                 }
 
                 // Start PHP session
-                WPCT_Helper::wpct_destroy_session('wpct_math_captcha_field');
                 WPCT_Helper::wpct_start_session('wpct_math_captcha_field');
 
                 $captcha_level = intval($this->wpct_ren_math_captcha_level());
