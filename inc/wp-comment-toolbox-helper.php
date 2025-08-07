@@ -43,7 +43,7 @@ if (!class_exists('WPCT_Helper')) {
                            <?php echo $additional_attributes; ?>
                     />
                     <?php if ($description): ?>
-                        <p class="description"><?php echo esc_html($description); ?></p>
+                        <p class="description"><?php echo $description; ?></p>
                     <?php endif; ?>
                 </td>
             </tr>
@@ -81,7 +81,7 @@ if (!class_exists('WPCT_Helper')) {
                         ?>
                     </select>
                     <?php if ($description): ?>
-                        <p class="description"><?php echo esc_html($description); ?></p>
+                        <p class="description"><?php echo $description ?></p>
                     <?php endif; ?>
                 </td>
             </tr>
@@ -115,7 +115,7 @@ if (!class_exists('WPCT_Helper')) {
                               <?php echo $additional_attributes; ?>
                     ><?php echo esc_textarea($text_value); ?></textarea>
                     <?php if ($description): ?>
-                        <p class="description"><?php echo esc_html($description); ?></p>
+                        <p class="description"><?php echo $description ?></p>
                     <?php endif; ?>
                 </td>
             </tr>
@@ -144,7 +144,7 @@ if (!class_exists('WPCT_Helper')) {
                               id="<?php echo esc_attr($name); ?>"
                               <?php echo $additional_attributes; ?> ><?php echo esc_textarea($value); ?></textarea>
                     <?php if ($description): ?>
-                        <p class="description"><?php echo esc_html($description); ?></p>
+                        <p class="description"><?php echo $description ?></p>
                     <?php endif; ?>
                 </td>
             </tr>
