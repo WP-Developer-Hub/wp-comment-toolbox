@@ -83,9 +83,7 @@ if (!class_exists('WP_Comment_Toolbox_Comment_Form')) {
             }
 
             if (isset($ordered_fields['cookies'])) {
-                if (WPCT_Helper::wpct_get_comment_cookie_lifetime() === 0) {
-                    unset($ordered_fields['cookies']);
-                } else {
+                if (get_option('show_comments_cookies_opt_in', true)) {
                     $commenter = wp_get_current_commenter();
                     $consent = empty($commenter['comment_author_email']) ? '' : ' checked="checked"';
 
@@ -120,6 +118,8 @@ if (!class_exists('WP_Comment_Toolbox_Comment_Form')) {
                         $custom_cookies_msg = $cookies_msg . $privacy_policy_link;
                     }
                     $ordered_fields['cookies'] = '<p class="comment-form-cookies-consent"><label for="wp-comment-cookies-consent"><input id="wp-comment-cookies-consent" name="wp-comment-cookies-consent" type="checkbox" value="yes"' . $consent . '>' . $custom_cookies_msg . '</label></p>';
+                } else {
+                    unset($ordered_fields['cookies']);
                 }
             }
             return $ordered_fields;

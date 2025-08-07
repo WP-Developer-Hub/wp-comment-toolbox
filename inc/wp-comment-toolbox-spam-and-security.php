@@ -279,23 +279,19 @@ if (!class_exists('WP_Comment_Toolbox_Span_And_Security')) {
         }
 
         public function wpct_comment_flood_delay($dam_it, $time_last, $time_new) {
-            $delay = intval(get_option('wpct_comment_flood_delay', 15));
+            if (get_option('show_comments_cookies_opt_in', true)) {
+                $delay = intval(get_option('wpct_comment_flood_delay', 15));
 
-            // If delay is 00, disable flood protection (allow rapid comments)
-            if ($delay === 0) {
-                return false;
+                // Respect existing flood status first
+                if ($dam_it) {
+                    return true;
+                }
+
+                // Then check if time difference is less than delay
+                if (($time_new - $time_last) < $delay) {
+                    return true;
+                }
             }
-
-            // Respect existing flood status first
-            if ($dam_it) {
-                return true;
-            }
-
-            // Then check if time difference is less than delay
-            if (($time_new - $time_last) < $delay) {
-                return true;
-            }
-
             return false;
         }
     }
