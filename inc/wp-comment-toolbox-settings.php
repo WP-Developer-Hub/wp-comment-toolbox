@@ -165,7 +165,9 @@ if (!class_exists('WP_Comment_Toolbox_Settings')) {
             update_option('wpct_comment_message_limit', $_POST['wpct_comment_message_limit']);
             update_option('wpct_disable_clickable_links', $_POST['wpct_disable_clickable_links']);
             update_option('wpct_enable_wp_kses_post', $_POST['wpct_enable_wp_kses_post']);
-            update_option('wpct_comment_flood_delay', $_POST['wpct_comment_flood_delay']);
+            if (get_option('show_comments_cookies_opt_in', true)) {
+                update_option('wpct_comment_flood_delay', $_POST['wpct_comment_flood_delay']);
+            }
             update_option('wpct_enable_spam_protect', $_POST['wpct_enable_spam_protect']);
             update_option('wpct_submit_button_name', $_POST['wpct_submit_button_name']);
             update_option('wpct_enable_math_captcha', $_POST['wpct_enable_math_captcha']);
@@ -206,6 +208,7 @@ if (!class_exists('WP_Comment_Toolbox_Settings')) {
         // Save settings specific to Admin tab
         private function save_admin_settings() {
             update_option('wpct_scam_filter_enabled', $_POST['wpct_scam_filter_enabled']);
+            update_option('wpct_show_block_ip_action', $_POST['wpct_show_block_ip_action']);
             update_option('wpct_disable_comment_formatting', $_POST['wpct_disable_comment_formatting']);
         }
 

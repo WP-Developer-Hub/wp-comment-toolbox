@@ -161,7 +161,7 @@ if (!class_exists('WPCT_Helper')) {
             // Optional: sanitize again in case filter returns unexpected value
             return intval($lifetime);
         }
-    
+
         // Starts a PHP session if not already started and headers allow it
         public static function wpct_start_session($by = 'unknown') {
             if (session_status() == PHP_SESSION_NONE && !headers_sent()) {
@@ -176,13 +176,13 @@ if (!class_exists('WPCT_Helper')) {
                 }
             }
         }
-    
+
         // Destroys the PHP session only if it's currently active, with optional cleanup and logging
         public static function wpct_destroy_session($by = 'unknown') {
             if (session_status() == PHP_SESSION_ACTIVE) {
                 $_SESSION = [];
                 session_destroy();
-    
+
                 if (ini_get("session.use_cookies")) {
                     $params = session_get_cookie_params();
                     setcookie(session_name(), '', time() - 42000,

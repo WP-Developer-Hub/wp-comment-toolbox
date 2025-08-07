@@ -11,6 +11,9 @@ if (!class_exists('WP_Comment_Toolbox_Admin')) {
             add_action('manage_comments_custom_column', [$this, 'show_comment_column_content'], 10, 2);
             add_filter('views_edit-comments', [$this, 'filter_comments_by_scam']);
             add_filter('comments_clauses', [$this, 'filter_comments_by_scam_query'], 10, 2);
+            add_filter('comment_row_actions', [$this, 'add_block_ip_action_to_comment'], 10, 2);
+            add_filter('admin_post_block_ip', [$this, 'handle_block_ip_action'], 10, 2);
+            add_filter('admin_notices', [$this, 'handle_block_ip_notices']);
 
             // Add the comment text filter based on the option
             add_filter('comment_text', [$this, 'filter_comment_text'], PHP_INT_MAX);
@@ -62,9 +65,9 @@ if (!class_exists('WP_Comment_Toolbox_Admin')) {
                             'key' => 'has_scam',
                             'value' => '1',
                             'compare' => '='
-                        ),
-                    ),
-                );
+                       ),
+                   ),
+               );
                 $comment_query = new WP_Comment_Query($args);
                 $comments = $comment_query->comments;
 
@@ -96,13 +99,101 @@ if (!class_exists('WP_Comment_Toolbox_Admin')) {
             if (is_admin() && get_option('wpct_disable_comment_formatting')) {
                 // Preserve the actual URLs but strip the anchor tags
                 $comment_text = preg_replace_callback('/<a[^>]+href=["\']([^"\']+)["\'][^>]*>(.*?)<\/a>/is', function($matches) {
-                    return filter_var($matches[1], FILTER_VALIDATE_URL) ? $matches[1] : $matches[2];
+                    return filter_var($matches[1], (FILTER_VALIDATE_URL) ? $matches[1] : $matches[2]);
                 }, $comment_text);
 
                 // Strip all remaining HTML tags
                 $comment_text = wp_strip_all_tags($comment_text);
             }
             return $comment_text;
+        }
+
+        public function add_block_ip_action_to_comment($actions, $comment) {
+            // Check if the "Show Block IP Button" option is enabled (defaults to true)
+            if (get_option('wpct_show_block_ip_action', 1)) {
+
+                // Get the comment author's IP address
+                $ip = $comment->comment_author_IP;
+
+                // Build a nonce-secured action link to your plugin's IP block handler
+                $block_url = wp_nonce_url(
+                    admin_url('admin-post.php?action=block_ip&ip=' . urlencode($ip)),
+                    'block_ip_' . $ip
+                );
+
+                // Prepare translatable strings as variables
+                $confirm_message = esc_js(__('Are you sure you want to block this IP?', 'wpct'));
+                $link_text = esc_html__('Block IP', 'wpct');
+
+                // Add the 'Block' link to the actions array
+                $actions['block_ip'] = '<a href="' . esc_url($block_url) . '" onclick="return confirm(\'' . $confirm_message . '\');">' . $link_text . '</a>';
+            }
+
+            return $actions;
+        }
+
+        public function handle_block_ip_action() {
+            // Check if the "Show Block IP Button" option is enabled (defaults to true)
+            if (get_option('wpct_show_block_ip_action', 1)) {
+                // Check user capabilities
+                if (! current_user_can('manage_options')) {
+                    wp_die('Unauthorized user');
+                }
+
+                // Get IP and nonce from request and sanitize
+                $ip = isset($_GET['ip']) ? sanitize_text_field(wp_unslash($_GET['ip'])) : '';
+                $nonce = isset($_GET['_wpnonce']) ? wp_unslash($_GET['_wpnonce']) : '';
+
+                if (empty($ip) || ! wp_verify_nonce($nonce, 'block_ip_' . $ip)) {
+                    wp_die('Invalid request.');
+                }
+
+                // Get existing blacklist option (array or string)
+                $blacklist = get_option('blacklist_keys', array());
+
+                // If stored as string (old format), convert to array
+                if (! is_array($blacklist)) {
+                    $blacklist = explode("\n", str_replace("\r", '', $blacklist));
+                }
+
+                // Normalize blacklist: trim all lines and filter empty values
+                $blacklist = array_filter(array_map('trim', $blacklist));
+
+                // Add the IP only if not already in blacklist
+                if (! in_array($ip, $blacklist, true)) {
+                    $blacklist[] = $ip;
+                    // Update the option with each item on its own line, as WordPress expects
+                    update_option('blacklist_keys', implode("\n", $blacklist));
+                }
+
+                // Redirect back to comments admin page, optionally add notice
+                $redirect_url = add_query_arg(
+                    array(
+                        'block_ip_status' => 'success',
+                        'blocked_ip'      => urlencode($ip),
+                   ),
+                    admin_url('edit-comments.php')
+               );
+
+                wp_safe_redirect($redirect_url);
+                exit;
+            }
+        }
+
+        public function handle_block_ip_notices() {
+            // Check if the "Show Block IP Button" option is enabled (defaults to true)
+            if (get_option('wpct_show_block_ip_action', 1)) {
+                if (isset($_GET['block_ip_status']) && $_GET['block_ip_status'] === 'success' && !empty($_GET['blocked_ip'])) {
+                    $blocked_ip = sanitize_text_field(wp_unslash($_GET['blocked_ip']));
+                    echo '<div class="notice notice-success is-dismissible">';
+                    echo '<p>' . sprintf(
+                        /* translators: %s is an IP address */
+                        esc_html__('IP address %s has been added to the comment blacklist and blocked from commenting.', 'wpct'),
+                        '<strong>' . esc_html($blocked_ip) . '</strong>'
+                    ) . '</p>';
+                    echo '</div>';
+                }
+            }
         }
     }
     new WP_Comment_Toolbox_Admin();
