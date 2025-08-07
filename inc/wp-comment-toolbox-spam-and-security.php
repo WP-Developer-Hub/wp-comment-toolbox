@@ -116,6 +116,7 @@ if (!class_exists('WP_Comment_Toolbox_Span_And_Security')) {
                 wp_nonce_field('comment_nonce', 'wpct_comment_nonce');
 
                 // Start PHP session
+                WPCT_Helper::wpct_destroy_session('add_wp_nonce_and_honeypot_field');
                 WPCT_Helper::wpct_start_session('add_wp_nonce_and_honeypot_field');
 
                 // Store the textarea name in the session variable
@@ -175,8 +176,8 @@ if (!class_exists('WP_Comment_Toolbox_Span_And_Security')) {
                 }
 
                 // Start PHP session
+                WPCT_Helper::wpct_destroy_session('wpct_math_captcha_field');
                 WPCT_Helper::wpct_start_session('wpct_math_captcha_field');
-
 
                 $captcha_level = intval($this->wpct_ren_math_captcha_level());
                 $num1 = intval(rand(1, $captcha_level));
@@ -186,7 +187,6 @@ if (!class_exists('WP_Comment_Toolbox_Span_And_Security')) {
                 $_SESSION['wptc_captcha_answer'] = md5($num1 + $num2);
                 $_SESSION['wptc_captcha_num1'] = $num1;
                 $_SESSION['wptc_captcha_num2'] = $num2;
-
 
                 $problem = "<span class=\"wptc-captcha-problem\">{$num1} + {$num2}</span>";
 
