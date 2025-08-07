@@ -200,6 +200,13 @@ if (!class_exists('WPCT_Helper')) {
                 }
             }
         }
-    
+
+        public static function wpct_get_comment_blocklist() {
+            $raw = get_option('blacklist_keys');
+            if (!$raw) {
+                return [];
+            }
+            return array_filter(array_map('trim', explode("\n", $raw)));
+        }
     }
 }
