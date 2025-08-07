@@ -18,7 +18,7 @@ WPCT_Helper::wpct_select_box(
     __('Comment Flood Delay', 'wpct'),
     '15',
     sprintf(
-        __('This setting depends on the %1$sShow comments cookies opt-in checkbox%2$s option in %3$sSettings → Discussion%4$s. Disabling that option will disable this setting.', 'wpct'),
+        __('Set the minimum wait time between user comments. <br>This setting depends on the %1$sShow comments cookies opt-in checkbox%2$s option in %3$sSettings → Discussion%4$s. Disabling that option will disable this setting.', 'wpct'),
         '<a href="' . esc_url(admin_url('options-discussion.php#other-comment-settings')) . '" target="_blank" rel="noopener noreferrer">',
         '</a>',
         '<strong>',
