@@ -133,64 +133,71 @@ if (!class_exists('WP_Comment_Toolbox_Admin')) {
         }
 
         public function handle_block_ip_action() {
-            // Check if the "Show Block IP Button" option is enabled (defaults to true)
-            if (get_option('wpct_show_block_ip_action', 1)) {
-                // Check user capabilities
-                if (! current_user_can('manage_options')) {
-                    wp_die('Unauthorized user');
-                }
-
-                // Get IP and nonce from request and sanitize
-                $ip = isset($_GET['ip']) ? sanitize_text_field(wp_unslash($_GET['ip'])) : '';
-                $nonce = isset($_GET['_wpnonce']) ? wp_unslash($_GET['_wpnonce']) : '';
-
-                if (empty($ip) || ! wp_verify_nonce($nonce, 'block_ip_' . $ip)) {
-                    wp_die('Invalid request.');
-                }
-
-                // Get existing blacklist option (array or string)
-                $blacklist = get_option('blacklist_keys', array());
-
-                // If stored as string (old format), convert to array
-                if (! is_array($blacklist)) {
-                    $blacklist = explode("\n", str_replace("\r", '', $blacklist));
-                }
-
-                // Normalize blacklist: trim all lines and filter empty values
-                $blacklist = array_filter(array_map('trim', $blacklist));
-
-                // Add the IP only if not already in blacklist
-                if (! in_array($ip, $blacklist, true)) {
-                    $blacklist[] = $ip;
-                    // Update the option with each item on its own line, as WordPress expects
-                    update_option('blacklist_keys', implode("\n", $blacklist));
-                }
-
-                // Redirect back to comments admin page, optionally add notice
-                $redirect_url = add_query_arg(
-                    array(
-                        'block_ip_status' => 'success',
-                        'blocked_ip'      => urlencode($ip),
-                   ),
-                    admin_url('edit-comments.php')
-               );
-
-                wp_safe_redirect($redirect_url);
-                exit;
+            // Option check: only proceed if enabled (defaults to true)
+            if (! get_option('wpct_show_block_ip_action', 1)) {
+                return;
             }
+
+            // Capability check
+            if (! current_user_can('manage_options')) {
+                wp_die('Unauthorized user');
+            }
+
+            // Get and sanitize IP and nonce from URL
+            $ip = isset($_GET['ip']) ? sanitize_text_field(wp_unslash($_GET['ip'])) : '';
+            $nonce = isset($_GET['_wpnonce']) ? wp_unslash($_GET['_wpnonce']) : '';
+
+            // Validate IP format and nonce
+            if (empty($ip) || ! filter_var($ip, FILTER_VALIDATE_IP) || ! wp_verify_nonce($nonce, 'block_ip_' . $ip)) {
+                wp_die('Invalid request.');
+            }
+
+            // Get the blocklist via helper — already trimmed, filtered
+            $blacklist = WPCT_Helper::wpct_get_comment_blocklist();
+
+            // Add IP if not already blocked
+            if (! in_array($ip, $blacklist, true)) {
+                $blacklist[] = $ip;
+                update_option('blacklist_keys', implode("\n", $blacklist));
+            }
+
+            // Redirect back with success notice
+            $redirect_url = add_query_arg(
+                array(
+                    'block_ip_status' => 'success',
+                    'blocked_ip'      => urlencode($ip),
+                ),
+                admin_url('edit-comments.php')
+            );
+
+            wp_safe_redirect($redirect_url);
+            exit;
         }
 
         public function handle_block_ip_notices() {
-            // Check if the "Show Block IP Button" option is enabled (defaults to true)
             if (get_option('wpct_show_block_ip_action', 1)) {
                 if (isset($_GET['block_ip_status']) && $_GET['block_ip_status'] === 'success' && !empty($_GET['blocked_ip'])) {
                     $blocked_ip = sanitize_text_field(wp_unslash($_GET['blocked_ip']));
+                    $blacklist = WPCT_Helper::wpct_get_comment_blocklist();
+
+                    // Prepare the dynamic message text based on IP presence in blacklist
+                    if (in_array($blocked_ip, $blacklist, true)) {
+                        $message = sprintf(
+                            /* translators: %s is an IP address */
+                            esc_html__('IP address %s is already in the comment blacklist and remains blocked.', 'wpct'),
+                            '<strong>' . esc_html($blocked_ip) . '</strong>'
+                        );
+                    } else {
+                        $message = sprintf(
+                            /* translators: %s is an IP address */
+                            esc_html__('IP address %s has been added to the comment blacklist and blocked from commenting.', 'wpct'),
+                            '<strong>' . esc_html($blocked_ip) . '</strong>'
+                        );
+                    }
+
+                    // Output the static wrapper, inserting the dynamic message
                     echo '<div class="notice notice-success is-dismissible">';
-                    echo '<p>' . sprintf(
-                        /* translators: %s is an IP address */
-                        esc_html__('IP address %s has been added to the comment blacklist and blocked from commenting.', 'wpct'),
-                        '<strong>' . esc_html($blocked_ip) . '</strong>'
-                    ) . '</p>';
+                    echo '<p>' . $message . '</p>';
                     echo '</div>';
                 }
             }
