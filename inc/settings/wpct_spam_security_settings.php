@@ -34,6 +34,27 @@ WPCT_Helper::wpct_select_box(
     get_option('show_comments_cookies_opt_in', true) ? [] : ['disabled' => 'disabled']
 );
 
+// Enable commenter IP block list check
+WPCT_Helper::wpct_select_box(
+    'wpct_enabled_commenter_ip_block_list_check',
+    __( 'Enable comment author IP block list check', 'wpct'),
+    0,
+    sprintf(
+        __('When enabled, comments from IP addresses blocked via the blocklist will be blocked from submission.', 'wpct')
+    ) . ( ! $show_block_ip ?
+     ' ' . sprintf(
+        __('Please turn on %1$sShow Block IP Actions%2$s for this to work.', 'wpct'),
+        '<a href="' . esc_url(admin_url('options-general.php?page=wpct-comment-settings&tab=admin#wpct_show_block_ip_action')) . '" target="_blank" rel="noopener">',
+        '</a>'
+     ) : ''
+    ),
+    array(
+        0 => __('No', 'wpct'),
+        1 => __('Yes', 'wpct'),
+    ),
+    get_option('wpct_show_block_ip_action', true) ? ['disabled' => 'disabled'] : []
+);
+
 // Disable Clickable Links in Comments
 WPCT_Helper::wpct_select_box(
     'wpct_disable_clickable_links',

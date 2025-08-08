@@ -16,6 +16,7 @@ if (!class_exists('WP_Comment_Toolbox_Span_And_Security')) {
             add_filter('pre_comment_content', [$this, 'strip_bad_html_form_comment'], 9);
             add_filter('comment_flood_filter', [$this, 'wpct_comment_flood_delay'], 10, 3);
             add_filter('comment_form_field_comment', [$this, 'wpct_math_captcha_field'], 9);
+            add_filter('preprocess_comment', [$this, 'check_commenter_ip_against_blocklist'], 9);
         }
 
         public function toggle_make_clickable() {
@@ -291,6 +292,19 @@ if (!class_exists('WP_Comment_Toolbox_Span_And_Security')) {
                 }
             }
             return false;
+        }
+
+        // Function to check the user IP against the blocklist
+        public function check_commenter_ip_against_blocklist($commentdata) {
+            if ( get_option('wpct_enabled_commenter_ip_block_list_check', false) ) {
+                $blocklist = WPCT_Helper::wpct_get_comment_blocklist();
+
+                $ip = $_SERVER['REMOTE_ADDR'] ?? '';
+                if ($ip && in_array($ip, $blocklist)) {
+                    wp_die('Your IP address is blocked from commenting.', 'Access Denied', array('response' => 403, 'back_link' => true));
+                }
+            }
+            return $commentdata;
         }
     }
     new WP_Comment_Toolbox_Span_And_Security();

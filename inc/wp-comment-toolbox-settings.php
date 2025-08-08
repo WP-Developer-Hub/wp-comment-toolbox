@@ -172,6 +172,7 @@ if (!class_exists('WP_Comment_Toolbox_Settings')) {
             update_option('wpct_submit_button_name', $_POST['wpct_submit_button_name']);
             update_option('wpct_enable_math_captcha', $_POST['wpct_enable_math_captcha']);
             update_option('wpct_math_captcha_level', $_POST['wpct_math_captcha_level']);
+            update_option('wpct_enabled_commenter_ip_block_list_check', $_POST['wpct_enabled_commenter_ip_block_list_check']);
         }
 
         private function save_privacy_settings() {
