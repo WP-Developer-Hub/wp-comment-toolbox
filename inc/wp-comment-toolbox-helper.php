@@ -43,7 +43,7 @@ if (!class_exists('WPCT_Helper')) {
                            <?php echo $additional_attributes; ?>
                     />
                     <?php if ($description): ?>
-                        <p class="description"><?php echo $description; ?></p>
+                        <p class="description"><?php echo wp_kses_post($description); ?></p>
                     <?php endif; ?>
                 </td>
             </tr>
@@ -70,7 +70,7 @@ if (!class_exists('WPCT_Helper')) {
                         <label for="<?php echo esc_attr($name); ?>" class="status-label"><?php echo esc_html($label); ?></label>
                     <?php endif; ?>
                 </th>
-                <td>
+                <td colspan="1">
                     <select class="regular-text wpct-input" name="<?php echo esc_attr($name); ?>" id="<?php echo esc_attr($name); ?>" <?php echo $additional_attributes; ?>>
                         <?php
                         // Loop through choices and output the option tags
@@ -81,7 +81,7 @@ if (!class_exists('WPCT_Helper')) {
                         ?>
                     </select>
                     <?php if ($description): ?>
-                        <p class="description"><?php echo $description ?></p>
+                        <p class="description"><?php echo wp_kses_post($description) ?></p>
                     <?php endif; ?>
                 </td>
             </tr>
@@ -115,7 +115,7 @@ if (!class_exists('WPCT_Helper')) {
                               <?php echo $additional_attributes; ?>
                     ><?php echo esc_textarea($text_value); ?></textarea>
                     <?php if ($description): ?>
-                        <p class="description"><?php echo $description ?></p>
+                        <p class="description"><?php echo wp_kses_post($description) ?></p>
                     <?php endif; ?>
                 </td>
             </tr>
@@ -144,7 +144,7 @@ if (!class_exists('WPCT_Helper')) {
                               id="<?php echo esc_attr($name); ?>"
                               <?php echo $additional_attributes; ?> ><?php echo esc_textarea($value); ?></textarea>
                     <?php if ($description): ?>
-                        <p class="description"><?php echo $description ?></p>
+                        <p class="description"><?php echo wp_kses_post($description) ?></p>
                     <?php endif; ?>
                 </td>
             </tr>
@@ -201,12 +201,63 @@ if (!class_exists('WPCT_Helper')) {
             }
         }
 
+        // Get Comment Disallowed Keyes Formted
         public static function wpct_get_comment_blocklist() {
             $raw = get_option('disallowed_keys');
             if (!$raw) {
                 return [];
             }
             return array_filter(array_map('trim', explode("\n", $raw)));
+        }
+
+        // Update Comment Disallowed Keyes Formted
+        public static function wpct_update_comment_blocklist($item) {
+            $blacklist = self::wpct_get_comment_blocklist();
+
+            if (!in_array($item, $blacklist, true)) {
+                $blacklist[] = $item;
+                update_option('disallowed_keys', implode("\n", $blacklist));
+            }
+            return $blacklist;
+        }
+
+        // Get wp_get_referer with fallback
+        public static function wpct_get_referer($fallback) {
+            return wp_get_referer() ? wp_get_referer() : admin_url(esc_url($fallback));
+        }
+
+        public static function wpct_create_admin_notices($message, $level = 1, $is_dismissible = true, $vars = []) {
+            $classes = ['notice'];
+
+            // Map numeric levels to CSS classes
+            $levels_map = [
+                1 => 'notice-success',
+                2 => 'notice-warning',
+                3 => 'notice-error',
+                4 => 'notice-info',
+            ];
+
+            if (isset($levels_map[$level])) {
+                $classes[] = $levels_map[$level];
+            }
+
+            if ($is_dismissible) {
+                $classes[] = 'is-dismissible';
+
+                // If vars param is not empty, pass it to JS inline script
+                if (!empty($vars) && is_array($vars)) {
+                    // JSON encode safely for JS
+                    $vars_json = wp_json_encode($vars);
+
+                    wp_add_inline_script('wpct-script', '(function($){$(function(){$.fn.adminNoticeDismissCleaner(' . $vars_json . ');});})(jQuery);');
+                }
+            }
+
+            $html = '<div class="' . esc_attr(implode(' ', $classes)) . '">';
+            $html .= '<p>' . wp_kses_post($message) . '</p>';
+            $html .= '</div>';
+
+            return $html;
         }
     }
 }
