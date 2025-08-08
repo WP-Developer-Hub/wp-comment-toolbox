@@ -227,23 +227,15 @@ if (!class_exists('WPCT_Helper')) {
         }
 
         public static function wpct_create_admin_notices($message, $level = 1, $is_dismissible = true, $vars = []) {
-            $classes = ['notice'];
-
             // Map numeric levels to CSS classes
             $levels_map = [
-                1 => 'notice-success',
-                2 => 'notice-warning',
-                3 => 'notice-error',
-                4 => 'notice-info',
+                1 => 'success',
+                2 => 'warning',
+                3 => 'error',
+                4 => 'info',
             ];
 
-            if (isset($levels_map[$level])) {
-                $classes[] = $levels_map[$level];
-            }
-
             if ($is_dismissible) {
-                $classes[] = 'is-dismissible';
-
                 // If vars param is not empty, pass it to JS inline script
                 if (!empty($vars) && is_array($vars)) {
                     // JSON encode safely for JS
@@ -253,11 +245,15 @@ if (!class_exists('WPCT_Helper')) {
                 }
             }
 
-            $html = '<div class="' . esc_attr(implode(' ', $classes)) . '">';
-            $html .= '<p>' . wp_kses_post($message) . '</p>';
-            $html .= '</div>';
+            // Use wp_admin_notice (WP 6.4+)
+            $args = [
+                'type' => ((isset($levels_map[$level])) ? $levels_map[$level] : 'info'),
+                'dismissible' => $is_dismissible,
+            ];
 
-            return $html;
+            // Render the notice and capture output (wp_admin_notice echos by default)
+            // We'll capture it so that your function still returns the HTML string
+            wp_admin_notice($message, $args);
         }
     }
 }
