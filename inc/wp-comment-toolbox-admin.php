@@ -158,7 +158,7 @@ if (!class_exists('WP_Comment_Toolbox_Admin')) {
             // Add IP if not already blocked
             if (! in_array($ip, $blacklist, true)) {
                 $blacklist[] = $ip;
-                update_option('blacklist_keys', implode("\n", $blacklist));
+                update_option('disallowed_keys', implode("\n", $blacklist));
             }
 
             // Redirect back with success notice

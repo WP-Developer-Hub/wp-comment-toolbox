@@ -166,7 +166,7 @@ if (!class_exists('WPCT_Helper')) {
         public static function wpct_start_session($by = 'unknown') {
             if (session_status() == PHP_SESSION_NONE) {
                 session_start();
-    
+
                 if (defined('WP_COMMENT_TOOLBOX_PLUGIN_IS_DEBUG_ON') && WP_COMMENT_TOOLBOX_PLUGIN_IS_DEBUG_ON) {
                     error_log("WPCT: session started by {$by}");
                 }
@@ -202,7 +202,7 @@ if (!class_exists('WPCT_Helper')) {
         }
 
         public static function wpct_get_comment_blocklist() {
-            $raw = get_option('blacklist_keys');
+            $raw = get_option('disallowed_keys');
             if (!$raw) {
                 return [];
             }
