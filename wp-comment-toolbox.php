@@ -2,7 +2,7 @@
 /**
  * Plugin Name: WP Comment Toolbox
  * Description: A comprehensive toolset for enhancing WordPress comment forms. It reorders comment fields, customizes user role visibility, adds a dark/light mode toggle for the comment toolbar, supports link management (including disabling clickable links).
- * Version: 9.5.0
+ * Version: 9.5.1
  * Author: DJABHipHop
  * Author URI: https://github.com/WP-Developer-Hub/
  * Plugin URI: https://github.com/WP-Developer-Hub/wp-comment-toolbox
@@ -49,7 +49,8 @@ if (!class_exists('WP_Comment_Toolbox')) {
             require_once(WP_COMMENT_TOOLBOX_PLUGIN_DIR . 'inc/wp-comment-toolbox-spam-and-security.php');
 
             add_action('wp_head', array($this, 'add_custom_css'));
-            add_action('wp_footer', array($this, 'add_custom_toolbar_script'));
+            add_action('wp_footer', array($this, 'add_comment_toolbox_theme_script'));
+            add_action('admin_head', array($this, 'add_comment_toolbox_admin_script'));
 
             // Add customizer link in plugin actions
             add_filter('plugin_action_links_' . plugin_basename(__FILE__), [$this, 'add_settings_link']);
@@ -78,7 +79,7 @@ if (!class_exists('WP_Comment_Toolbox')) {
             return $links;
         }
 
-        public function add_custom_toolbar_script() {
+        public function add_comment_toolbox_theme_script() {
             // Ensure that comments are open and the post is not password protected
             if (is_singular() && comments_open() && !post_password_required()) {
                 // Check if specific features are enabled through options
@@ -91,7 +92,7 @@ if (!class_exists('WP_Comment_Toolbox')) {
                 // Enqueue the script and style if any relevant feature is enabled
                 // This ensures the script is loaded for any necessary feature
                 if ($toolbar_enabled || $char_count_enabled || ($html5_validation_enabled && $math_captcha_enable)) {
-                    wp_enqueue_script('wpct-script', WP_COMMENT_TOOLBOX_PLUGIN_URL . 'js/wp-comment-toolbox.js', array('jquery', 'quicktags'), null, true);
+                    wp_enqueue_script('wpct-script', WP_COMMENT_TOOLBOX_PLUGIN_URL . 'js/wp-comment-toolbox-theme.js', array('jquery', 'quicktags'), null, true);
                 }
 
                 // Enqueue styles if the toolbar or character count feature is enabled
@@ -116,7 +117,7 @@ if (!class_exists('WP_Comment_Toolbox')) {
                 // Initialize CAPTCHA validation if HTML5 validation is enabled
                 // Adds CAPTCHA validation to prevent spam submissions
                 if ($html5_validation_enabled) {
-                    wp_add_inline_script('wpct-script', '(function($){$(function(){$.fn.initializeCaptchaValidation();});})(jQuery);');
+                    wp_add_inline_script('wpct-script', '(function($){$(function(){$.fn.adminNoticeDismissCleaner();});})(jQuery);');
                     wp_localize_script('wpct-script', 'wpctCaptchaMessage', array(
                         'wpctCaptchaErrorMessage' => __('Please answer the CAPTCHA question.', 'wpct'),
                         'wpctCaptchaSuccessMessage' => __('Your CAPTCHA answer was incorrect. Please try again.', 'wpct')
@@ -130,6 +131,13 @@ if (!class_exists('WP_Comment_Toolbox')) {
                     wp_add_inline_style('', "#$submit_button_name { display: none; }");
                     wp_add_inline_script('wpct-script', '(function($){$(function(){setTimeout(function() { $("#' . esc_js($submit_button_name) . '").show(); }, 8000);});})(jQuery);');
                 }
+            }
+        }
+
+        public function add_comment_toolbox_admin_script() {
+            global $pagenow;
+            if ($pagenow === 'edit-comments.php') {
+                wp_enqueue_script('wpct-script', WP_COMMENT_TOOLBOX_PLUGIN_URL . 'js/wp-comment-toolbox-admin.js', array('jquery'), null, true);
             }
         }
 

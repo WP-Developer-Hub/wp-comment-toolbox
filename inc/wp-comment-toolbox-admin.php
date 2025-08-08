@@ -152,22 +152,25 @@ if (!class_exists('WP_Comment_Toolbox_Admin')) {
                 wp_die('Invalid request.');
             }
 
-            // Get the blocklist via helper — already trimmed, filtered
+            // Get the blocklist via helper — already Formted
             $blacklist = WPCT_Helper::wpct_get_comment_blocklist();
 
-            // Add IP if not already blocked
-            if (! in_array($ip, $blacklist, true)) {
-                $blacklist[] = $ip;
-                update_option('disallowed_keys', implode("\n", $blacklist));
-            }
+            // Update the blocklist via helper — already Formted
+            $blacklist = WPCT_Helper::wpct_update_comment_blocklist($ip);
 
-            // Redirect back with success notice
+            // Get current/referring admin page with fallback via helper
+            $redirect_url = WPCT_Helper::wpct_get_referer('edit-comments.php');
+
+            // Clean old query parameters from URL
+            $redirect_url = remove_query_arg(array('block_ip_status', 'blocked_ip'), $redirect_url);
+
+            // Append success status and blocked IP params
             $redirect_url = add_query_arg(
                 array(
                     'block_ip_status' => 'success',
-                    'blocked_ip'      => urlencode($ip),
+                    'blocked_ip' => $ip,
                 ),
-                admin_url('edit-comments.php')
+                $redirect_url
             );
 
             wp_safe_redirect($redirect_url);
@@ -191,14 +194,12 @@ if (!class_exists('WP_Comment_Toolbox_Admin')) {
                         $message = sprintf(
                             /* translators: %s is an IP address */
                             esc_html__('IP address %s has been added to the comment blacklist and blocked from commenting.', 'wpct'),
-                            '<strong>' . esc_html($blocked_ip) . '</strong>'
+                            '<strong><a href="https://example.com/download/file.zip" target="_blank" rel="noopener noreferrer">Download File</a>' . esc_html($blocked_ip) . '</strong>'
                         );
                     }
 
                     // Output the static wrapper, inserting the dynamic message
-                    echo '<div class="notice notice-success is-dismissible">';
-                    echo '<p>' . $message . '</p>';
-                    echo '</div>';
+                    echo WPCT_Helper::wpct_create_admin_notices($message, 1, true, ['block_ip_status', 'blocked_ip']);
                 }
             }
         }
