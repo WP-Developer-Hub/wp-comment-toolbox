@@ -2,7 +2,7 @@
 /**
  * Plugin Name: WP Comment Toolbox
  * Description: A comprehensive toolset for enhancing WordPress comment forms. It reorders comment fields, customizes user role visibility, adds a dark/light mode toggle for the comment toolbar, supports link management (including disabling clickable links).
- * Version: 9.5.1
+ * Version: 9.5.2
  * Author: DJABHipHop
  * Author URI: https://github.com/WP-Developer-Hub/
  * Plugin URI: https://github.com/WP-Developer-Hub/wp-comment-toolbox
