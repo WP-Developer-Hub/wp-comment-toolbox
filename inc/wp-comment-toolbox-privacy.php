@@ -11,11 +11,9 @@ if (!class_exists('WP_Comment_Toolbox_Privacy')) {
 
         public function wpct_set_comment_cookie_lifetime($seconds) {
             $lifetime = WPCT_Helper::wpct_get_comment_cookie_lifetime();
-
             if ($lifetime < 0) {
                 $lifetime = 0;
             }
-
             return $lifetime;
         }
     }

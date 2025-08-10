@@ -14,12 +14,12 @@ if (!class_exists('WPCT_Helper')) {
             ]);
             echo '</div>';
         }
-    
+
         // Input Field
         public static function wpct_input_field($name, $label, $type = 'text', $value = '', $description = '', $attr = array()) {
             // Fetch the stored value for this option (default to $value if not set)
             $input_value = get_option($name, $value);
-    
+
             // Prepare additional attributes
             $additional_attributes = '';
             if (!empty($attr)) {
@@ -27,7 +27,7 @@ if (!class_exists('WPCT_Helper')) {
                     $additional_attributes .= ' ' . esc_attr($key) . '="' . esc_attr($val) . '"';
                 }
             }
-            
+
             ?>
             <tr>
                 <th scope="row">
@@ -49,12 +49,12 @@ if (!class_exists('WPCT_Helper')) {
             </tr>
             <?php
         }
-    
+
         // Select Box
         public static function wpct_select_box($name, $label, $value = '', $description = '', $choices = array(), $attr = array()) {
             // Fetch the stored value for this option (default to $value if not set)
             $input_value = get_option($name, $value);
-    
+
             // Prepare additional attributes
             $additional_attributes = '';
             if (!empty($attr)) {
@@ -62,7 +62,7 @@ if (!class_exists('WPCT_Helper')) {
                     $additional_attributes .= ' ' . esc_attr($key) . '="' . esc_attr($val) . '"';
                 }
             }
-    
+
             ?>
             <tr>
                 <th scope="row">
@@ -87,12 +87,12 @@ if (!class_exists('WPCT_Helper')) {
             </tr>
             <?php
         }
-    
+
         // Text Area Field
         public static function wpct_text_area($name, $label, $value = '', $description = '', $attr = array()) {
             // Fetch the stored value for this option (default to $value if not set)
             $text_value = get_option($name, $value);
-            
+
             // Prepare additional attributes
             $additional_attributes = '';
             if (!empty($attr)) {
@@ -100,7 +100,7 @@ if (!class_exists('WPCT_Helper')) {
                     $additional_attributes .= ' ' . esc_attr($key) . '="' . esc_attr($val) . '"';
                 }
             }
-            
+
             ?>
             <tr>
                 <th scope="row">
@@ -121,7 +121,7 @@ if (!class_exists('WPCT_Helper')) {
             </tr>
             <?php
         }
-    
+
         // Test Code Field
         public static function wpct_test_code($name, $label, $value = '', $description = '', $attr = array()) {
             // Prepare additional attributes
@@ -131,7 +131,7 @@ if (!class_exists('WPCT_Helper')) {
                     $additional_attributes .= ' ' . esc_attr($key) . '="' . esc_attr($val) . '"';
                 }
             }
-            
+
             ?>
             <tr>
                 <th scope="row">
@@ -150,7 +150,7 @@ if (!class_exists('WPCT_Helper')) {
             </tr>
             <?php
         }
-    
+
         public static function wpct_get_comment_cookie_lifetime() {
             // Get the raw option value for cookie lifetime, default to 259200 (3 days)
             $lifetime_value = intval(get_option('wpct_comment_cookie_lifetime', 259200));
@@ -190,7 +190,7 @@ if (!class_exists('WPCT_Helper')) {
                         $params["secure"], $params["httponly"]
                     );
                 }
-    
+
                 if (defined('WP_COMMENT_TOOLBOX_PLUGIN_IS_DEBUG_ON') && WP_COMMENT_TOOLBOX_PLUGIN_IS_DEBUG_ON) {
                     error_log("WPCT: session destroyed by {$by}");
                 }

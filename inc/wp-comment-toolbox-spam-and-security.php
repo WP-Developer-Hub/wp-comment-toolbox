@@ -42,7 +42,7 @@ if (!class_exists('WP_Comment_Toolbox_Span_And_Security')) {
                         header('Content-Type: text/plain; charset=UTF-8');
                         die($error_message);
                     } else {
-                        wp_die($error_message, $error_title, array('response' => 403));
+                        wp_die($error_message, $error_title, array('response' => 403, 'back_link' => true));
                     }
                 }
 
@@ -58,7 +58,7 @@ if (!class_exists('WP_Comment_Toolbox_Span_And_Security')) {
                         header('Content-Type: text/plain; charset=UTF-8');
                         die($error_message);
                     } else {
-                        wp_die($error_message, $error_title, array('response' => 403));
+                        wp_die($error_message, $error_title, array('response' => 403, 'back_link' => true));
                     }
                 }
             }
@@ -103,7 +103,7 @@ if (!class_exists('WP_Comment_Toolbox_Span_And_Security')) {
                         header('Content-Type: text/plain; charset=UTF-8');
                         die($error_message);
                     } else {
-                        wp_die($error_message, $error_title, array('response' => 403));
+                        wp_die($error_message, $error_title, array('response' => 403, 'back_link' => true));
                     }
                 }
             }
