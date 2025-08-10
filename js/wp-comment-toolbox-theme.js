@@ -45,6 +45,11 @@
       $.fn.initializeCaptchaValidation = function(options) {
           var captchaField = $('input[name="wpct_math_captcha"]');
 
+          // Check if CAPTCHA field is empty
+          if (isEmpty(captchaField.val())) {
+              captchaField[0].setCustomValidity(wpctCaptchaMessage.blank);
+          }
+
           captchaField.on('input', function(e) {
               var num1 = parseInt($('input[name="wpct_math_num1"]').val());
               var num2 = parseInt($('input[name="wpct_math_num2"]').val());
@@ -52,12 +57,12 @@
 
               // Check if CAPTCHA field is empty
               if (isEmpty(captchaField.val())) {
-                  captchaField[0].setCustomValidity(wpctCaptchaMessage.wpctCaptchaErrorMessage);
+                  captchaField[0].setCustomValidity(wpctCaptchaMessage.blank);
                   e.preventDefault();
               }
               // Check if the answer is incorrect
               else if (parseInt(captchaField.val()) !== correctAnswer) {
-                  captchaField[0].setCustomValidity(wpctCaptchaMessage.wpctCaptchaSuccessMessage);
+                  captchaField[0].setCustomValidity(wpctCaptchaMessage.error);
                   e.preventDefault();
               } else {
                   // Reset custom validity if the answer is correct

@@ -194,7 +194,7 @@ if (!class_exists('WP_Comment_Toolbox_Span_And_Security')) {
                 $field .= sprintf(__('What is %s?', 'wpct'), $problem);
                 $field .= '</label>';
                 $field .= '<input type="text" name="wpct_math_captcha" id="wpct_math_captcha" required autocomplete="off" ';
-                $field .= 'inputmode="numeric" pattern="[0-9]*">';
+                $field .= 'inputmode="numeric" pattern="[0-9]*" aria-required="true" required="required">';
                 $field .= '<input type="hidden" name="wpct_math_num1" value="' . $num1 . '">';
                 $field .= '<input type="hidden" name="wpct_math_num2" value="' . $num2 . '">';
                 $field .= '</p>';
