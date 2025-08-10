@@ -109,69 +109,80 @@ if (!class_exists('WP_Comment_Toolbox_Admin')) {
         }
 
         public function add_block_ip_action_to_comment($actions, $comment) {
-            // Check if the "Show Block IP Button" option is enabled (defaults to true)
             if (get_option('wpct_show_block_ip_action', 1)) {
-
-                // Get the comment author's IP address
                 $ip = $comment->comment_author_IP;
+                $id = $comment->comment_ID; // Use comment_ID for WP native objects, but $comment->ID works as well.
 
-                // Build a nonce-secured action link to your plugin's IP block handler
                 $block_url = wp_nonce_url(
-                    admin_url('admin-post.php?action=block_ip&ip=' . urlencode($ip)),
+                    admin_url('admin-post.php?action=block_ip&ip=' . urlencode($ip) . '&id=' . $id),
                     'block_ip_' . $ip
                 );
 
-                // Prepare translatable strings as variables
                 $confirm_message = esc_js(__('Are you sure you want to block this IP?', 'wpct'));
                 $link_text = esc_html__('Block IP', 'wpct');
 
-                // Add the 'Block' link to the actions array
                 $actions['block_ip'] = '<a href="' . esc_url($block_url) . '" onclick="return confirm(\'' . $confirm_message . '\');">' . $link_text . '</a>';
             }
-
             return $actions;
         }
 
         public function handle_block_ip_action() {
-            // Option check: only proceed if enabled (defaults to true)
-            if (! get_option('wpct_show_block_ip_action', 1)) {
+            if (!get_option('wpct_show_block_ip_action', 1)) {
                 return;
             }
 
-            // Capability check
-            if (! current_user_can('manage_options')) {
-                wp_die('Unauthorized user');
+            if (!current_user_can('manage_options')) {
+                WPCT_Helper::wpct_create_admin_notices(__('Unauthorized user', 'wpct'), 3, true);
+                wp_safe_redirect(admin_url('edit-comments.php'));
+                exit;
             }
 
-            // Get and sanitize IP and nonce from URL
             $ip = isset($_GET['ip']) ? sanitize_text_field(wp_unslash($_GET['ip'])) : '';
+            $id = isset($_GET['id']) ? intval($_GET['id']) : 0;
             $nonce = isset($_GET['_wpnonce']) ? wp_unslash($_GET['_wpnonce']) : '';
 
-            // Validate IP format and nonce
-            if (empty($ip) || ! filter_var($ip, FILTER_VALIDATE_IP) || ! wp_verify_nonce($nonce, 'block_ip_' . $ip)) {
-                wp_die('Invalid request.');
+            // Validate IP
+            if (empty($ip) || !filter_var($ip, FILTER_VALIDATE_IP)) {
+                WPCT_Helper::wpct_create_admin_notices(__('Invalid IP address', 'wpct'), 3, true);
+                wp_safe_redirect(admin_url('edit-comments.php'));
+                exit;
             }
 
-            // Get the blocklist via helper — already Formted
-            $blacklist = WPCT_Helper::wpct_get_comment_blocklist();
+            // Validate comment ID
+            if (empty($id) || $id <= 0) {
+                WPCT_Helper::wpct_create_admin_notices(__('Invalid comment ID', 'wpct'), 3, true);
+                wp_safe_redirect(admin_url('edit-comments.php'));
+                exit;
+            }
 
-            // Update the blocklist via helper — already Formted
-            $blacklist = WPCT_Helper::wpct_update_comment_blocklist($ip);
+            // Validate nonce
+            if (!wp_verify_nonce($nonce, 'block_ip_' . $ip)) {
+                WPCT_Helper::wpct_create_admin_notices(__('Invalid request', 'wpct'), 3, true);
+                wp_safe_redirect(admin_url('edit-comments.php'));
+                exit;
+            }
 
-            // Get current/referring admin page with fallback via helper
+            // 1. Block the IP
+            WPCT_Helper::wpct_update_comment_blocklist($ip);
+
+            // 2. Decide what to do with the comment based on status
+            $comment = get_comment($id);
+
+            if ($comment && ($comment->comment_approved === 'spam' || $comment->comment_approved === 'trash')) {
+                // Permanently delete spam
+                wp_delete_comment($id, true);
+            } else {
+                // Move approved/pending to trash
+                wp_set_comment_status($id, 'trash', true);
+            }
+
+            // 3. Redirect with success notice
             $redirect_url = WPCT_Helper::wpct_get_referer('edit-comments.php');
-
-            // Clean old query parameters from URL
-            $redirect_url = remove_query_arg(array('block_ip_status', 'blocked_ip'), $redirect_url);
-
-            // Append success status and blocked IP params
-            $redirect_url = add_query_arg(
-                array(
-                    'block_ip_status' => 'success',
-                    'blocked_ip' => $ip,
-                ),
-                $redirect_url
-            );
+            $redirect_url = remove_query_arg(['block_ip_status', 'blocked_ip'], $redirect_url);
+            $redirect_url = add_query_arg([
+                'block_ip_status' => 'success',
+                'blocked_ip'      => $ip,
+            ], $redirect_url);
 
             wp_safe_redirect($redirect_url);
             exit;

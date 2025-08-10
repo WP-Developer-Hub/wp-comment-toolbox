@@ -2,7 +2,7 @@
 /**
  * Plugin Name: WP Comment Toolbox
  * Description: A comprehensive toolset for enhancing WordPress comment forms. It reorders comment fields, customizes user role visibility, adds a dark/light mode toggle for the comment toolbar, supports link management (including disabling clickable links).
- * Version: 9.5.1
+ * Version: 9.5.3
  * Author: DJABHipHop
  * Author URI: https://github.com/WP-Developer-Hub/
  * Plugin URI: https://github.com/WP-Developer-Hub/wp-comment-toolbox
@@ -117,7 +117,7 @@ if (!class_exists('WP_Comment_Toolbox')) {
                 // Initialize CAPTCHA validation if HTML5 validation is enabled
                 // Adds CAPTCHA validation to prevent spam submissions
                 if ($html5_validation_enabled) {
-                    wp_add_inline_script('wpct-script', '(function($){$(function(){$.fn.adminNoticeDismissCleaner();});})(jQuery);');
+                    wp_add_inline_script('wpct-script', '(function($){$(function(){$.fn.initializeCaptchaValidation();});})(jQuery);');
                     wp_localize_script('wpct-script', 'wpctCaptchaMessage', array(
                         'wpctCaptchaErrorMessage' => __('Please answer the CAPTCHA question.', 'wpct'),
                         'wpctCaptchaSuccessMessage' => __('Your CAPTCHA answer was incorrect. Please try again.', 'wpct')
