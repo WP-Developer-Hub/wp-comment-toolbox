@@ -108,21 +108,44 @@ if (!class_exists('WP_Comment_Toolbox_Admin')) {
             return $comment_text;
         }
 
-        public function add_block_ip_action_to_comment($actions, $comment) {
-            if (get_option('wpct_show_block_ip_action', 1)) {
-                $ip = $comment->comment_author_IP;
-                $id = $comment->comment_ID; // Use comment_ID for WP native objects, but $comment->ID works as well.
+        /**
+         * Add "Block IP" action link to each comment row in wp-admin.
+         */
+        public function add_block_ip_action_to_comment( $actions, $comment ) {
 
+            if ( get_option( 'wpct_show_block_ip_action', 1 ) ) {
+
+                $id = $comment->comment_ID;
+                $ip = $comment->comment_author_IP;
+                $link_txt = esc_html__( 'Block IP', 'wpct' );
+                $confirm  = esc_js( __( 'Are you sure you want to block this IP?', 'wpct' ) );
+
+                // Normal link fallback for now
                 $block_url = wp_nonce_url(
-                    admin_url('admin-post.php?action=block_ip&ip=' . urlencode($ip) . '&id=' . $id),
+                    admin_url( 'admin-post.php?action=block_ip&ip=' . urlencode( $ip ) . '&id=' . $id ),
                     'block_ip_' . $ip
                 );
 
-                $confirm_message = esc_js(__('Are you sure you want to block this IP?', 'wpct'));
-                $link_text = esc_html__('Block IP', 'wpct');
+                // AJAX nonce for future use
+                $ajax_nonce = wp_create_nonce( 'block_ip_ajax_' . $ip );
 
-                $actions['block_ip'] = '<a href="' . esc_url($block_url) . '" onclick="return confirm(\'' . $confirm_message . '\');">' . $link_text . '</a>';
+                // Build the link HTML
+                $actions['wptc_block_ip'] = sprintf(
+                    '<a href="%1$s"
+                        class="wptc_block_ip"
+                        data-wptc-comment-id="%2$d"
+                        data-wptc-comment-ip="%3$s"
+                        data-wptc-nonce="%4$s"
+                        onclick="return confirm(\'%5$s\');">%6$s</a>',
+                    esc_url( $block_url ), // 1
+                    esc_attr( $id ), // 2
+                    esc_attr( $ip ), // 3
+                    esc_attr( $ajax_nonce ), // 4
+                    $confirm, // 5
+                    $link_txt // 6
+                );
             }
+
             return $actions;
         }
 
