@@ -12,7 +12,8 @@ if (!class_exists('WP_Comment_Toolbox_Admin')) {
             add_filter('views_edit-comments', [$this, 'filter_comments_by_scam']);
             add_filter('comments_clauses', [$this, 'filter_comments_by_scam_query'], 10, 2);
             add_filter('comment_row_actions', [$this, 'add_block_ip_action_to_comment'], 10, 2);
-            add_filter('admin_post_block_ip', [$this, 'handle_block_ip_action'], 10, 2);
+            add_action('wp_ajax_wptc_block_commentor_ip', [$this, 'handle_block_ip_action']);
+            add_filter('admin_post_wptc_block_commentor_ip', [$this, 'handle_block_ip_action']);
             add_filter('admin_notices', [$this, 'handle_block_ip_notices']);
 
             // Add the comment text filter based on the option
@@ -111,38 +112,35 @@ if (!class_exists('WP_Comment_Toolbox_Admin')) {
         /**
          * Add "Block IP" action link to each comment row in wp-admin.
          */
-        public function add_block_ip_action_to_comment( $actions, $comment ) {
+        public function add_block_ip_action_to_comment($actions, $comment) {
 
-            if ( get_option( 'wpct_show_block_ip_action', 1 ) ) {
+            if (get_option('wpct_show_block_ip_action', 1)) {
 
                 $id = $comment->comment_ID;
                 $ip = $comment->comment_author_IP;
-                $link_txt = esc_html__( 'Block IP', 'wpct' );
-                $confirm  = esc_js( __( 'Are you sure you want to block this IP?', 'wpct' ) );
+                $txt = esc_html__('Block IP', 'wpct');
+                $confirm = esc_js(__('Are you sure you want to block this IP?', 'wpct'));
 
-                // Normal link fallback for now
+                // Consistent nonce action
+                $nonce_action = 'wptc_block_commentor_ip_' . $ip;
+
+                // Fallback URL for non-JS
                 $block_url = wp_nonce_url(
-                    admin_url( 'admin-post.php?action=block_ip&ip=' . urlencode( $ip ) . '&id=' . $id ),
-                    'block_ip_' . $ip
+                    admin_url('admin-post.php?action=wptc_block_commentor_ip&ip=' . urlencode($ip) . '&id=' . $id),
+                    $nonce_action,
+                    '_wpnonce'
                 );
 
-                // AJAX nonce for future use
-                $ajax_nonce = wp_create_nonce( 'block_ip_ajax_' . $ip );
+                // Same nonce for AJAX
+                $ajax_nonce = wp_create_nonce($nonce_action);
 
-                // Build the link HTML
                 $actions['wptc_block_ip'] = sprintf(
                     '<a href="%1$s"
-                        class="wptc_block_ip"
-                        data-wptc-comment-id="%2$d"
-                        data-wptc-comment-ip="%3$s"
-                        data-wptc-nonce="%4$s"
-                        onclick="return confirm(\'%5$s\');">%6$s</a>',
-                    esc_url( $block_url ), // 1
-                    esc_attr( $id ), // 2
-                    esc_attr( $ip ), // 3
-                    esc_attr( $ajax_nonce ), // 4
-                    $confirm, // 5
-                    $link_txt // 6
+                        class="wptc_block_ip vim-d vim-destructive aria-button-if-js"
+                        data-wp-lists="wptc_block_commentor_ip:the-comment-list:comment-%2$d::trash=1">%3$s</a>',
+                    esc_url($block_url), // 1 - URL
+                    esc_attr($id), // 2 - comment ID
+                    $txt // 6 - link text
                 );
             }
 
@@ -179,7 +177,7 @@ if (!class_exists('WP_Comment_Toolbox_Admin')) {
             }
 
             // Validate nonce
-            if (!wp_verify_nonce($nonce, 'block_ip_' . $ip)) {
+            if (!wp_verify_nonce($nonce, 'wptc_block_commentor_ip_' . $ip)) {
                 WPCT_Helper::wpct_create_admin_notices(__('Invalid request', 'wpct'), 3, true);
                 wp_safe_redirect(admin_url('edit-comments.php'));
                 exit;
