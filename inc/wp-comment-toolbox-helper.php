@@ -255,5 +255,15 @@ if (!class_exists('WPCT_Helper')) {
             // We'll capture it so that your function still returns the HTML string
             wp_admin_notice($message, $args);
         }
+
+        // Decide what to do with the comment based on status
+        public static function wpct_handel_with_comment($id) {
+            $comment = get_comment($id);
+            if ($comment && ($comment->comment_approved === 'spam' || $comment->comment_approved === 'trash')) {
+                wp_delete_comment($id, true);
+            } else {
+                wp_set_comment_status($id, 'trash', true);
+            }
+        }
     }
 }

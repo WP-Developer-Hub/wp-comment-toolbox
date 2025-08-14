@@ -13,7 +13,7 @@ if (!class_exists('WP_Comment_Toolbox_Admin')) {
             add_filter('comments_clauses', [$this, 'filter_comments_by_scam_query'], 10, 2);
             add_filter('comment_row_actions', [$this, 'add_block_ip_action_to_comment'], 10, 2);
             add_action('wp_ajax_wptc_block_commentor_ip', [$this, 'handle_block_ip_action']);
-            add_filter('admin_post_wptc_block_commentor_ip', [$this, 'handle_block_ip_action']);
+            add_action('admin_post_wptc_block_commentor_ip', [$this, 'handle_block_ip_action']);
             add_filter('admin_notices', [$this, 'handle_block_ip_notices']);
 
             // Add the comment text filter based on the option
@@ -113,20 +113,17 @@ if (!class_exists('WP_Comment_Toolbox_Admin')) {
          * Add "Block IP" action link to each comment row in wp-admin.
          */
         public function add_block_ip_action_to_comment($actions, $comment) {
-
             if (get_option('wpct_show_block_ip_action', 1)) {
-
                 $id = $comment->comment_ID;
                 $ip = $comment->comment_author_IP;
                 $txt = esc_html__('Block IP', 'wpct');
-                $confirm = esc_js(__('Are you sure you want to block this IP?', 'wpct'));
+                $label = __('Block commentor IP?', 'wpct');
 
                 // Consistent nonce action
                 $nonce_action = 'wptc_block_commentor_ip_' . $ip;
 
-                // Fallback URL for non-JS
                 $block_url = wp_nonce_url(
-                    admin_url('admin-post.php?action=wptc_block_commentor_ip&ip=' . urlencode($ip) . '&id=' . $id),
+                    admin_url('admin-post.php?action=wptc_block_commentor_ip&id=' . $id . '&ip=' . urlencode($ip)),
                     $nonce_action,
                     '_wpnonce'
                 );
@@ -135,15 +132,16 @@ if (!class_exists('WP_Comment_Toolbox_Admin')) {
                 $ajax_nonce = wp_create_nonce($nonce_action);
 
                 $actions['wptc_block_ip'] = sprintf(
-                    '<a href="%1$s"
-                        class="wptc_block_ip vim-d vim-destructive aria-button-if-js"
-                        data-wp-lists="wptc_block_commentor_ip:the-comment-list:comment-%2$d::trash=1">%3$s</a>',
-                    esc_url($block_url), // 1 - URL
-                    esc_attr($id), // 2 - comment ID
-                    $txt // 6 - link text
+                    '<a href="%1$s" class="wptc_block_ip vim-b vim-destructive aria-button-if-js" 
+                    data-wp-lists="wptc_block_commentor_ip:the-comment-list:comment-%2$d:ip=%3$s::trash=1"
+                    aria-label="%4$s" role="button" style="color: #b32d2e;">%5$s</a>',
+                    esc_url($block_url),
+                    esc_attr($id),
+                    esc_attr($ip),
+                    esc_attr($label),
+                    $txt
                 );
             }
-
             return $actions;
         }
 
@@ -158,8 +156,8 @@ if (!class_exists('WP_Comment_Toolbox_Admin')) {
                 exit;
             }
 
-            $ip = isset($_GET['ip']) ? sanitize_text_field(wp_unslash($_GET['ip'])) : '';
             $id = isset($_GET['id']) ? intval($_GET['id']) : 0;
+            $ip = isset($_GET['ip']) ? sanitize_text_field(wp_unslash($_GET['ip'])) : '';
             $nonce = isset($_GET['_wpnonce']) ? wp_unslash($_GET['_wpnonce']) : '';
 
             // Validate IP
@@ -187,15 +185,7 @@ if (!class_exists('WP_Comment_Toolbox_Admin')) {
             WPCT_Helper::wpct_update_comment_blocklist($ip);
 
             // 2. Decide what to do with the comment based on status
-            $comment = get_comment($id);
-
-            if ($comment && ($comment->comment_approved === 'spam' || $comment->comment_approved === 'trash')) {
-                // Permanently delete spam
-                wp_delete_comment($id, true);
-            } else {
-                // Move approved/pending to trash
-                wp_set_comment_status($id, 'trash', true);
-            }
+            WPCT_Helper::wpct_handel_with_comment($id);
 
             // 3. Redirect with success notice
             $redirect_url = WPCT_Helper::wpct_get_referer('edit-comments.php');
@@ -226,7 +216,7 @@ if (!class_exists('WP_Comment_Toolbox_Admin')) {
                         $message = sprintf(
                             /* translators: %s is an IP address */
                             esc_html__('IP address %s has been added to the comment blacklist and blocked from commenting.', 'wpct'),
-                            '<strong><a href="https://example.com/download/file.zip" target="_blank" rel="noopener noreferrer">Download File</a>' . esc_html($blocked_ip) . '</strong>'
+                            '<strong>' . esc_html($blocked_ip) . '</strong>'
                         );
                     }
 
