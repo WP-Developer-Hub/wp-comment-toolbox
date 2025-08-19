@@ -50,9 +50,9 @@
                   captchaField[0].setCustomValidity(wpctCaptchaMessage.blank);
               }
               
-              captchaField.on('input', function(e) {
-                  var num1 = parseInt($('input[name="wpct_math_num1"]').val());
-                  var num2 = parseInt($('input[name="wpct_math_num2"]').val());
+              captchaField.on('input focus blur', function(e) {
+                  var num1 = parseInt($('input[name="wpct_math_num1"]').val(), 10);
+                  var num2 = parseInt($('input[name="wpct_math_num2"]').val(), 10);
                   var correctAnswer = num1 + num2;
                   
                   // Check if CAPTCHA field is empty
@@ -61,7 +61,7 @@
                       e.preventDefault();
                   }
                   // Check if the answer is incorrect
-                  else if (parseInt(captchaField.val()) !== correctAnswer) {
+                  else if (parseInt(captchaField.val(), 10) !== correctAnswer) {
                       captchaField[0].setCustomValidity(wpctCaptchaMessage.error);
                       e.preventDefault();
                   } else {

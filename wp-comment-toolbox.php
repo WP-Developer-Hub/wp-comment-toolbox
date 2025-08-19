@@ -116,11 +116,11 @@ if (!class_exists('WP_Comment_Toolbox')) {
 
                 // Initialize CAPTCHA validation if HTML5 validation is enabled
                 // Adds CAPTCHA validation to prevent spam submissions
-                if ($html5_validation_enabled) {
+                if ($math_captcha_enable) {
                     wp_add_inline_script('wpct-script', '(function($){$(function(){$.fn.initializeCaptchaValidation();});})(jQuery);');
                     wp_localize_script('wpct-script', 'wpctCaptchaMessage', array(
-                        'wpctCaptchaErrorMessage' => __('Please answer the CAPTCHA question.', 'wpct'),
-                        'wpctCaptchaSuccessMessage' => __('Your CAPTCHA answer was incorrect. Please try again.', 'wpct')
+                        'blank' => __('Please answer the CAPTCHA question.', 'wpct'),
+                        'error' => __('Your CAPTCHA answer was incorrect. Please try again.', 'wpct')
                     ));
                 }
 
