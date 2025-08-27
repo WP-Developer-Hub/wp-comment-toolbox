@@ -223,7 +223,16 @@ if (!class_exists('WPCT_Helper')) {
 
         // Get wp_get_referer with fallback
         public static function wpct_get_referer($fallback) {
-            return wp_get_referer() ? wp_get_referer() : admin_url(esc_url($fallback));
+            return (wp_get_referer() ? wp_get_referer() : admin_url(esc_url($fallback)));
+        }
+
+        // create wpct_create_action_url with $query_arg
+        public static function wpct_create_action_url($action, $nonce_action, $query_args = []) {
+            // Build URL to admin-post.php with query args
+            $url = add_query_arg(['action' => $action, $query_args], admin_url('admin-post.php'));
+
+            // Add nonce to URL and return
+            return wp_nonce_url($url, $nonce_action, '_wpnonce');
         }
 
         public static function wpct_create_admin_notices($message, $level = 1, $is_dismissible = true, $vars = []) {
@@ -262,7 +271,7 @@ if (!class_exists('WPCT_Helper')) {
             if ($comment && ($comment->comment_approved === 'spam' || $comment->comment_approved === 'trash')) {
                 wp_delete_comment($id, true);
             } else {
-                wp_set_comment_status($id, 'trash', true);
+                wp_set_comment_status($id, 'trash', false);
             }
         }
 
@@ -277,6 +286,43 @@ if (!class_exists('WPCT_Helper')) {
                 '</strong>',
                 $name
             );
+        }
+
+        public static function wpct_check_comment_for_spam($commentdata) {
+            if ('1' !== intval(get_option('wpct_spam_filter_enabled', 0))) {
+                $comment = $commentdata['comment_content'];
+                $comment_id = $commentdata['comment_ID'];
+
+                // Check moderation keys from WordPress options
+                $moderation_keys = get_option('moderation_keys');
+                if (!empty($moderation_keys)) {
+                    $keys = preg_split('/\r\n|\r|\n/', $moderation_keys);
+                    foreach ($keys as $key) {
+                        $key = trim($key);
+                        if (empty($key)) {
+                            continue;
+                        }
+                        if (stripos($comment, $key) !== false) {
+                            $commentdata['comment_type'] = 'flagged';
+                            wp_set_comment_status($comment_id, 'spam', false);
+                            return $commentdata;
+                        }
+                    }
+                }
+
+                // Check number of links if manual comment approval is enabled
+                if ('1' === intval(get_option('comment_moderation', 0))) {
+                    $max_links = get_option('comment_max_links');
+                    if ($max_links) {
+                        if (preg_match_all("|(href\t*=\t*['\"])?(https?:)?//|i", $comment, $matches) >= $max_links) {
+                            $commentdata['comment_type'] = 'flagged';
+                            wp_set_comment_status($comment_id, 'spam', false);
+                            return $commentdata;
+                        }
+                    }
+                }
+            }
+            return $commentdata;
         }
     }
 }

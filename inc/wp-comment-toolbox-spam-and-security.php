@@ -295,32 +295,7 @@ if (!class_exists('WP_Comment_Toolbox_Span_And_Security')) {
         }
 
         public function wpct_verify_comments_content($commentdata) {
-            if ('1' === intval(get_option('wpct_spam_filter_enabled', 0))) {
-                $comment = $commentdata['comment_content'];
-
-                // Check moderation keys from WordPress options
-                $moderation_keys = get_option('moderation_keys');
-                if (!empty($moderation_keys)) {
-                    $keys = preg_split('/\r\n|\r|\n/', $moderation_keys);
-                    foreach ($keys as $key) {
-                        $key = trim($key);
-                        if (empty($key)) continue;
-                        if (stripos($comment, $key) !== false) {
-                            $commentdata['comment_type'] = 'flagged';
-                            return $commentdata;
-                        }
-                    }
-                }
-
-                if ('1' === intval(get_option('comment_moderation', 0))) {
-                    $max_links = get_option('comment_max_links');
-                    // Check for links only using your provided pattern and method
-                    if ($max_links && preg_match_all("|(href\t*?=\t*?['\"]?)?(https?:)?//|i", $comment, $out) >= $max_links) {
-                        $commentdata['comment_type'] = 'flagged';
-                    }
-                }
-            }
-            return $commentdata;
+            return WPCT_Helper::wpct_check_comment_for_spam($commentdata);
         }
     }
     new WP_Comment_Toolbox_Span_And_Security();
