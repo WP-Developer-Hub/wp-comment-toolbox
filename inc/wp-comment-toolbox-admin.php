@@ -15,10 +15,16 @@ if (!class_exists('WP_Comment_Toolbox_Admin')) {
             // Add the comment text filter based on the option
             add_filter('comment_text', [$this, 'filter_comment_text'], PHP_INT_MAX);
 
-            add_filter('admin_comment_types_dropdown', [$this, 'filter_comments_by_scam'], PHP_INT_MAX);
+            // Add check comments for sus button
+            add_action('admin_post_wptc_check_comments_for_sus', [$this, 'handle_check_comments_for_sus_action']);
+            add_filter('manage_comments_nav', [$this, 'add_check_comments_for_sus_button'], PHP_INT_MAX, 2);
+            add_filter('admin_notices', [$this, 'handle_check_comments_for_sus_notices']);
+
+            // Add new comment type called flagged
+            add_filter('admin_comment_types_dropdown', [$this, 'add_fleged_comments_type'], PHP_INT_MAX);
         }
 
-        public function filter_comments_by_scam($comment_types) {
+        public function add_fleged_comments_type($comment_types) {
             if ('1' === get_option('wpct_spam_filter_enabled')) {
                 $comment_types['flagged'] = __('Flagged', 'wpct');
             }
@@ -30,11 +36,11 @@ if (!class_exists('WP_Comment_Toolbox_Admin')) {
             if (is_admin() && get_option('wpct_disable_comment_formatting')) {
                 // Preserve the actual URLs but strip the anchor tags
                 $comment_text = preg_replace_callback('/<a[^>]+href=["\']([^"\']+)["\'][^>]*>(.*?)<\/a>/is', function($matches) {
-                    return filter_var($matches[1], (FILTER_VALIDATE_URL) ? $matches[1] : $matches[2]);
+                   return (filter_var($matches[1], FILTER_VALIDATE_URL) ? $matches[1] : $matches[2]);
                 }, $comment_text);
 
-                // Strip all remaining HTML tags
-                $comment_text = wp_strip_all_tags($comment_text);
+                // Strip any remaining HTML tags
+                return wp_strip_all_tags($comment_text);
             }
             return $comment_text;
         }
@@ -52,11 +58,12 @@ if (!class_exists('WP_Comment_Toolbox_Admin')) {
                 // Consistent nonce action
                 $nonce_action = 'wptc_block_commentor_ip_' . $ip;
 
-                $block_url = wp_nonce_url(
-                    admin_url('admin-post.php?action=wptc_block_commentor_ip&id=' . $id . '&ip=' . urlencode($ip)),
-                    $nonce_action,
-                    '_wpnonce'
-                );
+                $params = [
+                    'id' => $id,
+                    'ip' => $ip,
+                ];
+
+                $block_url = WPCT_Helper::wpct_create_action_url('wptc_block_commentor_ip', $nonce_action, $params);
 
                 // Same nonce for AJAX
                 $ajax_nonce = wp_create_nonce($nonce_action);
@@ -80,9 +87,11 @@ if (!class_exists('WP_Comment_Toolbox_Admin')) {
                 return;
             }
 
+            $redirect_url = WPCT_Helper::wpct_get_referer('edit-comments.php');
+
             if (!current_user_can('manage_options')) {
                 WPCT_Helper::wpct_create_admin_notices(__('Unauthorized user', 'wpct'), 3, true);
-                wp_safe_redirect(admin_url('edit-comments.php'));
+                wp_safe_redirect($redirect_url);
                 exit;
             }
 
@@ -93,21 +102,21 @@ if (!class_exists('WP_Comment_Toolbox_Admin')) {
             // Validate IP
             if (empty($ip) || !filter_var($ip, FILTER_VALIDATE_IP)) {
                 WPCT_Helper::wpct_create_admin_notices(__('Invalid IP address', 'wpct'), 3, true);
-                wp_safe_redirect(admin_url('edit-comments.php'));
+                wp_safe_redirect($redirect_url);
                 exit;
             }
 
             // Validate comment ID
             if (empty($id) || $id <= 0) {
                 WPCT_Helper::wpct_create_admin_notices(__('Invalid comment ID', 'wpct'), 3, true);
-                wp_safe_redirect(admin_url('edit-comments.php'));
+                wp_safe_redirect($redirect_url);
                 exit;
             }
 
             // Validate nonce
             if (!wp_verify_nonce($nonce, 'wptc_block_commentor_ip_' . $ip)) {
                 WPCT_Helper::wpct_create_admin_notices(__('Invalid request', 'wpct'), 3, true);
-                wp_safe_redirect(admin_url('edit-comments.php'));
+                wp_safe_redirect($redirect_url);
                 exit;
             }
 
@@ -118,11 +127,10 @@ if (!class_exists('WP_Comment_Toolbox_Admin')) {
             WPCT_Helper::wpct_handel_with_comment($id);
 
             // 3. Redirect with success notice
-            $redirect_url = WPCT_Helper::wpct_get_referer('edit-comments.php');
             $redirect_url = remove_query_arg(['block_ip_status', 'blocked_ip'], $redirect_url);
             $redirect_url = add_query_arg([
                 'block_ip_status' => 'success',
-                'blocked_ip'      => $ip,
+                'blocked_ip' => $ip,
             ], $redirect_url);
 
             wp_safe_redirect($redirect_url);
@@ -152,6 +160,103 @@ if (!class_exists('WP_Comment_Toolbox_Admin')) {
 
                     // Output the static wrapper, inserting the dynamic message
                     echo WPCT_Helper::wpct_create_admin_notices($message, 1, true, ['block_ip_status', 'blocked_ip']);
+                }
+            }
+        }
+
+        public function add_check_comments_for_sus_button($comment_status, $which) {
+            if ($which === 'top' && get_option('wpct_spam_filter_enabled', 0)) {
+                $params = [
+                    'wptc_comment_status' => ! empty($comment_status) ? $comment_status : 'all',
+                ];
+
+                $url = WPCT_Helper::wpct_create_action_url(
+                    'wptc_check_comments_for_sus',
+                    'wptc_check_comments_for_sus_action',
+                    $params
+                );
+                echo '<a href="' . esc_url($url) . '" class="button">' . esc_html__('Check for sus', 'wpct') . '</a>';
+            }
+        }
+
+        public function handle_check_comments_for_sus_action() {
+            if (!get_option('wpct_spam_filter_enabled', 1)) {
+                return;
+            }
+
+            $redirect_url = WPCT_Helper::wpct_get_referer('edit-comments.php');
+
+            // Capability check
+            if (!current_user_can('manage_options')) {
+                WPCT_Helper::wpct_create_admin_notices(__('Unauthorized user', 'wpct'), 3, true);
+                wp_safe_redirect($redirect_url);
+                exit;
+            }
+
+            $nonce = isset($_GET['_wpnonce']) ? wp_unslash($_GET['_wpnonce']) : '';
+
+            // Check nonce and query param for spam check trigger
+            if (!wp_verify_nonce($nonce, 'wptc_check_comments_for_sus_action')) {
+                WPCT_Helper::wpct_create_admin_notices(__('Invalid request', 'wpct'), 3, true);
+                wp_safe_redirect($redirect_url);
+                exit;
+            }
+
+            $comment_status = isset($_GET['wptc_comment_status']) ? wp_unslash($_GET['wptc_comment_status']) : 'all';
+
+            error_log($comment_status);
+
+            // Get all comments regardless of status or number
+            $comments = get_comments([
+                'status' => $comment_status,
+            ]);
+
+            $flagged_count = 0;
+
+            foreach ($comments as $comment) {
+                // Convert WP_Comment object to array as expected by helper
+                $commentdata = (array) $comment;
+
+                // Use your helper to determine if comment is suspicious
+                $checked_commentdata = WPCT_Helper::wpct_check_comment_for_spam($commentdata);
+
+                // If flagged, mark comment as spam
+                if (!empty($checked_commentdata['comment_type']) && $checked_commentdata['comment_type'] === 'flagged') {
+                    if (wp_set_comment_status($comment->comment_ID, 'spam')) {
+                        $flagged_count++;
+                    }
+                }
+            }
+
+            // Redirect back to comments admin with success message + flagged count
+            wp_safe_redirect(add_query_arg([
+                'wptc_check_spam' => 'success',
+                'wptc_flagged_count' => $flagged_count,
+            ], WPCT_Helper::wpct_get_referer('edit-comments.php')));
+            exit;
+        }
+
+        public function handle_check_comments_for_sus_notices() {
+            if (get_option('wpct_spam_filter_enabled', 1)) {
+                if (isset($_GET['wptc_check_spam']) && $_GET['wptc_check_spam'] === 'success' && isset($_GET['wptc_flagged_count'])) {
+                    $flagged_count = intval($_GET['wptc_flagged_count']);
+
+                    if ($flagged_count > 0) {
+                        $message = sprintf(
+                            /* translators: %d is the number of flagged suspect comments */
+                            _n(
+                                '%d sus comment found.',
+                                '%d sus comments found.',
+                                $flagged_count,
+                                'wpct'
+                            ),
+                            $flagged_count
+                        );
+                    } else {
+                        $message = esc_html__('No sus comments found.', 'wpct');
+                    }
+
+                    echo WPCT_Helper::wpct_create_admin_notices($message, 1, true, ['wptc_check_spam', 'wptc_flagged_count']);
                 }
             }
         }

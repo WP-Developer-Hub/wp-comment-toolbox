@@ -74,7 +74,7 @@ WPCT_Helper::wpct_select_box(
     __('Enable Spam Filter', 'wpct'),
     0,
     sprintf(
-        __('When enabled, comments containing words from the moderation_keys list will be flagged if that list is not empty. Comments with links will only be flagged if the comment_max_links option is set to a value greater than zero and the number of links meets or exceeds that value. Additionally, the Comment must be manually approved setting is required. All three settings must be enabled and configured correctly in %1$s to get full spam filtering effect. You can then filter comments by this flagged type in the WordPress admin to easily find and moderate potential spam.', 'wpct'),
+        __('Enable this option to flag comments containing words from the moderation_keys list if not empty. Comments with links are flagged only if comment_max_links is set and link count meets or exceeds it. Manual comment approval must also be enabled in %1$s for full spam filtering. When enabled, a new "Check Comments for Sus" button will appear in the comment list admin screen to quickly scan and mark suspicious comments as flagged and spam.', 'wpct'),
         WPCT_Helper::wpct_add_wp_setting_link('options-discussion.php#comment-moderation', 'Discussion')
     ),
     array(
