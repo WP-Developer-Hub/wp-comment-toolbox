@@ -295,34 +295,27 @@ if (!class_exists('WP_Comment_Toolbox_Span_And_Security')) {
         }
 
         public function wpct_verify_comments_content($commentdata) {
-            // Only proceed if the scam filter is enabled
-            if ('1' === get_option('wpct_spam_filter_enabled')) {
+            if ('1' === intval(get_option('wpct_spam_filter_enabled', 0))) {
+                $comment = $commentdata['comment_content'];
 
-                // Get moderation keys list from WP settings (one per line)
+                // Check moderation keys from WordPress options
                 $moderation_keys = get_option('moderation_keys');
-
-                // Only proceed if moderation_keys is not empty
                 if (!empty($moderation_keys)) {
                     $keys = preg_split('/\r\n|\r|\n/', $moderation_keys);
-
-                    // Check for moderation keys
                     foreach ($keys as $key) {
                         $key = trim($key);
                         if (empty($key)) continue;
-
-                        if (stripos($commentdata['comment_content'], $key) !== false) {
+                        if (stripos($comment, $key) !== false) {
                             $commentdata['comment_type'] = 'flagged';
-                            return $commentdata; // Early return if matched
+                            return $commentdata;
                         }
                     }
                 }
 
-                // Check for links only if 'comment_max_links' option is set > 0
-                $max_links = intval(get_option('comment_max_links', 0));
-                if ($max_links > 0) {
-                    // Count links in comment content (matches URL or anchor tags)
-                    preg_match_all('/https?:\/\/|<a\s+href=/i', $commentdata['comment_content'], $matches);
-                    if (count($matches[0]) > $max_links) {
+                if ('1' === intval(get_option('comment_moderation', 0))) {
+                    $max_links = get_option('comment_max_links');
+                    // Check for links only using your provided pattern and method
+                    if ($max_links && preg_match_all("|(href\t*?=\t*?['\"]?)?(https?:)?//|i", $comment, $out) >= $max_links) {
                         $commentdata['comment_type'] = 'flagged';
                     }
                 }
