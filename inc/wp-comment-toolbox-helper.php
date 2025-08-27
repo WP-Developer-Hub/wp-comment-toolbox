@@ -265,5 +265,18 @@ if (!class_exists('WPCT_Helper')) {
                 wp_set_comment_status($id, 'trash', true);
             }
         }
+
+        public static function wpct_add_wp_setting_link($path, $name) {
+            $url = $path;
+            return sprintf(
+                /* translators: %1$s = opening anchor tag with URL, %2$s = closing anchor tag, %3$s = opening strong tag */
+                __('%3$sSettings → %1$s%5$s%2$s%4$s', 'wpct'),
+                '<a href="' . esc_url(admin_url($url)) . '" target="_blank" rel="noopener noreferrer">',
+                '</a>',
+                '<strong>',
+                '</strong>',
+                $name
+            );
+        }
     }
 }

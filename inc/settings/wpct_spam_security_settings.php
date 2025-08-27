@@ -18,11 +18,9 @@ WPCT_Helper::wpct_select_box(
     __('Comment Flood Delay', 'wpct'),
     '15',
     sprintf(
-        __('Set the minimum wait time between user comments. <br>This setting depends on the %1$sShow comments cookies opt-in checkbox%2$s option in %3$sSettings → Discussion%4$s. Disabling that option will disable this setting.', 'wpct'),
-        '<a href="' . esc_url(admin_url('options-discussion.php#other-comment-settings')) . '" target="_blank" rel="noopener noreferrer">',
-        '</a>',
-        '<strong>',
-        '</strong>'
+        __('Set the minimum wait time between user comments. <br>This setting depends on the Show comments cookies opt-in checkbox option in %1$s. Disabling that option will disable this setting.', 'wpct'),
+        WPCT_Helper::wpct_add_wp_setting_link('options-discussion.php#other-comment-settings', 'Discussion')
+
     ),
     array(
         '15' => __('15 seconds', 'wpct'),
@@ -37,36 +35,36 @@ WPCT_Helper::wpct_select_box(
 // Disable Clickable Links in Comments
 WPCT_Helper::wpct_select_box(
     'wpct_disable_clickable_links',
-    __( 'Disable clickable links', 'wpct' ),
+    __('Disable clickable links', 'wpct'),
     0,
-    __( 'When enabled, links in comments will not be clickable. This can help reduce spam and unwanted external links.', 'wpct' ),
+    __('When enabled, links in comments will not be clickable. This can help reduce spam and unwanted external links.', 'wpct'),
     array(
-        0 => __( 'No', 'wpct' ),
-        1 => __( 'Yes', 'wpct' ),
+        0 => __('No', 'wpct'),
+        1 => __('Yes', 'wpct'),
     )
 );
 
 // Enable WP Kses Post
 WPCT_Helper::wpct_select_box(
     'wpct_enable_wp_kses_post',
-    __( 'Filter HTML', 'wpct' ),
+    __( 'Filter HTML', 'wpct'),
     0,
-    __( 'When enabled, only safe HTML tags such as links, blockquotes, and basic formatting will be allowed in comments. This helps prevent malicious code from being rendered for users with higher roles, while keeping basic styling.', 'wpct' ),
+    __('When enabled, only safe HTML tags such as links, blockquotes, and basic formatting will be allowed in comments. This helps prevent malicious code from being rendered for users with higher roles, while keeping basic styling.', 'wpct'),
     array(
-        0 => __( 'No', 'wpct' ),
-        1 => __( 'Yes', 'wpct' ),
+        0 => __('No', 'wpct'),
+        1 => __('Yes', 'wpct'),
     )
 );
 
 // Enable Spam Protection
 WPCT_Helper::wpct_select_box(
     'wpct_enable_spam_protect',
-    __( 'Enable Spam Protection', 'wpct' ),
+    __('Enable Spam Protection', 'wpct'),
     0,
-    __( 'When enabled, your WordPress site will be protected from spam comments sent via bots. It checks the referrer header to ensure that the comment is coming from a valid source. If spam protection is enabled and the referrer is missing, comments will be blocked, preventing bot submissions. Additionally, a honeypot mechanism will be added to the comment form. This includes a hidden textarea field that bots are likely to fill out, and if detected, the comment will be marked as spam. You can also customize the submit button name used for honeypot checks.', 'wpct' ),
+    __('When enabled, your WordPress site will be protected from spam comments sent via bots. It checks the referrer header to ensure that the comment is coming from a valid source. If spam protection is enabled and the referrer is missing, comments will be blocked, preventing bot submissions. Additionally, a honeypot mechanism will be added to the comment form. This includes a hidden textarea field that bots are likely to fill out, and if detected, the comment will be marked as spam. You can also customize the submit button name used for honeypot checks.', 'wpct'),
     array(
-        0 => __( 'No', 'wpct' ),
-        1 => __( 'Yes', 'wpct' ),
+        0 => __('No', 'wpct'),
+        1 => __('Yes', 'wpct'),
     )
 );
 
@@ -76,11 +74,8 @@ WPCT_Helper::wpct_select_box(
     __('Enable Spam Filter', 'wpct'),
     0,
     sprintf(
-        __('When enabled, comments containing words from the moderation_keys list will be flagged if that list is not empty. Comments with links will only be flagged if the comment_max_links option is set to a value greater than zero and the number of links meets or exceeds that value. Additionally, the Comment must be manually approved setting is required. All three settings must be enabled and configured correctly in %3$sSettings → %1$sDiscussion%2$s%4$s for full spam filtering effect.%4$s You can then filter comments by this flagged type in the WordPress admin to easily find and moderate potential spam.', 'wpct'),
-        '<a href="' . esc_url(admin_url('options-discussion.php#comment-moderation')) . '" target="_blank" rel="noopener noreferrer">',
-        '</a>',
-        '<strong>',
-        '</strong>'
+        __('When enabled, comments containing words from the moderation_keys list will be flagged if that list is not empty. Comments with links will only be flagged if the comment_max_links option is set to a value greater than zero and the number of links meets or exceeds that value. Additionally, the Comment must be manually approved setting is required. All three settings must be enabled and configured correctly in %1$s to get full spam filtering effect. You can then filter comments by this flagged type in the WordPress admin to easily find and moderate potential spam.', 'wpct'),
+        WPCT_Helper::wpct_add_wp_setting_link('options-discussion.php#comment-moderation', 'Discussion')
     ),
     array(
         0 => __('No', 'wpct'),
@@ -91,11 +86,11 @@ WPCT_Helper::wpct_select_box(
 // Submit Button Field Name
 WPCT_Helper::wpct_input_field(
     'wpct_submit_button_name',
-    __( 'Submit Button Name', 'wpct' ),
+    __('Submit Button Name', 'wpct'),
     'text',
     'submit',
-    __( 'This name will be used when performing the honeypot check. Set the name for the submit button. If your theme changes the default name for the submit button, you can inspect the HTML of the comment form or consult your theme\'s documentation to find the appropriate name attribute for the submit button. Typically, it is something like "submit" or "comment-submit".', 'wpct' ),
-    array( 'placeholder' => 'Submit Button Name Go Here' )
+    __('This name will be used when performing the honeypot check. Set the name for the submit button. If your theme changes the default name for the submit button, you can inspect the HTML of the comment form or consult your theme\'s documentation to find the appropriate name attribute for the submit button. Typically, it is something like "submit" or "comment-submit".', 'wpct' ),
+    array('placeholder' => 'Submit Button Name Go Here')
 );
 
 // Enable Math Captcha
