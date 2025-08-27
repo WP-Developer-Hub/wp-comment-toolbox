@@ -13,6 +13,7 @@ if (!class_exists('WP_Comment_Toolbox_Span_And_Security')) {
             add_filter('comment_text', [$this, 'strip_bad_html_form_comment'], 9);
             add_action('comment_form', [$this, 'add_wp_nonce_and_honeypot_field']);
             add_filter('preprocess_comment', [$this, 'wpct_verify_math_captcha'], 8);
+            add_filter('preprocess_comment', [$this, 'wpct_verify_comments_content'], 8);
             add_filter('pre_comment_content', [$this, 'strip_bad_html_form_comment'], 9);
             add_filter('comment_flood_filter', [$this, 'wpct_comment_flood_delay'], 10, 3);
             add_filter('comment_form_field_comment', [$this, 'wpct_math_captcha_field'], 9);
@@ -291,6 +292,42 @@ if (!class_exists('WP_Comment_Toolbox_Span_And_Security')) {
                 }
             }
             return false;
+        }
+
+        public function wpct_verify_comments_content($commentdata) {
+            // Only proceed if the scam filter is enabled
+            if ('1' === get_option('wpct_spam_filter_enabled')) {
+
+                // Get moderation keys list from WP settings (one per line)
+                $moderation_keys = get_option('moderation_keys');
+
+                // Only proceed if moderation_keys is not empty
+                if (!empty($moderation_keys)) {
+                    $keys = preg_split('/\r\n|\r|\n/', $moderation_keys);
+
+                    // Check for moderation keys
+                    foreach ($keys as $key) {
+                        $key = trim($key);
+                        if (empty($key)) continue;
+
+                        if (stripos($commentdata['comment_content'], $key) !== false) {
+                            $commentdata['comment_type'] = 'flagged';
+                            return $commentdata; // Early return if matched
+                        }
+                    }
+                }
+
+                // Check for links only if 'comment_max_links' option is set > 0
+                $max_links = intval(get_option('comment_max_links', 0));
+                if ($max_links > 0) {
+                    // Count links in comment content (matches URL or anchor tags)
+                    preg_match_all('/https?:\/\/|<a\s+href=/i', $commentdata['comment_content'], $matches);
+                    if (count($matches[0]) > $max_links) {
+                        $commentdata['comment_type'] = 'flagged';
+                    }
+                }
+            }
+            return $commentdata;
         }
     }
     new WP_Comment_Toolbox_Span_And_Security();

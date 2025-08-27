@@ -15,18 +15,6 @@ WPCT_Helper::wpct_select_box(
     )
 );
 
-// Toggle Scam Filter Setting
-WPCT_Helper::wpct_select_box(
-    'wpct_scam_filter_enabled',
-    __('Enable Scam Filter', 'wpct'),
-    0,
-    __('When enabled, you will be able to see comments with links, which might indicate spam. This feature is experimental.', 'wpct'),
-    array(
-        0 => __('No', 'wpct'),
-        1 => __('Yes', 'wpct'),
-    )
-);
-
 // Toggle Formatting Setting
 WPCT_Helper::wpct_select_box(
     'wpct_disable_comment_formatting',

@@ -70,6 +70,18 @@ WPCT_Helper::wpct_select_box(
     )
 );
 
+// Enable Spam Filter
+WPCT_Helper::wpct_select_box(
+    'wpct_spam_filter_enabled',
+    __('Enable Spam Filter', 'wpct'),
+    0,
+    __('When enabled, comments containing words from the moderation_keys list or links exceeding the comment_max_links limit (1 or more) will be marked as flagged. You can then filter comments by this flagged type in the WordPress admin to easily find and moderate potential spam.', 'wpct'),
+    array(
+        0 => __('No', 'wpct'),
+        1 => __('Yes', 'wpct'),
+    )
+);
+
 // Submit Button Field Name
 WPCT_Helper::wpct_input_field(
     'wpct_submit_button_name',
