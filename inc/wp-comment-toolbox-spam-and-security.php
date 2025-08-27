@@ -17,6 +17,7 @@ if (!class_exists('WP_Comment_Toolbox_Span_And_Security')) {
             add_filter('pre_comment_content', [$this, 'strip_bad_html_form_comment'], 9);
             add_filter('comment_flood_filter', [$this, 'wpct_comment_flood_delay'], 10, 3);
             add_filter('comment_form_field_comment', [$this, 'wpct_math_captcha_field'], 9);
+            add_filter('wp_insert_comment', [$this, 'wpct_mark_flagged_comment_as_spam'], 8);
         }
 
         public function toggle_make_clickable() {
@@ -296,6 +297,13 @@ if (!class_exists('WP_Comment_Toolbox_Span_And_Security')) {
 
         public function wpct_verify_comments_content($commentdata) {
             return WPCT_Helper::wpct_check_comment_for_spam($commentdata);
+        }
+
+        public function wpct_mark_flagged_comment_as_spam($comment_ID) {
+            $comment = get_comment($comment_ID);
+            if ($comment && $comment->comment_type === 'flagged') {
+                wp_set_comment_status($comment_ID, 'spam', false);
+            }
         }
     }
     new WP_Comment_Toolbox_Span_And_Security();

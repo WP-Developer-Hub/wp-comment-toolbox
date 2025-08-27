@@ -289,9 +289,8 @@ if (!class_exists('WPCT_Helper')) {
         }
 
         public static function wpct_check_comment_for_spam($commentdata) {
-            if ('1' !== intval(get_option('wpct_spam_filter_enabled', 0))) {
+            if (get_option('wpct_enable_spam_filter', 0)) {
                 $comment = $commentdata['comment_content'];
-                $comment_id = $commentdata['comment_ID'];
 
                 // Check moderation keys from WordPress options
                 $moderation_keys = get_option('moderation_keys');
@@ -299,26 +298,22 @@ if (!class_exists('WPCT_Helper')) {
                     $keys = preg_split('/\r\n|\r|\n/', $moderation_keys);
                     foreach ($keys as $key) {
                         $key = trim($key);
-                        if (empty($key)) {
+                        if ($key === '') {
                             continue;
                         }
                         if (stripos($comment, $key) !== false) {
                             $commentdata['comment_type'] = 'flagged';
-                            wp_set_comment_status($comment_id, 'spam', false);
                             return $commentdata;
                         }
                     }
                 }
 
                 // Check number of links if manual comment approval is enabled
-                if ('1' === intval(get_option('comment_moderation', 0))) {
+                if (get_option('comment_moderation', 0)) {
                     $max_links = get_option('comment_max_links');
-                    if ($max_links) {
-                        if (preg_match_all("|(href\t*=\t*['\"])?(https?:)?//|i", $comment, $matches) >= $max_links) {
-                            $commentdata['comment_type'] = 'flagged';
-                            wp_set_comment_status($comment_id, 'spam', false);
-                            return $commentdata;
-                        }
+                    if ($max_links && preg_match_all('|(href\s*=\s*[\'"])?(https?:)?//|i', $comment, $matches) >= $max_links) {
+                        $commentdata['comment_type'] = 'flagged';
+                        return $commentdata;
                     }
                 }
             }

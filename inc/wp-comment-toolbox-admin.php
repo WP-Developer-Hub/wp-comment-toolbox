@@ -17,7 +17,7 @@ if (!class_exists('WP_Comment_Toolbox_Admin')) {
 
             // Add check comments for sus button
             add_action('admin_post_wptc_check_comments_for_sus', [$this, 'handle_check_comments_for_sus_action']);
-            add_filter('manage_comments_nav', [$this, 'add_check_comments_for_sus_button'], PHP_INT_MAX, 2);
+            add_filter('manage_comments_nav', [$this, 'add_check_comments_for_sus_button'], 10, 2);
             add_filter('admin_notices', [$this, 'handle_check_comments_for_sus_notices']);
 
             // Add new comment type called flagged
@@ -25,9 +25,7 @@ if (!class_exists('WP_Comment_Toolbox_Admin')) {
         }
 
         public function add_fleged_comments_type($comment_types) {
-            if ('1' === get_option('wpct_spam_filter_enabled')) {
-                $comment_types['flagged'] = __('Flagged', 'wpct');
-            }
+            $comment_types['flagged'] = __('Flagged', 'wpct');
             return $comment_types;
         }
 
@@ -165,9 +163,10 @@ if (!class_exists('WP_Comment_Toolbox_Admin')) {
         }
 
         public function add_check_comments_for_sus_button($comment_status, $which) {
-            if ($which === 'top' && get_option('wpct_spam_filter_enabled', 0)) {
+            if ($which === 'top' && get_option('wpct_enable_spam_filter', 0)) {
+                $nonce = isset($_GET['comment_status']) ? wp_unslash($_GET['_wpnonce']) : '';
                 $params = [
-                    'wptc_comment_status' => ! empty($comment_status) ? $comment_status : 'all',
+                    'wptc_comment_status' => !empty($comment_status) ? $comment_status : 'all',
                 ];
 
                 $url = WPCT_Helper::wpct_create_action_url(
@@ -175,12 +174,12 @@ if (!class_exists('WP_Comment_Toolbox_Admin')) {
                     'wptc_check_comments_for_sus_action',
                     $params
                 );
-                echo '<a href="' . esc_url($url) . '" class="button">' . esc_html__('Check for sus', 'wpct') . '</a>';
+                echo '<a href="' . esc_url($url) . '" id="wptc-ccfs" style="margin: 0 0 0 8px;" class="button">' . esc_html__('Check for sus', 'wpct') . '</a>';
             }
         }
 
         public function handle_check_comments_for_sus_action() {
-            if (!get_option('wpct_spam_filter_enabled', 1)) {
+            if (!get_option('wpct_enable_spam_filter', 1)) {
                 return;
             }
 
@@ -204,12 +203,8 @@ if (!class_exists('WP_Comment_Toolbox_Admin')) {
 
             $comment_status = isset($_GET['wptc_comment_status']) ? wp_unslash($_GET['wptc_comment_status']) : 'all';
 
-            error_log($comment_status);
-
             // Get all comments regardless of status or number
-            $comments = get_comments([
-                'status' => $comment_status,
-            ]);
+            $comments = get_comments(['status' => $comment_status]);
 
             $flagged_count = 0;
 
@@ -218,28 +213,27 @@ if (!class_exists('WP_Comment_Toolbox_Admin')) {
                 $commentdata = (array) $comment;
 
                 // Use your helper to determine if comment is suspicious
-                $checked_commentdata = WPCT_Helper::wpct_check_comment_for_spam($commentdata);
+                WPCT_Helper::wpct_check_comment_for_spam($commentdata);
 
-                // If flagged, mark comment as spam
-                if (!empty($checked_commentdata['comment_type']) && $checked_commentdata['comment_type'] === 'flagged') {
-                    if (wp_set_comment_status($comment->comment_ID, 'spam')) {
-                        $flagged_count++;
-                    }
+                $comment_id = $comment->comment_ID;
+                $flagged_comment = get_comment($comment_id);
+
+                if ($flagged_comment && $flagged_comment->comment_type === 'flagged') {
+                    wp_set_comment_status($comment_id, 'spam', false);
                 }
             }
 
             // Redirect back to comments admin with success message + flagged count
             wp_safe_redirect(add_query_arg([
                 'wptc_check_spam' => 'success',
-                'wptc_flagged_count' => $flagged_count,
             ], WPCT_Helper::wpct_get_referer('edit-comments.php')));
             exit;
         }
 
         public function handle_check_comments_for_sus_notices() {
-            if (get_option('wpct_spam_filter_enabled', 1)) {
-                if (isset($_GET['wptc_check_spam']) && $_GET['wptc_check_spam'] === 'success' && isset($_GET['wptc_flagged_count'])) {
-                    $flagged_count = intval($_GET['wptc_flagged_count']);
+            if (get_option('wpct_enable_spam_filter', 0)) {
+                if (isset($_GET['wptc_check_spam']) && $_GET['wptc_check_spam'] === 'success') {
+                    $flagged_count = count(get_comments(['type' => 'flagged']));
 
                     if ($flagged_count > 0) {
                         $message = sprintf(
@@ -256,7 +250,7 @@ if (!class_exists('WP_Comment_Toolbox_Admin')) {
                         $message = esc_html__('No sus comments found.', 'wpct');
                     }
 
-                    echo WPCT_Helper::wpct_create_admin_notices($message, 1, true, ['wptc_check_spam', 'wptc_flagged_count']);
+                    echo WPCT_Helper::wpct_create_admin_notices($message, 1, true, ['wptc_check_spam']);
                 }
             }
         }

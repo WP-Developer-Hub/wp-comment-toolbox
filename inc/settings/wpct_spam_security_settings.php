@@ -70,7 +70,7 @@ WPCT_Helper::wpct_select_box(
 
 // Enable Spam Filter
 WPCT_Helper::wpct_select_box(
-    'wpct_spam_filter_enabled',
+    'wpct_enable_spam_filter',
     __('Enable Spam Filter', 'wpct'),
     0,
     sprintf(

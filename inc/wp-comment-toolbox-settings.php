@@ -169,7 +169,7 @@ if (!class_exists('WP_Comment_Toolbox_Settings')) {
                 update_option('wpct_comment_flood_delay', $_POST['wpct_comment_flood_delay']);
             }
             update_option('wpct_enable_spam_protect', $_POST['wpct_enable_spam_protect']);
-            update_option('wpct_spam_filter_enabled', $_POST['wpct_spam_filter_enabled']);
+            update_option('wpct_enable_spam_filter', $_POST['wpct_enable_spam_filter']);
             update_option('wpct_submit_button_name', $_POST['wpct_submit_button_name']);
             update_option('wpct_enable_math_captcha', $_POST['wpct_enable_math_captcha']);
             update_option('wpct_math_captcha_level', $_POST['wpct_math_captcha_level']);
