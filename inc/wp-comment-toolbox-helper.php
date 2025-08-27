@@ -223,7 +223,16 @@ if (!class_exists('WPCT_Helper')) {
 
         // Get wp_get_referer with fallback
         public static function wpct_get_referer($fallback) {
-            return wp_get_referer() ? wp_get_referer() : admin_url(esc_url($fallback));
+            return (wp_get_referer() ? wp_get_referer() : admin_url(esc_url($fallback)));
+        }
+
+        // create wpct_create_action_url with $query_arg
+        public static function wpct_create_action_url($action, $nonce_action, $query_args = []) {
+            // Build URL to admin-post.php with query args
+            $url = add_query_arg(['action' => $action, $query_args], admin_url('admin-post.php'));
+
+            // Add nonce to URL and return
+            return wp_nonce_url($url, $nonce_action, '_wpnonce');
         }
 
         public static function wpct_create_admin_notices($message, $level = 1, $is_dismissible = true, $vars = []) {
@@ -262,8 +271,21 @@ if (!class_exists('WPCT_Helper')) {
             if ($comment && ($comment->comment_approved === 'spam' || $comment->comment_approved === 'trash')) {
                 wp_delete_comment($id, true);
             } else {
-                wp_set_comment_status($id, 'trash', true);
+                wp_set_comment_status($id, 'trash', false);
             }
+        }
+
+        public static function wpct_add_wp_setting_link($path, $name) {
+            $url = $path;
+            return sprintf(
+                /* translators: %1$s = opening anchor tag with URL, %2$s = closing anchor tag, %3$s = opening strong tag */
+                __('%3$sSettings → %1$s%5$s%2$s%4$s', 'wpct'),
+                '<a href="' . esc_url(admin_url($url)) . '" target="_blank" rel="noopener noreferrer">',
+                '</a>',
+                '<strong>',
+                '</strong>',
+                $name
+            );
         }
     }
 }

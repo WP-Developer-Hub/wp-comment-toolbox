@@ -100,11 +100,11 @@ if (!class_exists('WP_Comment_Toolbox_Admin')) {
             if (is_admin() && get_option('wpct_disable_comment_formatting')) {
                 // Preserve the actual URLs but strip the anchor tags
                 $comment_text = preg_replace_callback('/<a[^>]+href=["\']([^"\']+)["\'][^>]*>(.*?)<\/a>/is', function($matches) {
-                    return filter_var($matches[1], (FILTER_VALIDATE_URL) ? $matches[1] : $matches[2]);
+                   return (filter_var($matches[1], FILTER_VALIDATE_URL) ? $matches[1] : $matches[2]);
                 }, $comment_text);
 
-                // Strip all remaining HTML tags
-                $comment_text = wp_strip_all_tags($comment_text);
+                // Strip any remaining HTML tags
+                return wp_strip_all_tags($comment_text);
             }
             return $comment_text;
         }
@@ -122,11 +122,12 @@ if (!class_exists('WP_Comment_Toolbox_Admin')) {
                 // Consistent nonce action
                 $nonce_action = 'wptc_block_commentor_ip_' . $ip;
 
-                $block_url = wp_nonce_url(
-                    admin_url('admin-post.php?action=wptc_block_commentor_ip&id=' . $id . '&ip=' . urlencode($ip)),
-                    $nonce_action,
-                    '_wpnonce'
-                );
+                $params = [
+                    'id' => $id,
+                    'ip' => $ip,
+                ];
+
+                $block_url = WPCT_Helper::wpct_create_action_url('wptc_block_commentor_ip', $nonce_action, $params);
 
                 // Same nonce for AJAX
                 $ajax_nonce = wp_create_nonce($nonce_action);
@@ -150,9 +151,11 @@ if (!class_exists('WP_Comment_Toolbox_Admin')) {
                 return;
             }
 
+            $redirect_url = WPCT_Helper::wpct_get_referer('edit-comments.php');
+
             if (!current_user_can('manage_options')) {
                 WPCT_Helper::wpct_create_admin_notices(__('Unauthorized user', 'wpct'), 3, true);
-                wp_safe_redirect(admin_url('edit-comments.php'));
+                wp_safe_redirect($redirect_url);
                 exit;
             }
 
@@ -163,21 +166,21 @@ if (!class_exists('WP_Comment_Toolbox_Admin')) {
             // Validate IP
             if (empty($ip) || !filter_var($ip, FILTER_VALIDATE_IP)) {
                 WPCT_Helper::wpct_create_admin_notices(__('Invalid IP address', 'wpct'), 3, true);
-                wp_safe_redirect(admin_url('edit-comments.php'));
+                wp_safe_redirect($redirect_url);
                 exit;
             }
 
             // Validate comment ID
             if (empty($id) || $id <= 0) {
                 WPCT_Helper::wpct_create_admin_notices(__('Invalid comment ID', 'wpct'), 3, true);
-                wp_safe_redirect(admin_url('edit-comments.php'));
+                wp_safe_redirect($redirect_url);
                 exit;
             }
 
             // Validate nonce
             if (!wp_verify_nonce($nonce, 'wptc_block_commentor_ip_' . $ip)) {
                 WPCT_Helper::wpct_create_admin_notices(__('Invalid request', 'wpct'), 3, true);
-                wp_safe_redirect(admin_url('edit-comments.php'));
+                wp_safe_redirect($redirect_url);
                 exit;
             }
 
@@ -188,11 +191,10 @@ if (!class_exists('WP_Comment_Toolbox_Admin')) {
             WPCT_Helper::wpct_handel_with_comment($id);
 
             // 3. Redirect with success notice
-            $redirect_url = WPCT_Helper::wpct_get_referer('edit-comments.php');
             $redirect_url = remove_query_arg(['block_ip_status', 'blocked_ip'], $redirect_url);
             $redirect_url = add_query_arg([
                 'block_ip_status' => 'success',
-                'blocked_ip'      => $ip,
+                'blocked_ip' => $ip,
             ], $redirect_url);
 
             wp_safe_redirect($redirect_url);

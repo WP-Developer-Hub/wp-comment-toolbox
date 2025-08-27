@@ -85,11 +85,8 @@ WPCT_Helper::wpct_text_area(
     '[cookies_msg]',
     sprintf(
         /* translators: 1: opening anchor tag, 2: closing anchor tag, 3: strong open, 4: strong close */
-        __('Customize the cookies message for the comment form. <br> - Use <strong>[cookies_msg]</strong> to include the default cookies text.<br> - Use <strong>[privacy_policy_link]</strong> to insert a link to your privacy policy page.<br>This setting depends on the %1$sShow comments cookies opt-in checkbox%2$s option in %3$sSettings → Discussion%4$s. Disabling that option will disable this setting.', 'wpct'),
-        '<a href="' . esc_url(admin_url('options-discussion.php#other-comment-settings')) . '" target="_blank" rel="noopener noreferrer">',
-        '</a>',
-        '<strong>',
-        '</strong>'
+        __('Customize the cookies message for the comment form. <br> - Use <strong>[cookies_msg]</strong> to include the default cookies text.<br> - Use <strong>[privacy_policy_link]</strong> to insert a link to your privacy policy page.<br>This setting depends on the Show comments cookies opt-in checkbox option in %1$s. Disabling that option will disable this setting.', 'wpct'),
+        WPCT_Helper::wpct_add_wp_setting_link('options-discussion.php#other-comment-settings', 'Discussion')
     ),
     array_merge(
         ['rows' => 6],
