@@ -19,14 +19,13 @@ if (!class_exists('WP_Comment_Toolbox_Settings')) {
         }
 
         public function add_comment_settings_submenu() {
-            add_submenu_page(
-                             'edit-comments.php',
-                             'Comment Settings',
-                             'Comment Settings',
-                             'manage_options',
-                             'wpct-comment-settings',
-                             [$this, 'comment_settings_page']
-                             );
+            add_comments_page(
+                'Comment Settings',
+                'Comment Settings',
+                'manage_options',
+                'wpct-comment-settings',
+                [$this, 'comment_settings_page']
+            );
         }
 
         public function comment_settings_page() {
