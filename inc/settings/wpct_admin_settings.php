@@ -42,3 +42,14 @@ WPCT_Helper::wpct_select_box(
     )
 );
 
+// Comment List Enhancement
+WPCT_Helper::wpct_checkbox_group(
+    'wpct_comment_list_enhancement',
+    __('Enhance Comment List Tables', 'wpct'),
+    __('Add useful columns like, Comment ID, Comment Type and Author Role to the admin comments list for easier moderation.', 'wpct'),
+    array(
+        'wptc_comment_type' => __('Comment Type', 'wpct'),
+        'wptc_comment_author_role' => __('Comment Author Role', 'wpct'),
+        'wptc_comment_id' => __('Comment ID', 'wpct'),
+    )
+);

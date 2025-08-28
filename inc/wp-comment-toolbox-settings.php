@@ -210,6 +210,7 @@ if (!class_exists('WP_Comment_Toolbox_Settings')) {
             update_option('wpct_show_block_ip_action', $_POST['wpct_show_block_ip_action']);
             update_option('wpct_enable_nuke_all_sus_comment_button', $_POST['wpct_enable_nuke_all_sus_comment_button']);
             update_option('wpct_disable_comment_formatting', $_POST['wpct_disable_comment_formatting']);
+            update_option('wpct_comment_list_enhancement', $_POST['wpct_comment_list_enhancement']);
         }
 
         private function wpct_load_setting($name) {

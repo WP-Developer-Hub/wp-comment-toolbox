@@ -19,6 +19,9 @@ if (!class_exists('WP_Comment_Toolbox_Admin')) {
             add_action('admin_post_wptc_nuke_all_sus_comments', [$this, 'handle_nuke_all_sus_comments_action']);
             add_filter('manage_comments_nav', [$this, 'add_nuke_all_sus_comments_button'], 10, 2);
             add_filter('admin_notices', [$this, 'handle_nuke_all_sus_comments_notices']);
+
+            add_filter('manage_edit-comments_columns', array($this, 'add_comment_type_column'));
+            add_action('manage_comments_custom_column', array($this, 'output_comment_type_column'), 10, 2);
         }
 
         // Filter comment text based on wpct_disable_comment_formatting option
@@ -202,8 +205,8 @@ if (!class_exists('WP_Comment_Toolbox_Admin')) {
             foreach ($comments as $comment) {
                 if (WPCT_Helper::wpct_check_comment_for_spam($comment)) {
                     if (defined('WP_COMMENT_TOOLBOX_PLUGIN_IS_DEBUG_ON') && !WP_COMMENT_TOOLBOX_PLUGIN_IS_DEBUG_ON) {
-                    WPCT_Helper::wpct_update_comment_blocklist($comment->comment_author_IP);
-                    WPCT_Helper::wpct_handel_with_comment($comment->comment_ID);
+                        WPCT_Helper::wpct_update_comment_blocklist($comment->comment_author_IP);
+                        WPCT_Helper::wpct_handel_with_comment($comment->comment_ID);
                     }
                     $comment_count++;
                 }
@@ -247,6 +250,57 @@ if (!class_exists('WP_Comment_Toolbox_Admin')) {
                         ['wptc_spam_nuked', 'wptc_comment_count']
                     );
                 }
+            }
+        }
+
+        public function add_comment_type_column($columns) {
+            $enabled_columns = (array) get_option('wpct_comment_list_enhancement', []);
+            
+            // Make a new array to build columns
+            $new_columns = [];
+
+            foreach ($columns as $key => $label) {
+                $new_columns[$key] = $label;
+
+                if ($key === 'date') {
+                    // Insert columns enabled by settings, after the 'date' column
+                    if (in_array('wptc_comment_type', $enabled_columns, true)) {
+                        $new_columns['wptc_comment_type'] = __('Type', 'wptc');
+                    }
+                    if (in_array('wptc_comment_author_role', $enabled_columns, true)) {
+                        $new_columns['wptc_comment_author_role'] = __('Role', 'wptc');
+                    }
+                    if (in_array('wptc_comment_id', $enabled_columns, true)) {
+                        $new_columns['wptc_comment_id'] = __('ID', 'wptc');
+                    }
+                }
+            }
+
+            return $new_columns;
+        }
+
+        public function output_comment_type_column($column, $comment_ID) {
+            $enabled_columns = (array) get_option('wpct_comment_list_enhancement', []);
+            if (in_array('wptc_comment_type', $enabled_columns, true) && $column === 'wptc_comment_type') {
+                $comment = get_comment($comment_ID);
+                $type = $comment->comment_type;
+                echo esc_html(!empty($type) ? ucfirst($type) : __('Comment', 'wptc'));
+            }
+
+            if (in_array('wptc_comment_author_role', $enabled_columns, true) && $column === 'wptc_comment_author_role') {
+                $comment = get_comment($comment_id);
+                if ($comment->user_id) {
+                    $user = get_userdata($comment->user_id);
+                    $roles = ($user ? implode(', ', $user->roles) : __('No Role', 'text-domain'));
+                    echo esc_html($roles);
+                } else {
+                    echo __('Guest', 'text-domain');
+                }
+            }
+
+            if (in_array('wptc_comment_id', $enabled_columns, true) && $column === 'wptc_comment_id') {
+                $comment = get_comment($comment_id);
+                echo esc_html($comment_ID);
             }
         }
     }

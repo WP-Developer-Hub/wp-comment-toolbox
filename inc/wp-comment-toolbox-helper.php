@@ -122,6 +122,52 @@ if (!class_exists('WPCT_Helper')) {
             <?php
         }
 
+        // Checkbox Group
+        public static function wpct_checkbox_group($name, $label, $description = '', $choices = array(), $attr = array()) {
+            // Fetch the stored value for this option (defaults to $value if not set)
+            $input_value = get_option($name, array());
+            if (!is_array($input_value)) {
+                $input_value = array($input_value);
+            }
+
+            // Prepare additional attributes
+            $additional_attributes = '';
+            if (!empty($attr)) {
+                foreach ($attr as $key => $val) {
+                    $additional_attributes .= ' ' . esc_attr($key) . '="' . esc_attr($val) . '"';
+                }
+            }
+            ?>
+            <tr>
+                <th scope="row">
+                    <?php if ($label): ?>
+                        <span class="status-label"><?php echo esc_html($label); ?></span>
+                    <?php endif; ?>
+                </th>
+                <td>
+                    <fieldset>
+                        <?php foreach ($choices as $key => $choice_label): ?>
+                            <label class="widefat" for="<?php echo esc_attr($name); ?>[]">
+                                <input
+                                    type="checkbox"
+                                    id="<?php echo esc_attr($name); ?>[]"
+                                    name="<?php echo esc_attr($name); ?>[]"
+                                    value="<?php echo esc_attr($key); ?>"
+                                    <?php checked(in_array($key, $input_value), true); ?>
+                                    <?php echo $additional_attributes; ?>
+                                />
+                                <?php echo esc_html($choice_label); ?>
+                            </label>
+                        <?php endforeach; ?>
+                    </fieldset>
+                    <?php if ($description): ?>
+                        <p class="description"><?php echo wp_kses_post($description); ?></p>
+                    <?php endif; ?>
+                </td>
+            </tr>
+            <?php
+        }
+
         // Test Code Field
         public static function wpct_test_code($name, $label, $value = '', $description = '', $attr = array()) {
             // Prepare additional attributes
