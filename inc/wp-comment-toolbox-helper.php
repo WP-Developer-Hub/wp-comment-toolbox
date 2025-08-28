@@ -287,5 +287,34 @@ if (!class_exists('WPCT_Helper')) {
                 $name
             );
         }
+
+        public static function wpct_check_comment_for_spam($comment) {
+            $is_flagged = false;
+            $comment_content = $comment->comment_content;
+
+            // Check moderation keys from WordPress options
+            $moderation_keys = get_option('moderation_keys');
+            if (!empty($moderation_keys)) {
+                $keys = preg_split('/\r\n|\r|\n/', $moderation_keys);
+                foreach ($keys as $key) {
+                    $key = trim($key);
+                    if ($key === '') {
+                        continue;
+                    }
+                    if (stripos($comment_content, $key) !== false) {
+                        $is_flagged = true;
+                    }
+                }
+            }
+
+            // Check number of links if comment moderation enabled
+            if (get_option('comment_moderation', 0)) {
+                $max_links = get_option('comment_max_links');
+                if ($max_links && preg_match_all('|(href\s*=\s*[\'"])?(https?:)?//|i', $comment_content, $matches) >= $max_links) {
+                    $is_flagged = true;
+                }
+            }
+            return $is_flagged;
+        }
     }
 }

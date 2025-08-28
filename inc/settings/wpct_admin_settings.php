@@ -15,12 +15,15 @@ WPCT_Helper::wpct_select_box(
     )
 );
 
-// Toggle Scam Filter Setting
+// Enable Nuke Button
 WPCT_Helper::wpct_select_box(
-    'wpct_scam_filter_enabled',
-    __('Enable Scam Filter', 'wpct'),
+    'wpct_enable_nuke_all_sus_comment_button',
+    __('Enable all sus comments button', 'wpct'),
     0,
-    __('When enabled, you will be able to see comments with links, which might indicate spam. This feature is experimental.', 'wpct'),
+    sprintf(
+        __('Enable this option to add a "Nuke all sus comments" feature which checks all comments for words listed in moderation_keys & or links only when comment_max_links is set and manual comment approval is enabled in %1$s. When enabled, a new "Nuke all sus comments" button will appear next to the filter by type apply button in the comment list admin screen to quickly scan and nuke suspicious comments in one shot plus add the comment authors IP Address to a block list.', 'wpct'),
+        WPCT_Helper::wpct_add_wp_setting_link('options-discussion.php#comment-moderation', 'Discussion')
+    ),
     array(
         0 => __('No', 'wpct'),
         1 => __('Yes', 'wpct'),
