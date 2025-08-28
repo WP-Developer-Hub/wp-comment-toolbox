@@ -16,17 +16,9 @@ if (!class_exists('WP_Comment_Toolbox_Admin')) {
             add_filter('comment_text', [$this, 'filter_comment_text'], PHP_INT_MAX);
 
             // Add check comments for sus button
-            add_action('admin_post_wptc_nuke_comments_for_sus', [$this, 'handle_nuke_comments_for_sus_action']);
-            add_filter('manage_comments_nav', [$this, 'add_nuke_comments_for_sus_button'], 10, 2);
-            add_filter('admin_notices', [$this, 'handle_nuke_comments_for_sus_notices']);
-
-            // Add new comment type called flagged
-            add_filter('admin_comment_types_dropdown', [$this, 'add_fleged_comments_type'], PHP_INT_MAX);
-        }
-
-        public function add_fleged_comments_type($comment_types) {
-            $comment_types['flagged'] = __('Flagged', 'wpct');
-            return $comment_types;
+            add_action('admin_post_wptc_nuke_all_sus_comments', [$this, 'handle_nuke_all_sus_comments_action']);
+            add_filter('manage_comments_nav', [$this, 'add_nuke_all_sus_comments_button'], 10, 2);
+            add_filter('admin_notices', [$this, 'handle_nuke_all_sus_comments_notices']);
         }
 
         // Filter comment text based on wpct_disable_comment_formatting option
@@ -162,22 +154,22 @@ if (!class_exists('WP_Comment_Toolbox_Admin')) {
             }
         }
 
-        public function add_nuke_comments_for_sus_button($comment_status, $which) {
+        public function add_nuke_all_sus_comments_button($comment_status, $which) {
             if ($which === 'top' && get_option('wpct_enable_nuke_all_sus_comment_button', 0)) {
                 $params = [
                     'wptc_comment_status' => !empty($comment_status) ? $comment_status : 'all',
                 ];
 
                 $url = WPCT_Helper::wpct_create_action_url(
-                    'wptc_nuke_comments_for_sus',
-                    'wptc_nuke_comments_for_sus_action',
+                    'wptc_nuke_all_sus_comments',
+                    'wptc_nuke_all_sus_comments_action',
                     $params
                 );
                 echo '<a href="' . esc_url($url) . '" id="wptc-ccfs" style="margin: 0 0 0 8px;" class="button">' . esc_html__('Block all sus comment', 'wpct') . '</a>';
             }
         }
 
-        public function handle_nuke_comments_for_sus_action() {
+        public function handle_nuke_all_sus_comments_action() {
             if (!get_option('wpct_enable_nuke_all_sus_comment_button', 0)) {
                 return;
             }
@@ -194,7 +186,7 @@ if (!class_exists('WP_Comment_Toolbox_Admin')) {
             $nonce = isset($_GET['_wpnonce']) ? wp_unslash($_GET['_wpnonce']) : '';
 
             // Check nonce and query param for spam check trigger
-            if (!wp_verify_nonce($nonce, 'wptc_nuke_comments_for_sus_action')) {
+            if (!wp_verify_nonce($nonce, 'wptc_nuke_all_sus_comments_action')) {
                 WPCT_Helper::wpct_create_admin_notices(__('Invalid request', 'wpct'), 3, true);
                 wp_safe_redirect($redirect_url);
                 exit;
@@ -209,8 +201,10 @@ if (!class_exists('WP_Comment_Toolbox_Admin')) {
 
             foreach ($comments as $comment) {
                 if (WPCT_Helper::wpct_check_comment_for_spam($comment)) {
+                    if (defined('WP_COMMENT_TOOLBOX_PLUGIN_IS_DEBUG_ON') && !WP_COMMENT_TOOLBOX_PLUGIN_IS_DEBUG_ON) {
                     WPCT_Helper::wpct_update_comment_blocklist($comment->comment_author_IP);
                     WPCT_Helper::wpct_handel_with_comment($comment->comment_ID);
+                    }
                     $comment_count++;
                 }
             }
@@ -223,7 +217,7 @@ if (!class_exists('WP_Comment_Toolbox_Admin')) {
             exit;
         }
 
-        public function handle_nuke_comments_for_sus_notices() {
+        public function handle_nuke_all_sus_comments_notices() {
             if (get_option('wpct_enable_nuke_all_sus_comment_button', 0)) {
 
                 $is_spam_nuked_successful = (isset($_GET['wptc_spam_nuked']) && $_GET['wptc_spam_nuked'] === 'success');
