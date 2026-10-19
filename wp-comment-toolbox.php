@@ -10,7 +10,7 @@
  * Requires at least: 6.0
  * License: GPL-2.0-or-later
  * License URI: https://www.gnu.org/licenses/gpl-2.0.html
- * Text Domain: wpct
+ * Text Domain: wp-comment-toolbox
  */
 
 // Exit if accessed directly
@@ -60,7 +60,7 @@ if (!class_exists('WP_Comment_Toolbox')) {
          * Load the plugin's text domain for translations.
          */
         public function load_plugin_textdomain() {
-            load_plugin_textdomain('wpct', false, WP_COMMENT_TOOLBOX_PLUGIN_DIR . 'languages');
+            load_plugin_textdomain('wp-comment-toolbox', false, WP_COMMENT_TOOLBOX_PLUGIN_DIR . 'languages');
         }
 
         /**
@@ -71,7 +71,7 @@ if (!class_exists('WP_Comment_Toolbox')) {
             $url = esc_url(admin_url('edit-comments.php?page=wpct-comment-settings'));
 
             // Construct the link HTML
-            $custom_link = '<a href="' . $url . '">' . __('Settings', 'wpct') . '</a>';
+            $custom_link = '<a href="' . $url . '">' . __('Settings', 'wp-comment-toolbox') . '</a>';
 
             // Add the link to the existing array of links
             array_push($links, $custom_link);
@@ -119,8 +119,8 @@ if (!class_exists('WP_Comment_Toolbox')) {
                 if ($math_captcha_enable && current_theme_supports('html5')) {
                     wp_add_inline_script('wpct-script', '(function($){$(function(){$.fn.initializeCaptchaValidation();});})(jQuery);');
                     wp_localize_script('wpct-script', 'wpctCaptchaMessage', array(
-                        'blank' => __('Please answer the CAPTCHA question.', 'wpct'),
-                        'error' => __('Your CAPTCHA answer was incorrect. Please try again.', 'wpct')
+                        'blank' => __('Please answer the CAPTCHA question.', 'wp-comment-toolbox'),
+                        'error' => __('Your CAPTCHA answer was incorrect. Please try again.', 'wp-comment-toolbox')
                     ));
                 }
 
@@ -149,8 +149,8 @@ if (!class_exists('WP_Comment_Toolbox')) {
 
                 echo "<style>
                     :root {
-                        --wpct-toolbar-bg-color: $bg_color;
-                        --wpct-toolbar-border-color: $border_color;
+                        --wpct-toolbar-bg-color: " . esc_attr($bg_color) . ";
+                        --wpct-toolbar-border-color: " . esc_attr($border_color) . ";
                     }
                 </style>";
             }

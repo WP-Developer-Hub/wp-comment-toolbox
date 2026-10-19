@@ -6,50 +6,50 @@ if (!defined('ABSPATH')) {
 // Show "Block IP" Button in Comment List
 WPCT_Helper::wpct_select_box(
     'wpct_show_block_ip_action',
-    __('Show Block IP Actions', 'wpct'),
+    __('Show Block IP Actions', 'wp-comment-toolbox'),
     1,
-    __('Enable this option to show the "Block IP" action to the row actions in the comment list, allowing you to quickly add comment author IP addresses to the block list.', 'wpct'),
+    __('Enable this option to show the "Block IP" action to the row actions in the comment list, allowing you to quickly add comment author IP addresses to the block list.', 'wp-comment-toolbox'),
     array(
-        0 => __('No', 'wpct'),
-        1 => __('Yes', 'wpct'),
+        0 => __('No', 'wp-comment-toolbox'),
+        1 => __('Yes', 'wp-comment-toolbox'),
     )
 );
 
 // Enable Nuke Button
 WPCT_Helper::wpct_select_box(
     'wpct_enable_nuke_all_sus_comment_button',
-    __('Enable all sus comments button', 'wpct'),
+    __('Enable all sus comments button', 'wp-comment-toolbox'),
     0,
-    sprintf(
-        __('Enable this option to add a "Nuke all sus comments" feature which checks all comments for words listed in moderation_keys & or links only when comment_max_links is set and manual comment approval is enabled in %1$s. When enabled, a new "Nuke all sus comments" button will appear next to the filter by type apply button in the comment list admin screen to quickly scan and nuke suspicious comments in one shot plus add the comment authors IP Address to a block list.', 'wpct'),
+    sprintf(/* translators: Nuke all sus comments */
+        __('Enable this option to add a "Nuke all sus comments" feature which checks all comments for words listed in moderation_keys & or links only when comment_max_links is set and manual comment approval is enabled in %1$s. When enabled, a new "Nuke all sus comments" button will appear next to the filter by type apply button in the comment list admin screen to quickly scan and nuke suspicious comments in one shot plus add the comment authors IP Address to a block list.', 'wp-comment-toolbox'),
         WPCT_Helper::wpct_add_wp_setting_link('options-discussion.php#comment-moderation', 'Discussion')
     ),
     array(
-        0 => __('No', 'wpct'),
-        1 => __('Yes', 'wpct'),
+        0 => __('No', 'wp-comment-toolbox'),
+        1 => __('Yes', 'wp-comment-toolbox'),
     )
 );
 
 // Toggle Formatting Setting
 WPCT_Helper::wpct_select_box(
     'wpct_disable_comment_formatting',
-    __('Disable Formating', 'wpct'),
+    __('Disable Formating', 'wp-comment-toolbox'),
     0,
-   __('When enabled, all HTML tags are removed from comments in the admin area, reducing formatting for less distraction.', 'wpct'),
+   __('When enabled, all HTML tags are removed from comments in the admin area, reducing formatting for less distraction.', 'wp-comment-toolbox'),
     array(
-        0 => __('No', 'wpct'),
-        1 => __('Yes', 'wpct'),
+        0 => __('No', 'wp-comment-toolbox'),
+        1 => __('Yes', 'wp-comment-toolbox'),
     )
 );
 
 // Comment List Enhancement
 WPCT_Helper::wpct_checkbox_group(
     'wpct_comment_list_enhancement',
-    __('Enhance Comment List Tables', 'wpct'),
-    __('Add useful columns like, Comment ID, Comment Type and Author Role to the admin comments list for easier moderation.', 'wpct'),
+    __('Enhance Comment List Tables', 'wp-comment-toolbox'),
+    __('Add useful columns like, Comment ID, Comment Type and Author Role to the admin comments list for easier moderation.', 'wp-comment-toolbox'),
     array(
-        'wptc_comment_type' => __('Comment Type', 'wpct'),
-        'wptc_comment_author_role' => __('Comment Author Role', 'wpct'),
-        'wptc_comment_id' => __('Comment ID', 'wpct'),
+        'wptc_comment_type' => __('Comment Type', 'wp-comment-toolbox'),
+        'wptc_comment_author_role' => __('Comment Author Role', 'wp-comment-toolbox'),
+        'wptc_comment_id' => __('Comment ID', 'wp-comment-toolbox'),
     )
 );
