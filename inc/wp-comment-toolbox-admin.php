@@ -20,8 +20,8 @@ if (!class_exists('WP_Comment_Toolbox_Admin')) {
             add_filter('manage_comments_nav', [$this, 'add_nuke_all_sus_comments_button'], 10, 2);
             add_filter('admin_notices', [$this, 'handle_nuke_all_sus_comments_notices']);
 
-            add_filter('manage_edit-comments_columns', array($this, 'add_comment_type_column'));
-            add_action('manage_comments_custom_column', array($this, 'output_comment_type_column'), 10, 2);
+            add_filter('manage_edit-comments_columns',[$this, 'add_comment_type_column']);
+            add_action('manage_comments_custom_column', [$this, 'output_comment_type_column'], 10, 2);
         }
 
         // Filter comment text based on wpct_disable_comment_formatting option
