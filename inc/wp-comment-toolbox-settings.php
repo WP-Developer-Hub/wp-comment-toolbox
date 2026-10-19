@@ -14,7 +14,7 @@ if (!class_exists('WP_Comment_Toolbox_Settings')) {
         public function enqueue_admin_styles($hook) {
             // Only enqueue on the comment settings page
             if ($hook === 'comments_page_wpct-comment-settings') {
-                wp_enqueue_style('wpct-style', WP_COMMENT_TOOLBOX_PLUGIN_URL . 'css/wp-comment-toolbox-admin.css');
+                wp_enqueue_style('wpct-style', WP_COMMENT_TOOLBOX_PLUGIN_URL . 'css/wp-comment-toolbox-admin.css', [], '9.6.2');
             }
         }
 

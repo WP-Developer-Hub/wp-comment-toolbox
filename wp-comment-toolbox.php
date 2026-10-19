@@ -92,13 +92,13 @@ if (!class_exists('WP_Comment_Toolbox')) {
                 // Enqueue the script and style if any relevant feature is enabled
                 // This ensures the script is loaded for any necessary feature
                 if ($toolbar_enabled || $char_count_enabled || ($html5_validation_enabled && $math_captcha_enable)) {
-                    wp_enqueue_script('wpct-script', WP_COMMENT_TOOLBOX_PLUGIN_URL . 'js/wp-comment-toolbox-theme.js', array('jquery', 'quicktags'), null, true);
+                    wp_enqueue_script('wpct-script', WP_COMMENT_TOOLBOX_PLUGIN_URL . 'js/wp-comment-toolbox-theme.js', ['jquery', 'quicktags'], '9.6.2', true);
                 }
 
                 // Enqueue styles if the toolbar or character count feature is enabled
                 // This ensures the proper styles are applied to the toolbar or character count
                 if ($toolbar_enabled || $char_count_enabled || $math_captcha_enable) {
-                    wp_enqueue_style('wpct-style', WP_COMMENT_TOOLBOX_PLUGIN_URL . 'css/wp-comment-toolbox.css');
+                    wp_enqueue_style('wpct-style', WP_COMMENT_TOOLBOX_PLUGIN_URL . 'css/wp-comment-toolbox.css', [], '9.6.2');
                 }
 
                 // Initialize Quicktags if the toolbar feature is enabled
@@ -116,7 +116,7 @@ if (!class_exists('WP_Comment_Toolbox')) {
 
                 // Initialize CAPTCHA validation if HTML5 validation is enabled
                 // Adds CAPTCHA validation to prevent spam submissions
-                if ($math_captcha_enable) {
+                if ($math_captcha_enable && current_theme_supports('html5')) {
                     wp_add_inline_script('wpct-script', '(function($){$(function(){$.fn.initializeCaptchaValidation();});})(jQuery);');
                     wp_localize_script('wpct-script', 'wpctCaptchaMessage', array(
                         'blank' => __('Please answer the CAPTCHA question.', 'wpct'),
@@ -137,7 +137,7 @@ if (!class_exists('WP_Comment_Toolbox')) {
         public function add_comment_toolbox_admin_script() {
             global $pagenow;
             if ($pagenow === 'edit-comments.php') {
-                wp_enqueue_script('wpct-script', WP_COMMENT_TOOLBOX_PLUGIN_URL . 'js/wp-comment-toolbox-admin.js', array('jquery'), null, true);
+                wp_enqueue_script('wpct-script', WP_COMMENT_TOOLBOX_PLUGIN_URL . 'js/wp-comment-toolbox-admin.js', ['jquery'], '9.6.2', true);
             }
         }
 
