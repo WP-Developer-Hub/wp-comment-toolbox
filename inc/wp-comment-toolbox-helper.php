@@ -8,7 +8,7 @@ if (!class_exists('WPCT_Helper')) {
         // Submit Button
         public static function wpct_submit_button($tabindex = 0) {
             echo '<div class="wpct_settings_toolbar">';
-            submit_button(__('Save Setting', 'wpct'), 'primary', __('Save Setting', 'wpct'), false, [
+            submit_button(__('Save Setting', 'wp-comment-toolbox'), 'primary', __('Save Setting', 'wp-comment-toolbox'), false, [
                 'id' => 'wpct_save_button_' . $tabindex,
                 'tabindex' => $tabindex
             ]);
@@ -325,7 +325,7 @@ if (!class_exists('WPCT_Helper')) {
             $url = $path;
             return sprintf(
                 /* translators: %1$s = opening anchor tag with URL, %2$s = closing anchor tag, %3$s = opening strong tag */
-                __('%3$sSettings → %1$s%5$s%2$s%4$s', 'wpct'),
+                __('%3$sSettings → %1$s%5$s%2$s%4$s', 'wp-comment-toolbox'),
                 '<a href="' . esc_url(admin_url($url)) . '" target="_blank" rel="noopener noreferrer">',
                 '</a>',
                 '<strong>',

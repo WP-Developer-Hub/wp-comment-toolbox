@@ -45,8 +45,8 @@ if (!class_exists('WP_Comment_Toolbox_Admin')) {
             if (get_option('wpct_show_block_ip_action', 1)) {
                 $id = $comment->comment_ID;
                 $ip = $comment->comment_author_IP;
-                $txt = esc_html__('Block IP', 'wpct');
-                $label = __('Block commentor IP?', 'wpct');
+                $txt = esc_html__('Block IP', 'wp-comment-toolbox');
+                $label = __('Block commentor IP?', 'wp-comment-toolbox');
 
                 // Consistent nonce action
                 $nonce_action = 'wptc_block_commentor_ip_' . $ip;
@@ -83,7 +83,7 @@ if (!class_exists('WP_Comment_Toolbox_Admin')) {
             $redirect_url = WPCT_Helper::wpct_get_referer('edit-comments.php');
 
             if (!current_user_can('manage_options')) {
-                WPCT_Helper::wpct_create_admin_notices(__('Unauthorized user', 'wpct'), 3, true);
+                WPCT_Helper::wpct_create_admin_notices(__('Unauthorized user', 'wp-comment-toolbox'), 3, true);
                 wp_safe_redirect($redirect_url);
                 exit;
             }
@@ -94,21 +94,21 @@ if (!class_exists('WP_Comment_Toolbox_Admin')) {
 
             // Validate IP
             if (empty($ip) || !filter_var($ip, FILTER_VALIDATE_IP)) {
-                WPCT_Helper::wpct_create_admin_notices(__('Invalid IP address', 'wpct'), 3, true);
+                WPCT_Helper::wpct_create_admin_notices(__('Invalid IP address', 'wp-comment-toolbox'), 3, true);
                 wp_safe_redirect($redirect_url);
                 exit;
             }
 
             // Validate comment ID
             if (empty($id) || $id <= 0) {
-                WPCT_Helper::wpct_create_admin_notices(__('Invalid comment ID', 'wpct'), 3, true);
+                WPCT_Helper::wpct_create_admin_notices(__('Invalid comment ID', 'wp-comment-toolbox'), 3, true);
                 wp_safe_redirect($redirect_url);
                 exit;
             }
 
             // Validate nonce
             if (!wp_verify_nonce($nonce, 'wptc_block_commentor_ip_' . $ip)) {
-                WPCT_Helper::wpct_create_admin_notices(__('Invalid request', 'wpct'), 3, true);
+                WPCT_Helper::wpct_create_admin_notices(__('Invalid request', 'wp-comment-toolbox'), 3, true);
                 wp_safe_redirect($redirect_url);
                 exit;
             }
@@ -140,13 +140,13 @@ if (!class_exists('WP_Comment_Toolbox_Admin')) {
                     if (in_array($blocked_ip, $blacklist, true)) {
                         $message = sprintf(
                             /* translators: %s is an IP address */
-                            esc_html__('IP address %s is already in the comment blacklist and remains blocked.', 'wpct'),
+                            esc_html__('IP address %s is already in the comment blacklist and remains blocked.', 'wp-comment-toolbox'),
                             '<strong>' . esc_html($blocked_ip) . '</strong>'
                         );
                     } else {
                         $message = sprintf(
                             /* translators: %s is an IP address */
-                            esc_html__('IP address %s has been added to the comment blacklist and blocked from commenting.', 'wpct'),
+                            esc_html__('IP address %s has been added to the comment blacklist and blocked from commenting.', 'wp-comment-toolbox'),
                             '<strong>' . esc_html($blocked_ip) . '</strong>'
                         );
                     }
@@ -168,7 +168,7 @@ if (!class_exists('WP_Comment_Toolbox_Admin')) {
                     'wptc_nuke_all_sus_comments_action',
                     $params
                 );
-                echo '<a href="' . esc_url($url) . '" id="wptc-ccfs" style="margin: 0 0 0 8px;" class="button">' . esc_html__('Block all sus comment', 'wpct') . '</a>';
+                echo '<a href="' . esc_url($url) . '" id="wptc-ccfs" style="margin: 0 0 0 8px;" class="button">' . esc_html__('Block all sus comment', 'wp-comment-toolbox') . '</a>';
             }
         }
 
@@ -181,7 +181,7 @@ if (!class_exists('WP_Comment_Toolbox_Admin')) {
 
             // Capability check
             if (!current_user_can('manage_options')) {
-                WPCT_Helper::wpct_create_admin_notices(__('Unauthorized user', 'wpct'), 3, true);
+                WPCT_Helper::wpct_create_admin_notices(__('Unauthorized user', 'wp-comment-toolbox'), 3, true);
                 wp_safe_redirect($redirect_url);
                 exit;
             }
@@ -190,7 +190,7 @@ if (!class_exists('WP_Comment_Toolbox_Admin')) {
 
             // Check nonce and query param for spam check trigger
             if (!wp_verify_nonce($nonce, 'wptc_nuke_all_sus_comments_action')) {
-                WPCT_Helper::wpct_create_admin_notices(__('Invalid request', 'wpct'), 3, true);
+                WPCT_Helper::wpct_create_admin_notices(__('Invalid request', 'wp-comment-toolbox'), 3, true);
                 wp_safe_redirect($redirect_url);
                 exit;
             }
@@ -235,12 +235,12 @@ if (!class_exists('WP_Comment_Toolbox_Admin')) {
                                 '%d sus comment has been nuked and its IP address has been added to the block list.',
                                 '%d sus comments have been nuked and their IP addresses have been added to the block list.',
                                 $flagged_count,
-                                'wpct'
+                                'wp-comment-toolbox'
                             ),
                             $flagged_count
                         );
                     } else {
-                        $message = esc_html__('No sus comments found.', 'wpct');
+                        $message = esc_html__('No sus comments found.', 'wp-comment-toolbox');
                     }
 
                     echo WPCT_Helper::wpct_create_admin_notices(
@@ -265,13 +265,13 @@ if (!class_exists('WP_Comment_Toolbox_Admin')) {
                 if ($key === 'date') {
                     // Insert columns enabled by settings, after the 'date' column
                     if (in_array('wptc_comment_type', $enabled_columns, true)) {
-                        $new_columns['wptc_comment_type'] = __('Type', 'wptc');
+                        $new_columns['wptc_comment_type'] = __('Type', 'wp-comment-toolbox');
                     }
                     if (in_array('wptc_comment_author_role', $enabled_columns, true)) {
-                        $new_columns['wptc_comment_author_role'] = __('Role', 'wptc');
+                        $new_columns['wptc_comment_author_role'] = __('Role', 'wp-comment-toolbox');
                     }
                     if (in_array('wptc_comment_id', $enabled_columns, true)) {
-                        $new_columns['wptc_comment_id'] = __('ID', 'wptc');
+                        $new_columns['wptc_comment_id'] = __('ID', 'wp-comment-toolbox');
                     }
                 }
             }
@@ -284,17 +284,17 @@ if (!class_exists('WP_Comment_Toolbox_Admin')) {
             if (in_array('wptc_comment_type', $enabled_columns, true) && $column === 'wptc_comment_type') {
                 $comment = get_comment($comment_ID);
                 $type = $comment->comment_type;
-                echo esc_html(!empty($type) ? ucfirst($type) : __('Comment', 'wptc'));
+                echo esc_html(!empty($type) ? ucfirst($type) : __('Comment', 'wp-comment-toolbox'));
             }
 
             if (in_array('wptc_comment_author_role', $enabled_columns, true) && $column === 'wptc_comment_author_role') {
                 $comment = get_comment($comment_id);
                 if ($comment->user_id) {
                     $user = get_userdata($comment->user_id);
-                    $roles = ($user ? implode(', ', $user->roles) : __('No Role', 'text-domain'));
+                    $roles = ($user ? implode(', ', $user->roles) : __('No Role', 'wp-comment-toolbox'));
                     echo esc_html($roles);
                 } else {
-                    echo __('Guest', 'text-domain');
+                    echo __('Guest', 'wp-comment-toolbox');
                 }
             }
 

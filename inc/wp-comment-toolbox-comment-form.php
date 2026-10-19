@@ -34,7 +34,7 @@ if (!class_exists('WP_Comment_Toolbox_Comment_Form')) {
             $custom_cookies_msg = esc_html(get_option('wpct_comment_form_cookies_msg'), '');
             $comment_textarea_placeholder = get_option('wpct_comment_textarea_placeholder');
             $comment_form_layout = get_option('wpct_comment_form_layout', '[author] [email] [url] [comment] [cookies]');
-            $privacy_policy_link = '<a href="' . esc_url(get_privacy_policy_url()) . '" target="_blank">' . __('Privacy Policy', 'wpct') . '</a>';
+            $privacy_policy_link = '<a href="' . esc_url(get_privacy_policy_url()) . '" target="_blank">' . __('Privacy Policy', 'wp-comment-toolbox') . '</a>';
 
             preg_match_all('/\[(.*?)\]/', $comment_form_layout, $matches);
             $keys = $matches[1] ?? [];
@@ -54,9 +54,9 @@ if (!class_exists('WP_Comment_Toolbox_Comment_Form')) {
 
             if (isset($ordered_fields['author'])) {
                 $placeholders = [
-                    'full_name' => __('Please enter your full name', 'wpct'),
-                    'username' => __('Please enter your username', 'wpct'),
-                    'both' => __('Please enter your full name or username', 'wpct')
+                    'full_name' => __('Please enter your full name', 'wp-comment-toolbox'),
+                    'username' => __('Please enter your username', 'wp-comment-toolbox'),
+                    'both' => __('Please enter your full name or username', 'wp-comment-toolbox')
                 ];
 
                 // Set placeholder based on the selected option
@@ -96,19 +96,19 @@ if (!class_exists('WP_Comment_Toolbox_Comment_Form')) {
                     ];
 
                     if ($fields_set['comment_author'] && $fields_set['comment_author_email'] && $fields_set['comment_author_url']) {
-                        $cookies_msg = __('Save my name, email, and website in this browser for the next time I comment.', 'wpct');
+                        $cookies_msg = __('Save my name, email, and website in this browser for the next time I comment.', 'wp-comment-toolbox');
                     } elseif ($fields_set['comment_author'] && $fields_set['comment_author_email']) {
-                        $cookies_msg = __('Save my name, and email in this browser for the next time I comment.', 'wpct');
+                        $cookies_msg = __('Save my name, and email in this browser for the next time I comment.', 'wp-comment-toolbox');
                     } elseif ($fields_set['comment_author'] && $fields_set['comment_author_url']) {
-                        $cookies_msg = __('Save my name, and website in this browser for the next time I comment.', 'wpct');
+                        $cookies_msg = __('Save my name, and website in this browser for the next time I comment.', 'wp-comment-toolbox');
                     } elseif ($fields_set['comment_author_email'] && $fields_set['comment_author_url']) {
-                        $cookies_msg = __('Save my email and website in this browser for the next time I comment.', 'wpct');
+                        $cookies_msg = __('Save my email and website in this browser for the next time I comment.', 'wp-comment-toolbox');
                     } elseif ($fields_set['comment_author']) {
-                        $cookies_msg = __('Save my name in this browser for the next time I comment.', 'wpct');
+                        $cookies_msg = __('Save my name in this browser for the next time I comment.', 'wp-comment-toolbox');
                     } elseif ($fields_set['comment_author_email']) {
-                        $cookies_msg = __('Save my email in this browser for the next time I comment.', 'wpct');
+                        $cookies_msg = __('Save my email in this browser for the next time I comment.', 'wp-comment-toolbox');
                     } elseif ($fields_set['comment_author_url']) {
-                        $cookies_msg = __('Save my website in this browser for the next time I comment.', 'wpct');
+                        $cookies_msg = __('Save my website in this browser for the next time I comment.', 'wp-comment-toolbox');
                     }
 
                     if ($custom_cookies_msg) {

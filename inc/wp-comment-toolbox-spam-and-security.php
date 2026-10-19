@@ -27,8 +27,8 @@ if (!class_exists('WP_Comment_Toolbox_Span_And_Security')) {
         public function verify_wp_nonce_field() {
             if (get_option('wpct_enable_spam_protect', 0)) {
                 // Define custom error messages
-                $error_title = __('Security Check', 'wpct');
-                $error_message = __('An issue occurred while processing your request. If this continues, please contact support.', 'wpct');
+                $error_title = __('Security Check', 'wp-comment-toolbox');
+                $error_message = __('An issue occurred while processing your request. If this continues, please contact support.', 'wp-comment-toolbox');
 
                 // Check if the HTTP_REFERER header is set and non-empty
                 if (!isset($_SERVER['HTTP_REFERER']) || $_SERVER['HTTP_REFERER'] == "") {
@@ -80,17 +80,32 @@ if (!class_exists('WP_Comment_Toolbox_Span_And_Security')) {
 
         public function limit_comment_length($comment) {
             $max_length = esc_html(intval(get_option('wpct_comment_message_limit', 280)));
+
             if (strlen($comment['comment_content']) > $max_length) {
-                wp_die(sprintf( '<strong>%s</strong> %s', __('Warning:', 'wpct'), __('Please keep your comment under ', 'wpct') . $max_length . __(' characters.', 'wpct') ), __('Comment Length Warning', 'wpct'), array('response' => 500, 'back_link' => true));
+                $message = sprintf(
+                    /* translators: 1: Warning label, 2: Comment length limit message */
+                    '<strong>%s</strong> %s',
+                    __('Warning:', 'wp-comment-toolbox'),
+                    sprintf(
+                        /* translators: %d: maximum allowed comment length */
+                        __('Please keep your comment under %d characters.', 'wp-comment-toolbox'),
+                        $max_length
+                    )
+                );
+
+                $title = __('Comment Length Warning', 'wp-comment-toolbox');
+
+                wp_die($message, $title, ['response' => 500, 'back_link' => true]);
             }
+
             return $comment;
         }
 
         public function check_referrer() {
             if (get_option('wpct_enable_spam_protect', 0)) {
                 // Define custom error messages
-                $error_title = __('Security Check', 'wpct');
-                $error_message = __('An issue occurred while processing your request. If this continues, please contact support.', 'wpct');
+                $error_title = __('Security Check', 'wp-comment-toolbox');
+                $error_message = __('An issue occurred while processing your request. If this continues, please contact support.', 'wp-comment-toolbox');
 
                 if (!isset($_SERVER['HTTP_REFERER']) || $_SERVER['HTTP_REFERER'] == "") {
                     // Check for cURL and wget in the User-Agent header
@@ -125,7 +140,7 @@ if (!class_exists('WP_Comment_Toolbox_Span_And_Security')) {
 
                 // Output the hidden textarea field
                 echo '<p style="display:none">';
-                echo '<label>' . esc_html__('If you are a human, do not fill in this field.', 'wpct') . '</label>';
+                echo '<label>' . esc_html__('If you are a human, do not fill in this field.', 'wp-comment-toolbox') . '</label>';
                 echo '<textarea name="' . esc_attr($textarea_section_name) . '" cols="100" rows="10"></textarea>';
                 echo '</p>';
             }
@@ -191,7 +206,12 @@ if (!class_exists('WP_Comment_Toolbox_Span_And_Security')) {
                 // Append the CAPTCHA after the comment box
                 $field .= '<p class="wptc-math-captcha">';
                 $field .= '<label for="wpct_math_captcha" class="wptc-captcha-label">';
-                $field .= sprintf(__('What is %s?', 'wpct'), $problem);
+                $field .= sprintf(
+                    /* translators: What is %s */
+                    __('What is %s?', 'wp-comment-toolbox'),
+                    $problem
+                );
+
                 $field .= '</label>';
                 $field .= '<input type="text" name="wpct_math_captcha" id="wpct_math_captcha" required autocomplete="off" ';
                 $field .= 'inputmode="numeric" pattern="[0-9]*">';
@@ -207,10 +227,10 @@ if (!class_exists('WP_Comment_Toolbox_Span_And_Security')) {
             // Check if math CAPTCHA is enabled in options
             if (get_option('wpct_enable_math_captcha', 0)) {
                 // Define custom error messages
-                $error_message = __('CAPTCHA Failed', 'wpct');
-                $missing_fields_message = __('Please answer the CAPTCHA question.', 'wpct');
-                $tamper_answer_message = __('CAPTCHA validation error: Possible tampering detected.', 'wpct');
-                $incorrect_answer_message = __('Your CAPTCHA answer was incorrect. Please try again.', 'wpct');
+                $error_message = __('CAPTCHA Failed', 'wp-comment-toolbox');
+                $missing_fields_message = __('Please answer the CAPTCHA question.', 'wp-comment-toolbox');
+                $tamper_answer_message = __('CAPTCHA validation error: Possible tampering detected.', 'wp-comment-toolbox');
+                $incorrect_answer_message = __('Your CAPTCHA answer was incorrect. Please try again.', 'wp-comment-toolbox');
 
                 // Skip validation for logged-in users
                 if (is_user_logged_in()) {

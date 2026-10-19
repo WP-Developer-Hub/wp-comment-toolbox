@@ -6,28 +6,28 @@ if (!defined('ABSPATH')) {
 // Comment Character Limit
 WPCT_Helper::wpct_input_field(
     'wpct_comment_message_limit',
-    __( 'Comment Character Limit', 'wpct' ),
+    __( 'Comment Character Limit', 'wp-comment-toolbox' ),
     'number',
     280,
-    __( 'Set the maximum number of characters allowed in the comment text. This helps prevent overly long comments and spammy content.', 'wpct' ),
+    __( 'Set the maximum number of characters allowed in the comment text. This helps prevent overly long comments and spammy content.', 'wp-comment-toolbox' ),
     array( 'min' => 240, 'max' => 480, 'inputmode' => 'numeric', 'pattern' => '[0-9]*', 'placeholder' => '280' )
 );
 
 WPCT_Helper::wpct_select_box(
     'wpct_comment_flood_delay',
-    __('Comment Flood Delay', 'wpct'),
+    __('Comment Flood Delay', 'wp-comment-toolbox'),
     '15',
-    sprintf(
-        __('Set the minimum wait time between user comments. <br>This setting depends on the Show comments cookies opt-in checkbox option in %1$s. Disabling that option will disable this setting.', 'wpct'),
+    sprintf(/* translators: Set min wait time between user comments*/
+        __('Set the minimum wait time between user comments. <br>This setting depends on the Show comments cookies opt-in checkbox option in %1$s. Disabling that option will disable this setting.', 'wp-comment-toolbox'),
         WPCT_Helper::wpct_add_wp_setting_link('options-discussion.php#other-comment-settings', 'Discussion')
 
     ),
     array(
-        '15' => __('15 seconds', 'wpct'),
-        '30' => __('30 seconds', 'wpct'),
-        '45' => __('45 seconds', 'wpct'),
-        '60' => __('1 minute', 'wpct'),
-        '120' => __('2 minutes', 'wpct'),
+        '15' => __('15 seconds', 'wp-comment-toolbox'),
+        '30' => __('30 seconds', 'wp-comment-toolbox'),
+        '45' => __('45 seconds', 'wp-comment-toolbox'),
+        '60' => __('1 minute', 'wp-comment-toolbox'),
+        '120' => __('2 minutes', 'wp-comment-toolbox'),
     ),
     get_option('show_comments_cookies_opt_in', true) ? [] : ['disabled' => 'disabled']
 );
@@ -35,72 +35,72 @@ WPCT_Helper::wpct_select_box(
 // Disable Clickable Links in Comments
 WPCT_Helper::wpct_select_box(
     'wpct_disable_clickable_links',
-    __('Disable clickable links', 'wpct'),
+    __('Disable clickable links', 'wp-comment-toolbox'),
     0,
-    __('When enabled, links in comments will not be clickable. This can help reduce spam and unwanted external links.', 'wpct'),
+    __('When enabled, links in comments will not be clickable. This can help reduce spam and unwanted external links.', 'wp-comment-toolbox'),
     array(
-        0 => __('No', 'wpct'),
-        1 => __('Yes', 'wpct'),
+        0 => __('No', 'wp-comment-toolbox'),
+        1 => __('Yes', 'wp-comment-toolbox'),
     )
 );
 
 // Enable WP Kses Post
 WPCT_Helper::wpct_select_box(
     'wpct_enable_wp_kses_post',
-    __( 'Filter HTML', 'wpct'),
+    __( 'Filter HTML', 'wp-comment-toolbox'),
     0,
-    __('When enabled, only safe HTML tags such as links, blockquotes, and basic formatting will be allowed in comments. This helps prevent malicious code from being rendered for users with higher roles, while keeping basic styling.', 'wpct'),
+    __('When enabled, only safe HTML tags such as links, blockquotes, and basic formatting will be allowed in comments. This helps prevent malicious code from being rendered for users with higher roles, while keeping basic styling.', 'wp-comment-toolbox'),
     array(
-        0 => __('No', 'wpct'),
-        1 => __('Yes', 'wpct'),
+        0 => __('No', 'wp-comment-toolbox'),
+        1 => __('Yes', 'wp-comment-toolbox'),
     )
 );
 
 // Enable Spam Protection
 WPCT_Helper::wpct_select_box(
     'wpct_enable_spam_protect',
-    __('Enable Spam Protection', 'wpct'),
+    __('Enable Spam Protection', 'wp-comment-toolbox'),
     0,
-    __('When enabled, your WordPress site will be protected from spam comments sent via bots. It checks the referrer header to ensure that the comment is coming from a valid source. If spam protection is enabled and the referrer is missing, comments will be blocked, preventing bot submissions. Additionally, a honeypot mechanism will be added to the comment form. This includes a hidden textarea field that bots are likely to fill out, and if detected, the comment will be marked as spam. You can also customize the submit button name used for honeypot checks.', 'wpct'),
+    __('When enabled, your WordPress site will be protected from spam comments sent via bots. It checks the referrer header to ensure that the comment is coming from a valid source. If spam protection is enabled and the referrer is missing, comments will be blocked, preventing bot submissions. Additionally, a honeypot mechanism will be added to the comment form. This includes a hidden textarea field that bots are likely to fill out, and if detected, the comment will be marked as spam. You can also customize the submit button name used for honeypot checks.', 'wp-comment-toolbox'),
     array(
-        0 => __('No', 'wpct'),
-        1 => __('Yes', 'wpct'),
+        0 => __('No', 'wp-comment-toolbox'),
+        1 => __('Yes', 'wp-comment-toolbox'),
     )
 );
 
 // Submit Button Field Name
 WPCT_Helper::wpct_input_field(
     'wpct_submit_button_name',
-    __('Submit Button Name', 'wpct'),
+    __('Submit Button Name', 'wp-comment-toolbox'),
     'text',
     'submit',
-    __('This name will be used when performing the honeypot check. Set the name for the submit button. If your theme changes the default name for the submit button, you can inspect the HTML of the comment form or consult your theme\'s documentation to find the appropriate name attribute for the submit button. Typically, it is something like "submit" or "comment-submit".', 'wpct' ),
+    __('This name will be used when performing the honeypot check. Set the name for the submit button. If your theme changes the default name for the submit button, you can inspect the HTML of the comment form or consult your theme\'s documentation to find the appropriate name attribute for the submit button. Typically, it is something like "submit" or "comment-submit".', 'wp-comment-toolbox' ),
     array('placeholder' => 'Submit Button Name Go Here')
 );
 
 // Enable Math Captcha
 WPCT_Helper::wpct_select_box(
     'wpct_enable_math_captcha',
-    __( 'Enable Math Captcha', 'wpct' ),
+    __( 'Enable Math Captcha', 'wp-comment-toolbox' ),
     0,
-    __('When enabled, the user will have to solve a math question to submit a comment. This helps prevent spam and automated submissions from bots.', 'wpct'),
+    __('When enabled, the user will have to solve a math question to submit a comment. This helps prevent spam and automated submissions from bots.', 'wp-comment-toolbox'),
     array(
-        0 => __('No', 'wpct'),
-        1 => __('Yes', 'wpct'),
+        0 => __('No', 'wp-comment-toolbox'),
+        1 => __('Yes', 'wp-comment-toolbox'),
     )
 );
 
 // Math Captcha Difficulty Level
 WPCT_Helper::wpct_select_box(
     'wpct_math_captcha_level',
-    __('Math Captcha Difficulty Level', 'wpct'),
+    __('Math Captcha Difficulty Level', 'wp-comment-toolbox'),
     'easy',
-    __('Choose from four different difficulty levels.', 'wpct'),
+    __('Choose from four different difficulty levels.', 'wp-comment-toolbox'),
     array(
-        'easy' => __('Easy (1-10)', 'wpct'),
-        'medium' => __('Medium (1-15)', 'wpct'),
-        'hard' => __('Hard (1-20)', 'wpct'),
-        'extreme' => __('Extreme (1-50)', 'wpct'),
+        'easy' => __('Easy (1-10)', 'wp-comment-toolbox'),
+        'medium' => __('Medium (1-15)', 'wp-comment-toolbox'),
+        'hard' => __('Hard (1-20)', 'wp-comment-toolbox'),
+        'extreme' => __('Extreme (1-50)', 'wp-comment-toolbox'),
     )
 );
 
