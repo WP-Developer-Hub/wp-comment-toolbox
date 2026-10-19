@@ -46,7 +46,7 @@ if (!class_exists('WP_Comment_Toolbox_Admin')) {
                 $id = $comment->comment_ID;
                 $ip = $comment->comment_author_IP;
                 $txt = esc_html__('Block IP', 'wp-comment-toolbox');
-                $label = __('Block commentor IP?', 'wp-comment-toolbox');
+                $label = esc_html__('Block commentor IP?', 'wp-comment-toolbox');
 
                 // Consistent nonce action
                 $nonce_action = 'wptc_block_commentor_ip_' . $ip;
@@ -83,7 +83,7 @@ if (!class_exists('WP_Comment_Toolbox_Admin')) {
             $redirect_url = WPCT_Helper::wpct_get_referer('edit-comments.php');
 
             if (!current_user_can('manage_options')) {
-                WPCT_Helper::wpct_create_admin_notices(__('Unauthorized user', 'wp-comment-toolbox'), 3, true);
+                WPCT_Helper::wpct_create_admin_notices(esc_html__('Unauthorized user', 'wp-comment-toolbox'), 3, true);
                 wp_safe_redirect($redirect_url);
                 exit;
             }
@@ -152,7 +152,7 @@ if (!class_exists('WP_Comment_Toolbox_Admin')) {
                     }
 
                     // Output the static wrapper, inserting the dynamic message
-                    echo WPCT_Helper::wpct_create_admin_notices($message, 1, true, ['block_ip_status', 'blocked_ip']);
+                    echo WPCT_Helper::wpct_create_admin_notices(esc_html($message), 1, true, ['block_ip_status', 'blocked_ip']);
                 }
             }
         }
@@ -181,7 +181,7 @@ if (!class_exists('WP_Comment_Toolbox_Admin')) {
 
             // Capability check
             if (!current_user_can('manage_options')) {
-                WPCT_Helper::wpct_create_admin_notices(__('Unauthorized user', 'wp-comment-toolbox'), 3, true);
+                WPCT_Helper::wpct_create_admin_notices(esc_html__('Unauthorized user', 'wp-comment-toolbox'), 3, true);
                 wp_safe_redirect($redirect_url);
                 exit;
             }
@@ -190,7 +190,7 @@ if (!class_exists('WP_Comment_Toolbox_Admin')) {
 
             // Check nonce and query param for spam check trigger
             if (!wp_verify_nonce($nonce, 'wptc_nuke_all_sus_comments_action')) {
-                WPCT_Helper::wpct_create_admin_notices(__('Invalid request', 'wp-comment-toolbox'), 3, true);
+                WPCT_Helper::wpct_create_admin_notices(esc_html__('Invalid request', 'wp-comment-toolbox'), 3, true);
                 wp_safe_redirect($redirect_url);
                 exit;
             }
@@ -244,7 +244,7 @@ if (!class_exists('WP_Comment_Toolbox_Admin')) {
                     }
 
                     echo WPCT_Helper::wpct_create_admin_notices(
-                        $message,
+                        esc_html($message),
                         1,
                         true,
                         ['wptc_spam_nuked', 'wptc_comment_count']
@@ -279,22 +279,22 @@ if (!class_exists('WP_Comment_Toolbox_Admin')) {
             return $new_columns;
         }
 
-        public function output_comment_type_column($column, $comment_ID) {
+        public function output_comment_type_column($column, $comment_id) {
             $enabled_columns = (array) get_option('wpct_comment_list_enhancement', []);
             if (in_array('wptc_comment_type', $enabled_columns, true) && $column === 'wptc_comment_type') {
-                $comment = get_comment($comment_ID);
+                $comment = get_comment($comment_id);
                 $type = $comment->comment_type;
-                echo esc_html(!empty($type) ? ucfirst($type) : __('Comment', 'wp-comment-toolbox'));
+                echo esc_html(!empty($type) ? ucfirst($type) : esc_html__('Comment', 'wp-comment-toolbox'));
             }
 
             if (in_array('wptc_comment_author_role', $enabled_columns, true) && $column === 'wptc_comment_author_role') {
                 $comment = get_comment($comment_id);
                 if ($comment->user_id) {
                     $user = get_userdata($comment->user_id);
-                    $roles = ($user ? implode(', ', $user->roles) : __('No Role', 'wp-comment-toolbox'));
+                    $roles = ($user ? implode(', ', $user->roles) : esc_html__('No Role', 'wp-comment-toolbox'));
                     echo esc_html($roles);
                 } else {
-                    echo __('Guest', 'wp-comment-toolbox');
+                    echo esc_html__('Guest', 'wp-comment-toolbox');
                 }
             }
 

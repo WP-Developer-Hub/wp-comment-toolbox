@@ -66,7 +66,7 @@ if (!class_exists('WP_Comment_Toolbox_Settings')) {
             ];
 
             foreach ($tabs as $tab => $label) {
-                echo '<a href="?page=wpct-comment-settings&tab=' . $tab . '" class="nav-tab ' . ($active_tab === $tab ? 'nav-tab-active' : '') . '">' . $label . '</a>';
+                echo '<a href="?page=wpct-comment-settings&tab=' . esc_attr($tab) . '" class="nav-tab ' . esc_attr($active_tab === $tab ? 'nav-tab-active' : '') . '">' . esc_html($label) . '</a>';
             }
 
             echo '</h2>';
@@ -225,7 +225,7 @@ if (!class_exists('WP_Comment_Toolbox_Settings')) {
             } else {
                 // Handle the case when the file doesn't exist
                 // Optionally, show an error or log the issue
-                echo 'Settings file not found: ' . $file;
+                echo 'Settings file not found: ' . esc_attr($file);
             }
         }
     }
