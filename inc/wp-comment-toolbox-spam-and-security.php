@@ -40,9 +40,9 @@ if (!class_exists('WP_Comment_Toolbox_Span_And_Security')) {
                     if ($is_curl_request || $is_wget_request) {
                         header('HTTP/1.1 403 Forbidden');
                         header('Content-Type: text/plain; charset=UTF-8');
-                        die($error_message);
+                        die(esc_html($error_message));
                     } else {
-                        wp_die($error_message, $error_title, array('response' => 403, 'back_link' => true));
+                        wp_die(esc_html($error_message), esc_html($error_title), ['response' => 403, 'back_link' => true]);
                     }
                 }
 
@@ -56,9 +56,9 @@ if (!class_exists('WP_Comment_Toolbox_Span_And_Security')) {
                     if ($is_curl_request || $is_wget_request) {
                         header('HTTP/1.1 403 Forbidden');
                         header('Content-Type: text/plain; charset=UTF-8');
-                        die($error_message);
+                        die(esc_html($error_message));
                     } else {
-                        wp_die($error_message, $error_title, array('response' => 403, 'back_link' => true));
+                        wp_die(esc_html($error_message), esc_html($error_title), array('response' => 403, 'back_link' => true));
                     }
                 }
             }
@@ -79,23 +79,23 @@ if (!class_exists('WP_Comment_Toolbox_Span_And_Security')) {
         }
 
         public function limit_comment_length($comment) {
-            $max_length = esc_html(intval(get_option('wpct_comment_message_limit', 280)));
+            $max_length = intval(get_option('wpct_comment_message_limit', 280));
 
             if (strlen($comment['comment_content']) > $max_length) {
                 $message = sprintf(
                     /* translators: 1: Warning label, 2: Comment length limit message */
                     '<strong>%s</strong> %s',
-                    __('Warning:', 'wp-comment-toolbox'),
+                    esc_html__('Warning:', 'wp-comment-toolbox'),
                     sprintf(
                         /* translators: %d: maximum allowed comment length */
-                        __('Please keep your comment under %d characters.', 'wp-comment-toolbox'),
+                        esc_html__('Please keep your comment under %d characters.', 'wp-comment-toolbox'),
                         $max_length
                     )
                 );
 
                 $title = __('Comment Length Warning', 'wp-comment-toolbox');
 
-                wp_die($message, $title, ['response' => 500, 'back_link' => true]);
+                wp_die(esc_html($message), esc_html($title), ['response' => 500, 'back_link' => true]);
             }
 
             return $comment;
@@ -116,9 +116,9 @@ if (!class_exists('WP_Comment_Toolbox_Span_And_Security')) {
                     if ($is_curl_request || $is_wget_request) {
                         header('HTTP/1.1 403 Forbidden');
                         header('Content-Type: text/plain; charset=UTF-8');
-                        die($error_message);
+                        die(esc_html($error_message));
                     } else {
-                        wp_die($error_message, $error_title, array('response' => 403, 'back_link' => true));
+                        wp_die(esc_html($error_message), esc_html($error_title), ['response' => 403, 'back_link' => true]);
                     }
                 }
             }
@@ -134,14 +134,18 @@ if (!class_exists('WP_Comment_Toolbox_Span_And_Security')) {
                 WPCT_Helper::wpct_start_session('add_wp_nonce_and_honeypot_field');
 
                 // Store the textarea name in the session variable
-                $_SESSION['wpct_comment_honeypot_name'] = $textarea_name;
+                $_SESSION['wpct_comment_honeypot_name'] = sanitize_text_field(wp_unslash($textarea_name));
 
-                $textarea_section_name = sanitize_text_field($_SESSION['wpct_comment_honeypot_name']);
+                $textarea_session_name = '';
+
+                if (isset($_SESSION['wpct_comment_honeypot_name'])) {
+                    $textarea_session_name = sanitize_text_field(wp_unslash($_SESSION['wpct_comment_honeypot_name']));
+                }
 
                 // Output the hidden textarea field
                 echo '<p style="display:none">';
                 echo '<label>' . esc_html__('If you are a human, do not fill in this field.', 'wp-comment-toolbox') . '</label>';
-                echo '<textarea name="' . esc_attr($textarea_section_name) . '" cols="100" rows="10"></textarea>';
+                echo '<textarea name="' . esc_attr($textarea_session_name) . '" cols="100" rows="10"></textarea>';
                 echo '</p>';
             }
         }
@@ -193,30 +197,29 @@ if (!class_exists('WP_Comment_Toolbox_Span_And_Security')) {
                 WPCT_Helper::wpct_start_session('wpct_math_captcha_field');
 
                 $captcha_level = intval($this->wpct_ren_math_captcha_level());
-                $num1 = intval(rand(1, $captcha_level));
-                $num2 = intval(rand(1, $captcha_level));
+                $num1 = intval(trim(wp_rand(1, trim($captcha_level))));
+                $num2 = intval(trim(wp_rand(1, trim($captcha_level))));
 
                 // Store the correct CAPTCHA answer (MD5 hash of the sum as int) in the session
                 $_SESSION['wptc_captcha_answer'] = md5($num1 + $num2);
                 $_SESSION['wptc_captcha_num1'] = $num1;
                 $_SESSION['wptc_captcha_num2'] = $num2;
 
-                $problem = "<span class=\"wptc-captcha-problem\">{$num1} + {$num2}</span>";
+                $problem = '<span class="wptc-captcha-problem">'. esc_attr($num1) . ' + ' . esc_attr($num2) . '</span>';
 
                 // Append the CAPTCHA after the comment box
                 $field .= '<p class="wptc-math-captcha">';
                 $field .= '<label for="wpct_math_captcha" class="wptc-captcha-label">';
                 $field .= sprintf(
                     /* translators: What is %s */
-                    __('What is %s?', 'wp-comment-toolbox'),
+                            esc_html__('What is %s?', 'wp-comment-toolbox'),
                     $problem
                 );
-
                 $field .= '</label>';
                 $field .= '<input type="text" name="wpct_math_captcha" id="wpct_math_captcha" required autocomplete="off" ';
                 $field .= 'inputmode="numeric" pattern="[0-9]*">';
-                $field .= '<input type="hidden" name="wpct_math_num1" value="' . $num1 . '">';
-                $field .= '<input type="hidden" name="wpct_math_num2" value="' . $num2 . '">';
+                $field .= '<input type="hidden" name="wpct_math_num1" value="' . esc_attr($num1) . '">';
+                $field .= '<input type="hidden" name="wpct_math_num2" value="' . esc_attr($num2) . '">';
                 $field .= '</p>';
             }
             return $field;
@@ -249,7 +252,7 @@ if (!class_exists('WP_Comment_Toolbox_Span_And_Security')) {
                     !isset($_SESSION['wptc_captcha_num1']) ||
                     !isset($_SESSION['wptc_captcha_num2'])
                 ) {
-                    wp_die($missing_fields_message, $error_message, array('response' => 403, 'back_link' => true));
+                    wp_die(esc_html($missing_fields_message), esc_html($error_message), ['response' => 403, 'back_link' => true]);
                 }
 
                 // Cast posted numbers and session numbers to int to prevent type issues and tampering
@@ -260,7 +263,7 @@ if (!class_exists('WP_Comment_Toolbox_Span_And_Security')) {
 
                 // Verify the hidden input numbers match their session values to detect tampering
                 if ($post_num1 !== $session_num1 || $post_num2 !== $session_num2) {
-                    wp_die($tamper_answer_message, $error_message, array('response' => 403, 'back_link' => true));
+                    wp_die(esc_html($tamper_answer_message), esc_html($error_message), array('response' => 403, 'back_link' => true));
                 }
 
                 // Sanitize and cast the user answer to int
@@ -270,7 +273,7 @@ if (!class_exists('WP_Comment_Toolbox_Span_And_Security')) {
 
                 // Compare MD5 hash of user answer to stored session hash
                 if (md5($user_answer_int) !== $_SESSION['wptc_captcha_answer']) {
-                    wp_die($incorrect_answer_message, $error_message, array('response' => 403, 'back_link' => true));
+                    wp_die(esc_html($incorrect_answer_message), esc_html($error_message), ['response' => 403, 'back_link' => true]);
                 }
 
                 // Destroy PHP session

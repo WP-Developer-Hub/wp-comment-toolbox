@@ -9,8 +9,8 @@ if (!class_exists('WPCT_Helper')) {
         public static function wpct_submit_button($tabindex = 0) {
             echo '<div class="wpct_settings_toolbar">';
             submit_button(__('Save Setting', 'wp-comment-toolbox'), 'primary', __('Save Setting', 'wp-comment-toolbox'), false, [
-                'id' => 'wpct_save_button_' . $tabindex,
-                'tabindex' => $tabindex
+                'id' => 'wpct_save_button_' . esc_attr($tabindex),
+                'tabindex' => esc_attr($tabindex)
             ]);
             echo '</div>';
         }
@@ -24,7 +24,7 @@ if (!class_exists('WPCT_Helper')) {
             $additional_attributes = '';
             if (!empty($attr)) {
                 foreach ($attr as $key => $val) {
-                    $additional_attributes .= ' ' . esc_attr($key) . '="' . esc_attr($val) . '"';
+                    $additional_attributes .= ' ' . esc_attr($key) . '=' . esc_attr($val) . '';
                 }
             }
 
@@ -40,7 +40,7 @@ if (!class_exists('WPCT_Helper')) {
                            name="<?php echo esc_attr($name); ?>"
                            id="<?php echo esc_attr($name); ?>"
                            value="<?php echo esc_attr($input_value); ?>"
-                           <?php echo $additional_attributes; ?>
+                           <?php echo esc_attr($additional_attributes); ?>
                     />
                     <?php if ($description): ?>
                         <p class="description"><?php echo wp_kses_post($description); ?></p>
@@ -59,7 +59,7 @@ if (!class_exists('WPCT_Helper')) {
             $additional_attributes = '';
             if (!empty($attr)) {
                 foreach ($attr as $key => $val) {
-                    $additional_attributes .= ' ' . esc_attr($key) . '="' . esc_attr($val) . '"';
+                    $additional_attributes .= ' ' . esc_attr($key) . '=' . esc_attr($val) . '';
                 }
             }
 
@@ -71,12 +71,12 @@ if (!class_exists('WPCT_Helper')) {
                     <?php endif; ?>
                 </th>
                 <td colspan="1">
-                    <select class="regular-text wpct-input" name="<?php echo esc_attr($name); ?>" id="<?php echo esc_attr($name); ?>" <?php echo $additional_attributes; ?>>
+                    <select class="regular-text wpct-input" name="<?php echo esc_attr($name); ?>" id="<?php echo esc_attr($name); ?>" <?php echo esc_attr($additional_attributes); ?>>
                         <?php
                         // Loop through choices and output the option tags
                         foreach ($choices as $key => $label) {
                             $selected = selected($input_value, $key, false); // Check if this value is selected
-                            echo '<option value="' . esc_attr($key) . '" ' . $selected . '>' . esc_html($label) . '</option>';
+                            echo '<option value="' . esc_attr($key) . '" ' . esc_attr($selected) . '>' . esc_html($label) . '</option>';
                         }
                         ?>
                     </select>
@@ -97,7 +97,7 @@ if (!class_exists('WPCT_Helper')) {
             $additional_attributes = '';
             if (!empty($attr)) {
                 foreach ($attr as $key => $val) {
-                    $additional_attributes .= ' ' . esc_attr($key) . '="' . esc_attr($val) . '"';
+                    $additional_attributes .= ' ' . esc_attr($key) . '=' . esc_attr($val) . '';
                 }
             }
 
@@ -112,7 +112,7 @@ if (!class_exists('WPCT_Helper')) {
                     <textarea class="regular-text wpct-input"
                               name="<?php echo esc_attr($name); ?>"
                               id="<?php echo esc_attr($name); ?>"
-                              <?php echo $additional_attributes; ?>
+                              <?php echo esc_attr($additional_attributes); ?>
                     ><?php echo esc_textarea($text_value); ?></textarea>
                     <?php if ($description): ?>
                         <p class="description"><?php echo wp_kses_post($description) ?></p>
@@ -134,7 +134,7 @@ if (!class_exists('WPCT_Helper')) {
             $additional_attributes = '';
             if (!empty($attr)) {
                 foreach ($attr as $key => $val) {
-                    $additional_attributes .= ' ' . esc_attr($key) . '="' . esc_attr($val) . '"';
+                    $additional_attributes .= ' ' . esc_attr($key) . '=' . esc_attr($val) . '';
                 }
             }
             ?>
@@ -154,7 +154,7 @@ if (!class_exists('WPCT_Helper')) {
                                     name="<?php echo esc_attr($name); ?>[]"
                                     value="<?php echo esc_attr($key); ?>"
                                     <?php checked(in_array($key, $input_value), true); ?>
-                                    <?php echo $additional_attributes; ?>
+                                    <?php echo esc_attr($additional_attributes); ?>
                                 />
                                 <?php echo esc_html($choice_label); ?>
                             </label>
@@ -174,7 +174,7 @@ if (!class_exists('WPCT_Helper')) {
             $additional_attributes = '';
             if (!empty($attr)) {
                 foreach ($attr as $key => $val) {
-                    $additional_attributes .= ' ' . esc_attr($key) . '="' . esc_attr($val) . '"';
+                    $additional_attributes .= ' ' . esc_attr($key) . '=' . esc_attr($val) . '';
                 }
             }
 
@@ -188,7 +188,7 @@ if (!class_exists('WPCT_Helper')) {
                 <td>
                     <textarea class="widefat wpct-input"
                               id="<?php echo esc_attr($name); ?>"
-                              <?php echo $additional_attributes; ?> ><?php echo esc_textarea($value); ?></textarea>
+                              <?php echo esc_attr($additional_attributes); ?> ><?php echo esc_textarea($value); ?></textarea>
                     <?php if ($description): ?>
                         <p class="description"><?php echo wp_kses_post($description) ?></p>
                     <?php endif; ?>
@@ -308,7 +308,7 @@ if (!class_exists('WPCT_Helper')) {
 
             // Render the notice and capture output (wp_admin_notice echos by default)
             // We'll capture it so that your function still returns the HTML string
-            wp_admin_notice($message, $args);
+            wp_kses_post(wp_admin_notice($message, $args));
         }
 
         // Decide what to do with the comment based on status

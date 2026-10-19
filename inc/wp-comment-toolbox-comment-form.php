@@ -34,7 +34,7 @@ if (!class_exists('WP_Comment_Toolbox_Comment_Form')) {
             $custom_cookies_msg = esc_html(get_option('wpct_comment_form_cookies_msg'), '');
             $comment_textarea_placeholder = get_option('wpct_comment_textarea_placeholder');
             $comment_form_layout = get_option('wpct_comment_form_layout', '[author] [email] [url] [comment] [cookies]');
-            $privacy_policy_link = '<a href="' . esc_url(get_privacy_policy_url()) . '" target="_blank">' . __('Privacy Policy', 'wp-comment-toolbox') . '</a>';
+            $privacy_policy_link = '<a href="' . esc_url(get_privacy_policy_url()) . '" target="_blank">' . esc_html__('Privacy Policy', 'wp-comment-toolbox') . '</a>';
 
             preg_match_all('/\[(.*?)\]/', $comment_form_layout, $matches);
             $keys = $matches[1] ?? [];
@@ -96,19 +96,19 @@ if (!class_exists('WP_Comment_Toolbox_Comment_Form')) {
                     ];
 
                     if ($fields_set['comment_author'] && $fields_set['comment_author_email'] && $fields_set['comment_author_url']) {
-                        $cookies_msg = __('Save my name, email, and website in this browser for the next time I comment.', 'wp-comment-toolbox');
+                        $cookies_msg = esc_html__('Save my name, email, and website in this browser for the next time I comment.', 'wp-comment-toolbox');
                     } elseif ($fields_set['comment_author'] && $fields_set['comment_author_email']) {
-                        $cookies_msg = __('Save my name, and email in this browser for the next time I comment.', 'wp-comment-toolbox');
+                        $cookies_msg = esc_html__('Save my name, and email in this browser for the next time I comment.', 'wp-comment-toolbox');
                     } elseif ($fields_set['comment_author'] && $fields_set['comment_author_url']) {
-                        $cookies_msg = __('Save my name, and website in this browser for the next time I comment.', 'wp-comment-toolbox');
+                        $cookies_msg = esc_html__('Save my name, and website in this browser for the next time I comment.', 'wp-comment-toolbox');
                     } elseif ($fields_set['comment_author_email'] && $fields_set['comment_author_url']) {
-                        $cookies_msg = __('Save my email and website in this browser for the next time I comment.', 'wp-comment-toolbox');
+                        $cookies_msg = esc_html__('Save my email and website in this browser for the next time I comment.', 'wp-comment-toolbox');
                     } elseif ($fields_set['comment_author']) {
-                        $cookies_msg = __('Save my name in this browser for the next time I comment.', 'wp-comment-toolbox');
+                        $cookies_msg = esc_html__('Save my name in this browser for the next time I comment.', 'wp-comment-toolbox');
                     } elseif ($fields_set['comment_author_email']) {
-                        $cookies_msg = __('Save my email in this browser for the next time I comment.', 'wp-comment-toolbox');
+                        $cookies_msg = esc_html__('Save my email in this browser for the next time I comment.', 'wp-comment-toolbox');
                     } elseif ($fields_set['comment_author_url']) {
-                        $cookies_msg = __('Save my website in this browser for the next time I comment.', 'wp-comment-toolbox');
+                        $cookies_msg = esc_html__('Save my website in this browser for the next time I comment.', 'wp-comment-toolbox');
                     }
 
                     if ($custom_cookies_msg) {
@@ -117,7 +117,7 @@ if (!class_exists('WP_Comment_Toolbox_Comment_Form')) {
                     } else {
                         $custom_cookies_msg = $cookies_msg . $privacy_policy_link;
                     }
-                    $ordered_fields['cookies'] = '<p class="comment-form-cookies-consent"><label for="wp-comment-cookies-consent"><input id="wp-comment-cookies-consent" name="wp-comment-cookies-consent" type="checkbox" value="yes"' . $consent . '>' . $custom_cookies_msg . '</label></p>';
+                    $ordered_fields['cookies'] = '<p class="comment-form-cookies-consent"><label for="wp-comment-cookies-consent"><input id="wp-comment-cookies-consent" name="wp-comment-cookies-consent" type="checkbox" value="yes"' . esc_attr($consent) . '>' . wp_kses_post($custom_cookies_msg) . '</label></p>';
                 } else {
                     unset($ordered_fields['cookies']);
                 }
@@ -135,7 +135,7 @@ if (!class_exists('WP_Comment_Toolbox_Comment_Form')) {
                 $defaults['comment_notes_after'] = ''; // Set to empty if no custom note is provided
             } else {
                 $comment_notes_after = str_replace('[required]', '<span class="required">*</span>', $comment_notes_after);
-                $defaults['comment_notes_after'] = '<p class="comment-notes">' . $comment_notes_after . '</p>';
+                $defaults['comment_notes_after'] = '<p class="comment-notes">' . wp_kses_post($comment_notes_after) . '</p>';
             }
 
             // Handle comment_notes_before
@@ -145,7 +145,7 @@ if (!class_exists('WP_Comment_Toolbox_Comment_Form')) {
                 // Only wrap comment_notes_before if [default_msg] is not present
                 if (!str_contains($comment_notes_before, '[default_msg]')) {
                     $comment_notes_before = str_replace('[required]', '<span class="required">*</span>', $comment_notes_before);
-                    $defaults['comment_notes_before'] = '<p class="comment-notes">' . $comment_notes_before . '</p>';
+                    $defaults['comment_notes_before'] = '<p class="comment-notes">' . wp_kses_post($comment_notes_before) . '</p>';
                 }
             }
             return $defaults;
