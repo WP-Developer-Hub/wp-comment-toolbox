@@ -90,7 +90,7 @@ if (!class_exists('WP_Comment_Toolbox_Admin')) {
 
             $id = isset($_GET['id']) ? intval($_GET['id']) : 0;
             $ip = isset($_GET['ip']) ? sanitize_text_field(wp_unslash($_GET['ip'])) : '';
-            $nonce = isset($_GET['_wpnonce']) ? wp_unslash($_GET['_wpnonce']) : '';
+            $nonce = isset($_GET['_wpnonce']) ? sanitize_text_field(wp_unslash($_GET['_wpnonce'])) : '';
 
             // Validate IP
             if (empty($ip) || !filter_var($ip, FILTER_VALIDATE_IP)) {
@@ -132,27 +132,29 @@ if (!class_exists('WP_Comment_Toolbox_Admin')) {
 
         public function handle_block_ip_notices() {
             if (get_option('wpct_show_block_ip_action', 1)) {
-                if (isset($_GET['block_ip_status']) && $_GET['block_ip_status'] === 'success' && !empty($_GET['blocked_ip'])) {
-                    $blocked_ip = sanitize_text_field(wp_unslash($_GET['blocked_ip']));
-                    $blacklist = WPCT_Helper::wpct_get_comment_blocklist();
+                $ip = isset($_GET['blocked_ip']) ? sanitize_text_field(wp_unslash($_GET['blocked_ip'])) : '';
+                if (isset($_GET['block_ip_status']) && $_GET['block_ip_status'] === 'success') {
+                    if (!empty($ip)) {
+                        $blacklist = WPCT_Helper::wpct_get_comment_blocklist();
 
-                    // Prepare the dynamic message text based on IP presence in blacklist
-                    if (in_array($blocked_ip, $blacklist, true)) {
-                        $message = sprintf(
-                            /* translators: %s is an IP address */
-                            esc_html__('IP address %s is already in the comment blacklist and remains blocked.', 'wp-comment-toolbox'),
-                            '<strong>' . esc_html($blocked_ip) . '</strong>'
-                        );
-                    } else {
-                        $message = sprintf(
-                            /* translators: %s is an IP address */
-                            esc_html__('IP address %s has been added to the comment blacklist and blocked from commenting.', 'wp-comment-toolbox'),
-                            '<strong>' . esc_html($blocked_ip) . '</strong>'
-                        );
+                        // Prepare the dynamic message text based on IP presence in blacklist
+                        if (in_array($ip, $blacklist, true)) {
+                            $message = sprintf(
+                                /* translators: %s is an IP address */
+                                esc_html__('IP address %s is already in the comment blacklist and remains blocked.', 'wp-comment-toolbox'),
+                                '<strong>' . esc_html($ip) . '</strong>'
+                            );
+                        } else {
+                            $message = sprintf(
+                                /* translators: %s is an IP address */
+                                esc_html__('IP address %s has been added to the comment blacklist and blocked from commenting.', 'wp-comment-toolbox'),
+                                '<strong>' . esc_html($ip) . '</strong>'
+                            );
+                        }
+
+                        // Output the static wrapper, inserting the dynamic message
+                        WPCT_Helper::wpct_create_admin_notices(wp_kses_post($message), 1, true, ['block_ip_status', 'blocked_ip']);
                     }
-
-                    // Output the static wrapper, inserting the dynamic message
-                    echo WPCT_Helper::wpct_create_admin_notices(esc_html($message), 1, true, ['block_ip_status', 'blocked_ip']);
                 }
             }
         }
@@ -186,7 +188,7 @@ if (!class_exists('WP_Comment_Toolbox_Admin')) {
                 exit;
             }
 
-            $nonce = isset($_GET['_wpnonce']) ? wp_unslash($_GET['_wpnonce']) : '';
+            $nonce = isset($_GET['_wpnonce']) ? sanitize_text_field(wp_unslash($_GET['_wpnonce'])) : '';
 
             // Check nonce and query param for spam check trigger
             if (!wp_verify_nonce($nonce, 'wptc_nuke_all_sus_comments_action')) {
@@ -195,7 +197,7 @@ if (!class_exists('WP_Comment_Toolbox_Admin')) {
                 exit;
             }
 
-            $comment_status = isset($_GET['wptc_comment_status']) ? wp_unslash($_GET['wptc_comment_status']) : 'all';
+            $comment_status = isset($_GET['wptc_comment_status']) ? sanitize_text_field(wp_unslash($_GET['wptc_comment_status'])) : 'all';
 
             // Get all comments regardless of status or number
             $comments = get_comments(['status' => $comment_status]);
@@ -222,11 +224,10 @@ if (!class_exists('WP_Comment_Toolbox_Admin')) {
 
         public function handle_nuke_all_sus_comments_notices() {
             if (get_option('wpct_enable_nuke_all_sus_comment_button', 0)) {
+                $is_successful = (isset($_GET['wptc_spam_nuked']) && $_GET['wptc_spam_nuked'] === 'success');
 
-                $is_spam_nuked_successful = (isset($_GET['wptc_spam_nuked']) && $_GET['wptc_spam_nuked'] === 'success');
-
-                if ($is_spam_nuked_successful && isset($_GET['wptc_comment_count'])) {
-                    $flagged_count = intval($_GET['wptc_comment_count']);
+                if ($is_successful && isset($_GET['wptc_comment_count'])) {
+                    $flagged_count = intval(wp_unslash($_GET['wptc_comment_count']));
 
                     if ($flagged_count > 0) {
                         $message = sprintf(
@@ -243,7 +244,7 @@ if (!class_exists('WP_Comment_Toolbox_Admin')) {
                         $message = esc_html__('No sus comments found.', 'wp-comment-toolbox');
                     }
 
-                    echo WPCT_Helper::wpct_create_admin_notices(
+                    WPCT_Helper::wpct_create_admin_notices(
                         esc_html($message),
                         1,
                         true,
