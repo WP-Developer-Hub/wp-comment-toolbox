@@ -362,5 +362,13 @@ if (!class_exists('WPCT_Helper')) {
             }
             return $is_flagged;
         }
+
+        public static function wpct_privacy_policy_link() {
+            return '<a href="' . esc_url(get_privacy_policy_url()) . '" target="_blank">' . esc_html__('Privacy Policy', 'wp-comment-toolbox') . '</a>';
+        }
+                
+        public static function wpct_unwrap_comment_note($string) {
+            return str_replace(['<p class="comment-notes">', '</p>'], ['', ''], $string);
+        }
     }
 }
