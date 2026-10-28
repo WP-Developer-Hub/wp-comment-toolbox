@@ -124,7 +124,7 @@ if (!class_exists('WP_Comment_Toolbox_Settings')) {
         public function save_settings() {
             // Check nonce first for security
             if (!isset($_POST['wpct_settings_nonce']) || !wp_verify_nonce(sanitize_text_field(wp_unslash($_POST['wpct_settings_nonce'])), 'wpct_save_settings')) {
-                die('Permission denied');
+                $this->wpct_setting_nonce_message();
             }
 
             // Get the active tab to determine which settings to save
@@ -162,7 +162,7 @@ if (!class_exists('WP_Comment_Toolbox_Settings')) {
         // Save settings specific to Spam & Security tab
         private function save_spam_security_settings() {
             if (!isset($_POST['wpct_settings_nonce']) || !wp_verify_nonce(sanitize_text_field(wp_unslash($_POST['wpct_settings_nonce'])), 'wpct_save_settings')) {
-                die('Permission denied');
+                $this->wpct_setting_nonce_message();
             }
 
             if (isset($_POST['wpct_comment_message_limit'])) {
@@ -200,7 +200,7 @@ if (!class_exists('WP_Comment_Toolbox_Settings')) {
 
         private function save_privacy_settings() {
             if (!isset($_POST['wpct_settings_nonce']) || !wp_verify_nonce(sanitize_text_field(wp_unslash($_POST['wpct_settings_nonce'])), 'wpct_save_settings')) {
-                die('Permission denied');
+                $this->wpct_setting_nonce_message();
             }
 
             if (isset($_POST['wpct_comment_cookie_lifetime'])) {
@@ -211,7 +211,7 @@ if (!class_exists('WP_Comment_Toolbox_Settings')) {
         // Save settings specific to Comment List tab
         private function save_comment_list_settings() {
             if (!isset($_POST['wpct_settings_nonce']) || !wp_verify_nonce(sanitize_text_field(wp_unslash($_POST['wpct_settings_nonce'])), 'wpct_save_settings')) {
-                die('Permission denied');
+                $this->wpct_setting_nonce_message();
             }
 
             if (isset($_POST['wpct_author_link_visibility'])) {
@@ -234,7 +234,7 @@ if (!class_exists('WP_Comment_Toolbox_Settings')) {
         // Save settings specific to Comment Form tab
         private function save_comment_form_settings() {
             if (!isset($_POST['wpct_settings_nonce']) || !wp_verify_nonce(sanitize_text_field(wp_unslash($_POST['wpct_settings_nonce'])), 'wpct_save_settings')) {
-                die('Permission denied');
+                $this->wpct_setting_nonce_message();
             }
 
             if (isset($_POST['wpct_enabled_html5_validation'])) {
@@ -273,7 +273,7 @@ if (!class_exists('WP_Comment_Toolbox_Settings')) {
         // Save settings specific to Extra tab
         private function save_extra_settings() {
             if (!isset($_POST['wpct_settings_nonce']) || !wp_verify_nonce(sanitize_text_field(wp_unslash($_POST['wpct_settings_nonce'])), 'wpct_save_settings')) {
-                die('Permission denied');
+                $this->wpct_setting_nonce_message();
             }
 
             if (isset($_POST['wpct_toolbar_enabled'])) {
@@ -296,7 +296,7 @@ if (!class_exists('WP_Comment_Toolbox_Settings')) {
         // Save settings specific to Admin tab
         private function save_admin_settings() {
             if (!isset($_POST['wpct_settings_nonce']) || !wp_verify_nonce(sanitize_text_field(wp_unslash($_POST['wpct_settings_nonce'])), 'wpct_save_settings')) {
-                die('Permission denied');
+                $this->wpct_setting_nonce_message();
             }
 
             if (isset($_POST['wpct_show_block_ip_action'])) {
@@ -329,6 +329,10 @@ if (!class_exists('WP_Comment_Toolbox_Settings')) {
                 // Optionally, show an error or log the issue
                 echo 'Settings file not found: ' . esc_attr($file);
             }
+        }
+
+        private function wpct_setting_nonce_message() {
+            wp_die(esc_html__('Invaled nonce', 'wp-comment-toolbox'), esc_html__('Access Denied', 'wp-comment-toolbox' ), ['response' => 403, 'back_link' => true]);
         }
     }
     new WP_Comment_Toolbox_Settings();
