@@ -8,7 +8,6 @@ if (!class_exists('WP_Comment_Toolbox_Settings')) {
         public function __construct() {
             add_action('admin_menu', [$this, 'add_comment_settings_submenu']);
             add_action('admin_enqueue_scripts', [$this, 'enqueue_admin_styles']);
-            require_once(WP_COMMENT_TOOLBOX_PLUGIN_DIR . 'inc/wp-comment-toolbox-helper.php');
         }
 
         public function enqueue_admin_styles($hook) {

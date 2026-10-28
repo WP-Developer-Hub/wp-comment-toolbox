@@ -34,7 +34,7 @@ if (!class_exists('WP_Comment_Toolbox_Comment_Form')) {
             $custom_cookies_msg = esc_html(get_option('wpct_comment_form_cookies_msg'), '');
             $comment_textarea_placeholder = get_option('wpct_comment_textarea_placeholder');
             $comment_form_layout = get_option('wpct_comment_form_layout', '[author] [email] [url] [comment] [cookies]');
-            $privacy_policy_link = '<a href="' . esc_url(get_privacy_policy_url()) . '" target="_blank">' . esc_html__('Privacy Policy', 'wp-comment-toolbox') . '</a>';
+            $privacy_policy_link = WPCT_Helper::wpct_privacy_policy_link();
 
             preg_match_all('/\[(.*?)\]/', $comment_form_layout, $matches);
             $keys = $matches[1] ?? [];
@@ -127,15 +127,21 @@ if (!class_exists('WP_Comment_Toolbox_Comment_Form')) {
 
         public function override_comment_form_defaults($defaults) {
             // Retrieve custom comment notes from the options
-            $comment_notes_after = get_option('wpct_comment_notes_after', '');
-            $comment_notes_before = get_option('wpct_comment_notes_before', '[default_msg]');
+            $comment_notes_required = '<span class="required">*</span>';
+            $privacy_policy_link = WPCT_Helper::wpct_privacy_policy_link();
+            $comment_notes_after_message = $defaults['comment_notes_after'];
+            $comment_notes_after = nl2br(get_option('wpct_comment_notes_after', ''));
+            $comment_notes_before = nl2br(get_option('wpct_comment_notes_before', '[default_msg]'));
+            $comment_notes_before_message = WPCT_Helper::wpct_unwrap_comment_note($defaults['comment_notes_before']);
 
             // Handle comment_notes_after
             if (empty($comment_notes_after)) {
                 $defaults['comment_notes_after'] = ''; // Set to empty if no custom note is provided
             } else {
-                $comment_notes_after = str_replace('[required]', '<span class="required">*</span>', $comment_notes_after);
-                $defaults['comment_notes_after'] = '<p class="comment-notes">' . wp_kses_post($comment_notes_after) . '</p>';
+                $comment_notes_after = str_replace('[required]', $comment_notes_required, $comment_notes_after);
+                $comment_notes_after = str_replace('[default_msg]', $comment_notes_after_message, $comment_notes_after);
+                $comment_notes_after = str_replace('[privacy_policy_link]', $privacy_policy_link, $comment_notes_after);
+                $defaults['comment_notes_after'] = '<div class="comment-notes">' . wp_kses_post($comment_notes_after) . '</div>';
             }
 
             // Handle comment_notes_before
@@ -143,10 +149,10 @@ if (!class_exists('WP_Comment_Toolbox_Comment_Form')) {
                 $defaults['comment_notes_before'] = ''; // Set to empty if no custom note is provided
             } else {
                 // Only wrap comment_notes_before if [default_msg] is not present
-                if (!str_contains($comment_notes_before, '[default_msg]')) {
-                    $comment_notes_before = str_replace('[required]', '<span class="required">*</span>', $comment_notes_before);
-                    $defaults['comment_notes_before'] = '<p class="comment-notes">' . wp_kses_post($comment_notes_before) . '</p>';
-                }
+                $comment_notes_before = str_replace('[required]', $comment_notes_required, $comment_notes_before);
+                $comment_notes_before = str_replace('[default_msg]', $comment_notes_before_message, $comment_notes_before);
+                $comment_notes_before = str_replace('[privacy_policy_link]', $privacy_policy_link, $comment_notes_before);
+                $defaults['comment_notes_before'] = '<div class="comment-notes">' . wp_kses_post($comment_notes_before) . '</div>';
             }
             return $defaults;
         }
