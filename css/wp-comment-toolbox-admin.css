@@ -1,8 +1,8 @@
 .wpct_settings_toolbar {
-    padding: 5px;
-    display: flex;
-    align-items: center;
-    justify-content: flex-start;
+  padding: 5px;
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
 }
 
 .wpct-control {
@@ -117,4 +117,14 @@
 .wpct-control input[type="checkbox"]:active+.wpct-toggle-switch {
   border-color: #005a87;
   background-color: #005a87;
+}
+
+.wpct-check-box-group {
+  max-width: 22rem;
+}
+
+@media screen and (max-width: 782px) {
+  .wpct-check-box-group {
+      max-width: 100%;
+  }
 }

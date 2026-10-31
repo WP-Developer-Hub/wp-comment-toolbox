@@ -9,6 +9,34 @@ if (!class_exists('WP_Comment_Toolbox_Comment_list')) {
             add_action('init', [$this, 'initialize_comment_filters']);
             add_action('wp_loaded', [$this, 'apply_comment_format_filters'], 20);
             add_action('comment_text', [$this, 'auto_link_twitter_mentions'], 99);
+            add_filter('option_comment_registration', [$this, 'allow_guest_comment_filters'], 1, 1);
+        }
+
+        /**
+         * Trick the registration checks on front-end
+         *
+         * Important: If we return FALSE, the filter will be effectively ignored.
+         * It has to be any other value.
+         *
+         * @wp-hook pre_option_comment_registration
+         * @return bool|int|string
+         */
+        public function allow_guest_comment_filters($option) {
+            global $post;
+
+            $post_type = ($post instanceof WP_Post) ? get_post_type($post->ID) : '';
+            $post_types = get_option('wpct_public_commenting_toggles', []);
+            $is_match = in_array($post_type, $post_types);
+
+            if ((is_archive() || is_singular()) && !empty($post_types)) {
+                if ($option) {
+                    return $is_match ? 0 : 1;
+                } else {
+                    return $is_match ? 1 : 0;
+                }
+            } else {
+                return $option;
+            }
         }
 
         public function initialize_comment_filters() {
