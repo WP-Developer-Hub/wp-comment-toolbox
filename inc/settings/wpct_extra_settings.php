@@ -39,3 +39,17 @@ WPCT_Helper::wpct_select_box(
     )
 );
 
+WPCT_Helper::wpct_checkbox_group(
+    'wpct_public_commenting_toggles',
+    sprintf(
+        /* translators: %s: 'Enable' or 'Disable' state text depending on comment registration */
+        __('%1$s Public Commenting', 'wp-comment-toolbox'),
+        (get_option('comment_registration') ? 'Enable' : 'Disable')
+    ),
+    sprintf(
+        /* translators: 1: Discussion settings link opening tag, 2: Discussion settings link closing tag */
+        __('When enabled, user can leave comment on select post types with no needed to login at all.<br>This setting depends on the Users must be registered and logged in to comment %1$s. Toggling that option will invert this setting.', 'wp-comment-toolbox'),
+        WPCT_Helper::wpct_add_wp_setting_link('options-discussion.php#comment_registration', 'Discussion')
+    ),
+    WPCT_Helper::wpct_get_post_type()
+);

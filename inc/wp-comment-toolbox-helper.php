@@ -145,21 +145,27 @@ if (!class_exists('WPCT_Helper')) {
                     <?php endif; ?>
                 </th>
                 <td>
-                    <fieldset>
-                        <?php foreach ($choices as $key => $choice_label): ?>
-                            <label class="widefat" for="<?php echo esc_attr($name); ?>[]">
-                                <input
-                                    type="checkbox"
-                                    id="<?php echo esc_attr($name); ?>[]"
-                                    name="<?php echo esc_attr($name); ?>[]"
-                                    value="<?php echo esc_attr($key); ?>"
-                                    <?php checked(in_array($key, $input_value), true); ?>
-                                    <?php echo esc_attr($additional_attributes); ?>
-                                />
-                                <?php echo esc_html($choice_label); ?>
-                            </label>
-                        <?php endforeach; ?>
-                    </fieldset>
+                    <div class="wpct-check-box-group categorydiv">
+                        <div class="tabs-panel">
+                            <ul data-wp-lists="list:<?php echo esc_attr(str_replace(' ', '', $label)); ?>" class="categorychecklist form-no-clear">
+                                <?php foreach ($choices as $key => $choice_label): ?>
+                                    <li class="popular-category">
+                                        <label class="widefat" for="<?php echo esc_attr($name); ?>[]">
+                                            <input
+                                                type="checkbox"
+                                                id="<?php echo esc_attr($name); ?>[]"
+                                                name="<?php echo esc_attr($name); ?>[]"
+                                                value="<?php echo esc_attr($key); ?>"
+                                                <?php checked(in_array($key, $input_value), true); ?>
+                                                <?php echo esc_attr($additional_attributes); ?>
+                                            />
+                                            <?php echo esc_html($choice_label); ?>
+                                        </label>
+                                    </li>
+                                <?php endforeach; ?>
+                            </ul>
+                        </div>
+                    </div>
                     <?php if ($description): ?>
                         <p class="description"><?php echo wp_kses_post($description); ?></p>
                     <?php endif; ?>
@@ -366,9 +372,19 @@ if (!class_exists('WPCT_Helper')) {
         public static function wpct_privacy_policy_link() {
             return '<a href="' . esc_url(get_privacy_policy_url()) . '" target="_blank">' . esc_html__('Privacy Policy', 'wp-comment-toolbox') . '</a>';
         }
-                
+
         public static function wpct_unwrap_comment_note($string) {
             return str_replace(['<p class="comment-notes">', '</p>'], ['', ''], $string);
+        }
+
+        public static function wpct_get_post_type() {
+            $post_types = get_post_types_by_support('comments');
+            $choices = [];
+            foreach ($post_types as $type) {
+                $obj = get_post_type_object($type);
+                $choices[$type] = $obj ? $obj->labels->singular_name : $type;
+            }
+            return $choices;
         }
     }
 }

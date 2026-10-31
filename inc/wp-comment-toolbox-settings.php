@@ -287,8 +287,11 @@ if (!class_exists('WP_Comment_Toolbox_Settings')) {
                 update_option('wpct_character_count_enabled', sanitize_text_field(wp_unslash($_POST['wpct_character_count_enabled'])));
             }
 
-            if (isset($_POST['wpct_comment_count_format_enabled'])) {
-                update_option('wpct_comment_count_format_enabled', sanitize_text_field(wp_unslash($_POST['wpct_comment_count_format_enabled'])));
+            if (isset($_POST['wpct_public_commenting_toggles'])) {
+                $data = array_map('sanitize_text_field', wp_unslash($_POST['wpct_public_commenting_toggles']));
+                update_option('wpct_public_commenting_toggles', $data);
+            } else {
+                delete_option('wpct_public_commenting_toggles');
             }
         }
 
@@ -304,6 +307,10 @@ if (!class_exists('WP_Comment_Toolbox_Settings')) {
 
             if (isset($_POST['wpct_enable_nuke_all_sus_comment_button'])) {
                 update_option('wpct_enable_nuke_all_sus_comment_button', sanitize_text_field(wp_unslash($_POST['wpct_enable_nuke_all_sus_comment_button'])));
+            }
+
+            if (isset($_POST['wpct_disable_comment_formatting'])) {
+                update_option('wpct_disable_comment_formatting', sanitize_text_field(wp_unslash($_POST['wpct_disable_comment_formatting'])));
             }
 
             // Special handling for the array option
