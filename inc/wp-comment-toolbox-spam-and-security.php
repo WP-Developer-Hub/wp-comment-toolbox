@@ -33,8 +33,8 @@ if (!class_exists('WP_Comment_Toolbox_Span_And_Security')) {
                 // Check if the HTTP_REFERER header is set and non-empty
                 if (!isset($_SERVER['HTTP_REFERER']) || $_SERVER['HTTP_REFERER'] == "") {
                     // Handle the absence of referer header
-                    $is_curl_request = (isset($_SERVER['HTTP_USER_AGENT']) && strpos($_SERVER['HTTP_USER_AGENT'], 'curl') !== false);
-                    $is_wget_request = (isset($_SERVER['HTTP_USER_AGENT']) && strpos($_SERVER['HTTP_USER_AGENT'], 'Wget') !== false);
+                    $is_curl_request = (isset($_SERVER['HTTP_USER_AGENT']) && strpos( sanitize_text_field(wp_unslash($_SERVER['HTTP_USER_AGENT'])), 'curl') !== false);
+                    $is_wget_request = (isset($_SERVER['HTTP_USER_AGENT']) && strpos( sanitize_text_field(wp_unslash($_SERVER['HTTP_USER_AGENT'])), 'Wget') !== false);
 
                     // Handle cURL/Wget requests differently
                     if ($is_curl_request || $is_wget_request) {
@@ -47,10 +47,10 @@ if (!class_exists('WP_Comment_Toolbox_Span_And_Security')) {
                 }
 
                 // After checking referer, check for nonce
-                if (!isset($_POST['wpct_comment_nonce']) || !wp_verify_nonce($_POST['wpct_comment_nonce'], 'comment_nonce')) {
+                if (!isset($_POST['wpct_comment_nonce']) || !wp_verify_nonce( sanitize_text_field(wp_unslash($_POST['wpct_comment_nonce'])), 'comment_nonce')) {
                     // Handle nonce verification failure for cURL/Wget requests
-                    $is_curl_request = (isset($_SERVER['HTTP_USER_AGENT']) && strpos($_SERVER['HTTP_USER_AGENT'], 'curl') !== false);
-                    $is_wget_request = (isset($_SERVER['HTTP_USER_AGENT']) && strpos($_SERVER['HTTP_USER_AGENT'], 'Wget') !== false);
+                    $is_curl_request = (isset($_SERVER['HTTP_USER_AGENT']) && strpos( sanitize_text_field(wp_unslash($_SERVER['HTTP_USER_AGENT'])), 'curl') !== false);
+                    $is_wget_request = (isset($_SERVER['HTTP_USER_AGENT']) && strpos( sanitize_text_field(wp_unslash($_SERVER['HTTP_USER_AGENT'])), 'Wget') !== false);
 
                     // Handle cURL/Wget requests differently
                     if ($is_curl_request || $is_wget_request) {
@@ -95,7 +95,7 @@ if (!class_exists('WP_Comment_Toolbox_Span_And_Security')) {
 
                 $title = __('Comment Length Warning', 'wp-comment-toolbox');
 
-                wp_die(esc_html($message), esc_html($title), ['response' => 500, 'back_link' => true]);
+                wp_die(wp_kses_post($message), esc_html($title), ['response' => 500, 'back_link' => true]);
             }
 
             return $comment;
@@ -109,8 +109,8 @@ if (!class_exists('WP_Comment_Toolbox_Span_And_Security')) {
 
                 if (!isset($_SERVER['HTTP_REFERER']) || $_SERVER['HTTP_REFERER'] == "") {
                     // Check for cURL and wget in the User-Agent header
-                    $is_curl_request = (isset($_SERVER['HTTP_USER_AGENT']) && strpos($_SERVER['HTTP_USER_AGENT'], 'curl') !== false);
-                    $is_wget_request = (isset($_SERVER['HTTP_USER_AGENT']) && strpos($_SERVER['HTTP_USER_AGENT'], 'Wget') !== false);
+                    $is_curl_request = (isset($_SERVER['HTTP_USER_AGENT']) && strpos(sanitize_text_field(wp_unslash($_SERVER['HTTP_USER_AGENT'])), 'curl') !== false);
+                    $is_wget_request = (isset($_SERVER['HTTP_USER_AGENT']) && strpos(sanitize_text_field(wp_unslash($_SERVER['HTTP_USER_AGENT'])), 'Wget') !== false);
 
                     // Check if it's a cURL or wget request
                     if ($is_curl_request || $is_wget_request) {
@@ -163,10 +163,10 @@ if (!class_exists('WP_Comment_Toolbox_Span_And_Security')) {
 
                 // Retrieve the textarea name from the session
                 if (isset($_SESSION['wpct_comment_honeypot_name'])) {
-                    $textarea_name = sanitize_text_field($_SESSION['wpct_comment_honeypot_name']);
+                    $textarea_name = sanitize_text_field(wp_unslash($_SESSION['wpct_comment_honeypot_name']));
 
                     // Get the submit button name from settings
-                    $submit_name = sanitize_text_field(get_option('wpct_submit_button_name'));
+                    $submit_name = sanitize_text_field(wp_unslash(get_option('wpct_submit_button_name')));
 
                     // Check if the hidden textarea field is filled out
                     $textarea_filled_out = !empty($_POST[$textarea_name]);
@@ -211,10 +211,10 @@ if (!class_exists('WP_Comment_Toolbox_Span_And_Security')) {
                 $field .= '<p class="wptc-math-captcha">';
                 $field .= '<label for="wpct_math_captcha" class="wptc-captcha-label">';
                 $field .= sprintf(
-                    /* translators: What is %s */
+                        /* translators: What is %s */
                             esc_html__('What is %s?', 'wp-comment-toolbox'),
-                    $problem
-                );
+                            $problem
+                        );
                 $field .= '</label>';
                 $field .= '<input type="text" name="wpct_math_captcha" id="wpct_math_captcha" required autocomplete="off" ';
                 $field .= 'inputmode="numeric" pattern="[0-9]*">';
@@ -240,6 +240,10 @@ if (!class_exists('WP_Comment_Toolbox_Span_And_Security')) {
                     return $commentdata;
                 }
 
+                if (!isset($_POST['wpct_comment_nonce']) || !check_admin_referer('comment_nonce', 'wpct_comment_nonce')) {
+                    wp_die(esc_html($missing_fields_message), esc_html($error_message), ['response' => 403, 'back_link' => true]);
+                }
+
                 // Start PHP session
                 WPCT_Helper::wpct_start_session('wpct_verify_math_captcha');
 
@@ -256,10 +260,10 @@ if (!class_exists('WP_Comment_Toolbox_Span_And_Security')) {
                 }
 
                 // Cast posted numbers and session numbers to int to prevent type issues and tampering
-                $post_num1 = intval($_POST['wpct_math_num1']);
-                $post_num2 = intval($_POST['wpct_math_num2']);
-                $session_num1 = intval($_SESSION['wptc_captcha_num1']);
-                $session_num2 = intval($_SESSION['wptc_captcha_num2']);
+                $post_num1 = intval(wp_unslash($_POST['wpct_math_num1']));
+                $post_num2 = intval(wp_unslash($_POST['wpct_math_num2']));
+                $session_num1 = intval(wp_unslash($_SESSION['wptc_captcha_num1']));
+                $session_num2 = intval(wp_unslash($_SESSION['wptc_captcha_num2']));
 
                 // Verify the hidden input numbers match their session values to detect tampering
                 if ($post_num1 !== $session_num1 || $post_num2 !== $session_num2) {
@@ -267,12 +271,10 @@ if (!class_exists('WP_Comment_Toolbox_Span_And_Security')) {
                 }
 
                 // Sanitize and cast the user answer to int
-                $user_answer = trim($_POST['wpct_math_captcha']);
-                $user_answer = sanitize_text_field($user_answer);
-                $user_answer_int = intval($user_answer);
+                $user_answer = intval(wp_unslash($_POST['wpct_math_captcha']));
 
                 // Compare MD5 hash of user answer to stored session hash
-                if (md5($user_answer_int) !== $_SESSION['wptc_captcha_answer']) {
+                if (md5($user_answer) !== $_SESSION['wptc_captcha_answer']) {
                     wp_die(esc_html($incorrect_answer_message), esc_html($error_message), ['response' => 403, 'back_link' => true]);
                 }
 
