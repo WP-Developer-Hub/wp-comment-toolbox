@@ -49,7 +49,7 @@ WPCT_Helper::wpct_select_box(
     'wpct_enable_wp_kses_post',
     __( 'Filter HTML', 'wp-comment-toolbox'),
     0,
-    __('When enabled, only safe HTML tags such as links, blockquotes, and basic formatting will be allowed in comments. This helps prevent malicious code from being rendered for users with higher roles, while keeping basic styling.', 'wp-comment-toolbox'),
+    __('When enabled, only safe HTML tags such as links, blockquotes, and basic formatting will be allowed in comments. This helps prevent malicious code from being rendered for all users, while keeping basic styling.', 'wp-comment-toolbox'),
     array(
         0 => __('No', 'wp-comment-toolbox'),
         1 => __('Yes', 'wp-comment-toolbox'),
