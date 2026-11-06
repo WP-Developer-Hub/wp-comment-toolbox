@@ -117,7 +117,7 @@ if (!class_exists('WP_Comment_Toolbox_Comment_Form')) {
                     } else {
                         $custom_cookies_msg = $cookies_msg . $privacy_policy_link;
                     }
-                    $ordered_fields['cookies'] = '<p class="comment-form-cookies-consent"><label for="wp-comment-cookies-consent"><input id="wp-comment-cookies-consent" name="wp-comment-cookies-consent" type="checkbox" value="yes"' . esc_attr($consent) . '>' . wp_kses_post($custom_cookies_msg) . '</label></p>';
+                    $ordered_fields['cookies'] = '<p class="comment-form-cookies-consent"><label for="wp-comment-cookies-consent"><input id="wp-comment-cookies-consent" name="wp-comment-cookies-consent" type="checkbox" value="yes"' . esc_attr($consent) . '>' . $custom_cookies_msg . '</label></p>';
                 } else {
                     unset($ordered_fields['cookies']);
                 }
@@ -141,7 +141,7 @@ if (!class_exists('WP_Comment_Toolbox_Comment_Form')) {
                 $comment_notes_after = str_replace('[required]', $comment_notes_required, $comment_notes_after);
                 $comment_notes_after = str_replace('[default_msg]', $comment_notes_after_message, $comment_notes_after);
                 $comment_notes_after = str_replace('[privacy_policy_link]', $privacy_policy_link, $comment_notes_after);
-                $defaults['comment_notes_after'] = '<div class="comment-notes">' . wp_kses_post($comment_notes_after) . '</div>';
+                $defaults['comment_notes_after'] = '<div class="comment-notes">' . $comment_notes_after . '</div>';
             }
 
             // Handle comment_notes_before
@@ -152,7 +152,7 @@ if (!class_exists('WP_Comment_Toolbox_Comment_Form')) {
                 $comment_notes_before = str_replace('[required]', $comment_notes_required, $comment_notes_before);
                 $comment_notes_before = str_replace('[default_msg]', $comment_notes_before_message, $comment_notes_before);
                 $comment_notes_before = str_replace('[privacy_policy_link]', $privacy_policy_link, $comment_notes_before);
-                $defaults['comment_notes_before'] = '<div class="comment-notes">' . wp_kses_post($comment_notes_before) . '</div>';
+                $defaults['comment_notes_before'] = '<div class="comment-notes">' . $comment_notes_before . '</div>';
             }
             return $defaults;
         }
