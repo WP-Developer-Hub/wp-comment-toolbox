@@ -21,6 +21,8 @@ if (!class_exists('WP_Comment_Toolbox_Span_And_Security')) {
         public function toggle_make_clickable() {
             if (get_option('wpct_disable_clickable_links', 0)) {
                 remove_filter('comment_text', 'make_clickable', 9);
+            } else {
+                add_filter('comment_text', 'make_clickable', 9);
             }
         }
 
