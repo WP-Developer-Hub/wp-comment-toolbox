@@ -389,9 +389,17 @@ if (!class_exists('WPCT_Helper')) {
 
         public static function wpct_extract_href($content) {
             return preg_replace_callback('/<a[^>]+href=["\']([^"\']+)["\'][^>]*>(.*?)<\/a>/is', function($matches) {
-                    // Returns the raw URL if valid, otherwise falls back to the inner text
-                    return filter_var($matches[1], FILTER_VALIDATE_URL) ? $matches[1] : $matches[2];
+                // Returns the raw URL if valid, otherwise falls back to the inner text
+                return filter_var($matches[1], FILTER_VALIDATE_URL) ? $matches[1] : $matches[2];
             }, $content);
+        }
+
+        public static function wpct_secure_links($link) {
+            if(!wp_is_internal_link($link)) {
+                $link = links_add_target(wp_unslash($link));
+                $link = str_replace('rel="', 'rel="noopener noreferrer ', $link);
+            }
+            return $link;
         }
 
         public static function wpct_allowed_tags() {
@@ -404,7 +412,7 @@ if (!class_exists('WPCT_Helper')) {
                 'a' => array(
                     'href' => [],
                     'target' => ['_blank'],
-                    'rel' => ['noopener', 'noreferrer', 'nofollow'],
+                    'rel' => ['noopener', 'noreferrer', 'nofollow', 'ugc'],
                 ),
                 'blockquote' => [],
                 'code' => ['contenteditable' => ['']],
