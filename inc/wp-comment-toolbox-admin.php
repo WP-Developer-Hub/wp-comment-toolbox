@@ -28,12 +28,7 @@ if (!class_exists('WP_Comment_Toolbox_Admin')) {
         public function filter_comment_text($comment_text) {
             if (is_admin() && get_option('wpct_disable_comment_formatting')) {
                 // Preserve the actual URLs but strip the anchor tags
-                $comment_text = preg_replace_callback('/<a[^>]+href=["\']([^"\']+)["\'][^>]*>(.*?)<\/a>/is', function($matches) {
-                   return (filter_var($matches[1], FILTER_VALIDATE_URL) ? $matches[1] : $matches[2]);
-                }, $comment_text);
-
-                // Strip any remaining HTML tags
-                return wp_strip_all_tags($comment_text);
+                $comment_text = esc_html(WPCT_Helper::wpct_extract_href($comment_text));
             }
             return $comment_text;
         }

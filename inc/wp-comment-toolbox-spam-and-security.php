@@ -10,10 +10,13 @@ if (!class_exists('WP_Comment_Toolbox_Span_And_Security')) {
             add_action('check_comment_flood', [$this, 'check_referrer'], 5);
             add_filter('preprocess_comment', [$this, 'limit_comment_length']);
             add_action('pre_comment_on_post', [$this, 'verify_wp_nonce_field']);
-            add_filter('comment_text', [$this, 'strip_bad_html_form_comment'], 9);
+            add_filter('comment_text', [$this, 'strip_bad_html_comment_text'], 9);
             add_action('comment_form', [$this, 'add_wp_nonce_and_honeypot_field']);
+            add_filter('pre_comment_author_url', [$this, 'santize_comment_meta'], 9);
+            add_filter('pre_comment_content', [$this, 'santize_comment_content'], 9);
             add_filter('preprocess_comment', [$this, 'wpct_verify_math_captcha'], 8);
-            add_filter('pre_comment_content', [$this, 'strip_bad_html_form_comment'], 9);
+            add_filter('pre_comment_author_name', [$this, 'santize_comment_meta'], 9);
+            add_filter('pre_comment_author_email', [$this, 'santize_comment_meta'], 9);
             add_filter('comment_flood_filter', [$this, 'wpct_comment_flood_delay'], 10, 3);
             add_filter('comment_form_field_comment', [$this, 'wpct_math_captcha_field'], 9);
         }
@@ -66,38 +69,55 @@ if (!class_exists('WP_Comment_Toolbox_Span_And_Security')) {
             }
         }
 
-        public function strip_bad_html_form_comment($content) {
-            if (get_option('wpct_disable_clickable_links', 0)) {
-                $content = preg_replace_callback('/<a[^>]+href=["\']([^"\']+)["\'][^>]*>(.*?)<\/a>/is', function($matches) {
-                    return filter_var($matches[1], FILTER_VALIDATE_URL) ? $matches[1] : $matches[2];
-                }, $content);
+        public function strip_bad_html_comment_text($comment_text) {
+            if(!is_admin() && get_option('wpct_enable_santize_comments', 0)){
+                $comment_text = wp_kses($comment_text, WPCT_Helper::wpct_allowed_tags());
             }
+            return $comment_text;
+        }
 
-            if(get_option('wpct_enable_wp_kses_post', 0)){
-                $content = wp_kses_post($content);
+        public function santize_comment_content($comment_text) {
+            if (!is_admin()) {
+                if (get_option('wpct_disable_clickable_links', 0)) {
+                    $comment_content = WPCT_Helper::wpct_extract_href($comment_content);
+                }
+
+                if(get_option('wpct_enable_santize_comments', 0)){
+                    $comment_content = wp_kses_post(strip_shortcodes(wp_unslash($comment_content)));
+                }
             }
+            return $comment_content;
+        }
 
+        public function santize_comment_meta($content) {
+            if (!is_admin()) {
+                if(get_option('wpct_enable_sanitize_comments', 0)){
+                    $content = sanitize_text_field(strip_shortcodes(wp_unslash($content)));
+                }
+            }
             return $content;
         }
 
         public function limit_comment_length($comment) {
             $max_length = intval(get_option('wpct_comment_message_limit', 280));
 
-            if (strlen($comment['comment_content']) > $max_length) {
-                $message = sprintf(
-                    /* translators: 1: Warning label, 2: Comment length limit message */
-                    '<strong>%s</strong> %s',
-                    esc_html__('Warning:', 'wp-comment-toolbox'),
-                    sprintf(
-                        /* translators: %d: maximum allowed comment length */
-                        esc_html__('Please keep your comment under %d characters.', 'wp-comment-toolbox'),
-                        $max_length
-                    )
-                );
+            if (!is_admin()) {
+                if (strlen($comment['comment_content']) > $max_length) {
+                    $message = sprintf(
+                        /* translators: 1: Warning label, 2: Comment length limit message */
+                        '<strong>%s</strong> %s',
+                        esc_html__('Warning:', 'wp-comment-toolbox'),
+                        sprintf(
+                            /* translators: %d: maximum allowed comment length */
+                            esc_html__('Please keep your comment under %d characters.', 'wp-comment-toolbox'),
+                            $max_length
+                        )
+                    );
 
-                $title = __('Comment Length Warning', 'wp-comment-toolbox');
+                    $title = __('Comment Length Warning', 'wp-comment-toolbox');
 
-                wp_die(wp_kses_post($message), esc_html($title), ['response' => 500, 'back_link' => true]);
+                    wp_die(wp_kses_post($message), esc_html($title), ['response' => 500, 'back_link' => true]);
+                }
             }
 
             return $comment;
@@ -153,36 +173,38 @@ if (!class_exists('WP_Comment_Toolbox_Span_And_Security')) {
         }
 
         public function check_honeypot($approved) {
-            if (get_option('wpct_enable_spam_protect', 0)) {
+            if (!is_admin()) {
+                if (get_option('wpct_enable_spam_protect', 0)) {
 
-                // Start PHP session
-                WPCT_Helper::wpct_start_session('check_honeypot');
+                    // Start PHP session
+                    WPCT_Helper::wpct_start_session('check_honeypot');
 
-                // Check nonce validity
-                if (!isset($_POST['wpct_comment_nonce']) || !check_admin_referer('comment_nonce', 'wpct_comment_nonce')) {
-                    $approved = 'spam';
-                }
-
-                // Retrieve the textarea name from the session
-                if (isset($_SESSION['wpct_comment_honeypot_name'])) {
-                    $textarea_name = sanitize_text_field(wp_unslash($_SESSION['wpct_comment_honeypot_name']));
-
-                    // Get the submit button name from settings
-                    $submit_name = sanitize_text_field(wp_unslash(get_option('wpct_submit_button_name')));
-
-                    // Check if the hidden textarea field is filled out
-                    $textarea_filled_out = !empty($_POST[$textarea_name]);
-
-                    // Check if the submit button name is missing
-                    $submit_name_missing = !empty($submit_name) && empty($_POST[$submit_name]);
-
-                    if ($textarea_filled_out || $submit_name_missing) {
-                        $approved = 'spam'; // Mark as spam
+                    // Check nonce validity
+                    if (!isset($_POST['wpct_comment_nonce']) || !check_admin_referer('comment_nonce', 'wpct_comment_nonce')) {
+                        $approved = 'spam';
                     }
-                }
 
-                // Destroy PHP session
-                WPCT_Helper::wpct_destroy_session('check_honeypot');
+                    // Retrieve the textarea name from the session
+                    if (isset($_SESSION['wpct_comment_honeypot_name'])) {
+                        $textarea_name = sanitize_text_field(wp_unslash($_SESSION['wpct_comment_honeypot_name']));
+
+                        // Get the submit button name from settings
+                        $submit_name = sanitize_text_field(wp_unslash(get_option('wpct_submit_button_name')));
+
+                        // Check if the hidden textarea field is filled out
+                        $textarea_filled_out = !empty($_POST[$textarea_name]);
+
+                        // Check if the submit button name is missing
+                        $submit_name_missing = !empty($submit_name) && empty($_POST[$submit_name]);
+
+                        if ($textarea_filled_out || $submit_name_missing) {
+                            $approved = 'spam'; // Mark as spam
+                        }
+                    }
+
+                    // Destroy PHP session
+                    WPCT_Helper::wpct_destroy_session('check_honeypot');
+                }
             }
 
             return $approved;
@@ -229,62 +251,63 @@ if (!class_exists('WP_Comment_Toolbox_Span_And_Security')) {
 
         // Validate the math CAPTCHA (only for guests)
         public function wpct_verify_math_captcha($commentdata) {
-            // Check if math CAPTCHA is enabled in options
-            if (get_option('wpct_enable_math_captcha', 0)) {
-                // Define custom error messages
-                $error_message = __('CAPTCHA Failed', 'wp-comment-toolbox');
-                $missing_fields_message = __('Please answer the CAPTCHA question.', 'wp-comment-toolbox');
-                $tamper_answer_message = __('CAPTCHA validation error: Possible tampering detected.', 'wp-comment-toolbox');
-                $incorrect_answer_message = __('Your CAPTCHA answer was incorrect. Please try again.', 'wp-comment-toolbox');
+            if (!is_admin()) {
+                // Check if math CAPTCHA is enabled in options
+                if (get_option('wpct_enable_math_captcha', 0)) {
+                    // Define custom error messages
+                    $error_message = __('CAPTCHA Failed', 'wp-comment-toolbox');
+                    $missing_fields_message = __('Please answer the CAPTCHA question.', 'wp-comment-toolbox');
+                    $tamper_answer_message = __('CAPTCHA validation error: Possible tampering detected.', 'wp-comment-toolbox');
+                    $incorrect_answer_message = __('Your CAPTCHA answer was incorrect. Please try again.', 'wp-comment-toolbox');
 
-                // Skip validation for logged-in users
-                if (is_user_logged_in()) {
-                    return $commentdata;
+                    // Skip validation for logged-in users
+                    if (is_user_logged_in()) {
+                        return $commentdata;
+                    }
+
+                    if (!isset($_POST['wpct_comment_nonce']) || !check_admin_referer('comment_nonce', 'wpct_comment_nonce')) {
+                        wp_die(esc_html($missing_fields_message), esc_html($error_message), ['response' => 403, 'back_link' => true]);
+                    }
+
+                    // Start PHP session
+                    WPCT_Helper::wpct_start_session('wpct_verify_math_captcha');
+
+                    // Check if CAPTCHA fields or session variables are missing
+                    if (
+                        !isset($_POST['wpct_math_captcha']) ||
+                        !isset($_POST['wpct_math_num1']) ||
+                        !isset($_POST['wpct_math_num2']) ||
+                        !isset($_SESSION['wptc_captcha_answer']) ||
+                        !isset($_SESSION['wptc_captcha_num1']) ||
+                        !isset($_SESSION['wptc_captcha_num2'])
+                    ) {
+                        wp_die(esc_html($missing_fields_message), esc_html($error_message), ['response' => 403, 'back_link' => true]);
+                    }
+
+                    // Cast posted numbers and session numbers to int to prevent type issues and tampering
+                    $post_num1 = intval(wp_unslash($_POST['wpct_math_num1']));
+                    $post_num2 = intval(wp_unslash($_POST['wpct_math_num2']));
+                    $session_num1 = intval(wp_unslash($_SESSION['wptc_captcha_num1']));
+                    $session_num2 = intval(wp_unslash($_SESSION['wptc_captcha_num2']));
+
+                    // Verify the hidden input numbers match their session values to detect tampering
+                    if ($post_num1 !== $session_num1 || $post_num2 !== $session_num2) {
+                        wp_die(esc_html($tamper_answer_message), esc_html($error_message), array('response' => 403, 'back_link' => true));
+                    }
+
+                    // Sanitize and cast the user answer to int
+                    $user_answer = intval(wp_unslash($_POST['wpct_math_captcha']));
+
+                    // Compare MD5 hash of user answer to stored session hash
+                    if (md5($user_answer) !== $_SESSION['wptc_captcha_answer']) {
+                        wp_die(esc_html($incorrect_answer_message), esc_html($error_message), ['response' => 403, 'back_link' => true]);
+                    }
+
+                    // Destroy PHP session
+                    WPCT_Helper::wpct_destroy_session('wpct_verify_math_captcha');
+
                 }
-
-                if (!isset($_POST['wpct_comment_nonce']) || !check_admin_referer('comment_nonce', 'wpct_comment_nonce')) {
-                    wp_die(esc_html($missing_fields_message), esc_html($error_message), ['response' => 403, 'back_link' => true]);
-                }
-
-                // Start PHP session
-                WPCT_Helper::wpct_start_session('wpct_verify_math_captcha');
-
-                // Check if CAPTCHA fields or session variables are missing
-                if (
-                    !isset($_POST['wpct_math_captcha']) ||
-                    !isset($_POST['wpct_math_num1']) ||
-                    !isset($_POST['wpct_math_num2']) ||
-                    !isset($_SESSION['wptc_captcha_answer']) ||
-                    !isset($_SESSION['wptc_captcha_num1']) ||
-                    !isset($_SESSION['wptc_captcha_num2'])
-                ) {
-                    wp_die(esc_html($missing_fields_message), esc_html($error_message), ['response' => 403, 'back_link' => true]);
-                }
-
-                // Cast posted numbers and session numbers to int to prevent type issues and tampering
-                $post_num1 = intval(wp_unslash($_POST['wpct_math_num1']));
-                $post_num2 = intval(wp_unslash($_POST['wpct_math_num2']));
-                $session_num1 = intval(wp_unslash($_SESSION['wptc_captcha_num1']));
-                $session_num2 = intval(wp_unslash($_SESSION['wptc_captcha_num2']));
-
-                // Verify the hidden input numbers match their session values to detect tampering
-                if ($post_num1 !== $session_num1 || $post_num2 !== $session_num2) {
-                    wp_die(esc_html($tamper_answer_message), esc_html($error_message), array('response' => 403, 'back_link' => true));
-                }
-
-                // Sanitize and cast the user answer to int
-                $user_answer = intval(wp_unslash($_POST['wpct_math_captcha']));
-
-                // Compare MD5 hash of user answer to stored session hash
-                if (md5($user_answer) !== $_SESSION['wptc_captcha_answer']) {
-                    wp_die(esc_html($incorrect_answer_message), esc_html($error_message), ['response' => 403, 'back_link' => true]);
-                }
-
-                // Destroy PHP session
-                WPCT_Helper::wpct_destroy_session('wpct_verify_math_captcha');
-
             }
-
             // If CAPTCHA not enabled or validation passes, return comment data for further processing
             return $commentdata;
         }

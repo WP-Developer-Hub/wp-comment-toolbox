@@ -386,5 +386,29 @@ if (!class_exists('WPCT_Helper')) {
             }
             return $choices;
         }
+
+        public static function wpct_extract_href($content) {
+            return preg_replace_callback('/<a[^>]+href=["\']([^"\']+)["\'][^>]*>(.*?)<\/a>/is', function($matches) {
+                    // Returns the raw URL if valid, otherwise falls back to the inner text
+                    return filter_var($matches[1], FILTER_VALIDATE_URL) ? $matches[1] : $matches[2];
+            }, $content);
+        }
+
+        public static function wpct_allowed_tags() {
+            return array(
+                'q' => [],
+                'u' => [],
+                'em' => [],
+                'pre' => [],
+                'strong' => [],
+                'a' => array(
+                    'href' => [],
+                    'target' => ['_blank'],
+                    'rel' => ['noopener', 'noreferrer', 'nofollow'],
+                ),
+                'blockquote' => [],
+                'code' => ['contenteditable' => ['']],
+            );
+        }
     }
 }

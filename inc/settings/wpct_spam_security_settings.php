@@ -46,10 +46,10 @@ WPCT_Helper::wpct_select_box(
 
 // Enable WP Kses Post
 WPCT_Helper::wpct_select_box(
-    'wpct_enable_wp_kses_post',
-    __( 'Filter HTML', 'wp-comment-toolbox'),
+    'wpct_enable_sanitize_comments',
+    __('Santize Comments', 'wp-comment-toolbox'),
     0,
-    __('When enabled, only safe HTML tags such as links, blockquotes, and basic formatting will be allowed in comments. This helps prevent malicious code from being rendered for all users, while keeping basic styling.', 'wp-comment-toolbox'),
+    __('When enabled, only safe HTML tags such as stong, blockquotes, and basic formatting will be rendered in comments, while all submitted HTML is retained for security review. HTML is also stripped from the username, email, and legacy website fields. This helps prevent malicious code from being rendered for all users while preserving basic formatting.', 'wp-comment-toolbox'),
     array(
         0 => __('No', 'wp-comment-toolbox'),
         1 => __('Yes', 'wp-comment-toolbox'),
