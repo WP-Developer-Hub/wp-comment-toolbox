@@ -295,8 +295,7 @@ if (!class_exists('WP_Comment_Toolbox_Admin')) {
             }
 
             if (in_array('wptc_comment_id', $enabled_columns, true) && $column === 'wptc_comment_id') {
-                $comment = get_comment($comment_id);
-                echo esc_html($comment_ID);
+                echo esc_html($comment_id);
             }
         }
     }
