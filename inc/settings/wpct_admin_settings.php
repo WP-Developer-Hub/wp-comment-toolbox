@@ -35,7 +35,7 @@ WPCT_Helper::wpct_select_box(
     'wpct_disable_comment_formatting',
     __('Disable Formating', 'wp-comment-toolbox'),
     0,
-   __('When enabled, all HTML tags are removed from comments in the admin area, reducing formatting for less distraction.', 'wp-comment-toolbox'),
+    __('When enabled, all HTML tags are stopped from rendering in comments within the admin area for better security analysis.', 'wp-comment-toolbox'),
     array(
         0 => __('No', 'wp-comment-toolbox'),
         1 => __('Yes', 'wp-comment-toolbox'),
