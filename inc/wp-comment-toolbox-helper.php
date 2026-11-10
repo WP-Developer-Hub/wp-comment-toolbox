@@ -407,7 +407,6 @@ if (!class_exists('WPCT_Helper')) {
                 'q' => [],
                 'u' => [],
                 'em' => [],
-                'pre' => [],
                 'strong' => [],
                 'a' => array(
                     'href' => [],
@@ -415,7 +414,6 @@ if (!class_exists('WPCT_Helper')) {
                     'rel' => ['noopener', 'noreferrer', 'nofollow', 'ugc'],
                 ),
                 'blockquote' => [],
-                'code' => ['contenteditable' => ['']],
             );
         }
     }
