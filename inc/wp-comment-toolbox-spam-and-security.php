@@ -21,7 +21,7 @@ if (!class_exists('WP_Comment_Toolbox_Span_And_Security')) {
             add_filter('comment_form_field_comment', [$this, 'wpct_math_captcha_field'], 9);
         }
 
-        private function disable_make_clickable() {
+        public function disable_make_clickable() {
             if (!is_admin()) {
                 remove_filter('comment_text', 'make_clickable', PHP_INT_MAX);
             }
