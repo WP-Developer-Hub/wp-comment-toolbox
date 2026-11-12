@@ -1,65 +1,70 @@
-# WP Comment Toolbox Settings
+# WP Comment Toolbox
 
-This plugin provides customization options for comment form settings in WordPress. You can adjust various aspects of comment behavior, including security, formatting, and layout preferences.
+A comprehensive WordPress plugin that gives you fine-grained control over the comment system — spam protection, privacy, comment list display, form layout, extras, and admin tools.
 
-## Features
+## Installation Guide
 
-- **Comment Settings Panel**: Manage all comment-related settings from one place.
-- **Spam & Security**: Control comment length, disable clickable links to reduce spam, and more.
-- **Comment List**: Customize the visibility and format of author links, including the link type (internal/external) and comment text formatting.
-- **Comment Form Layout**: Define the structure of the comment form using placeholders.
-- **Quick Tags Toolbar**: Enable a quick tags toolbar in the comment form to make it easier for users to format their comments.
-- **Inline Tooltips**: Get brief explanations for certain options in settings for better understanding.
-- **Advanced Spam Protection**: Enhanced spam measures using `wp-comments-post.php` restrictions, and support for Honeypot-style techniques.
-- **Preview Option for Comment Layout**: See live previews of comment form layout changes in the customizer.
-- **Custom CSS/JS**: Add custom CSS or JavaScript to tweak the appearance and behavior of the comment form.
-- **Multilingual Support**: Fully compatible with translation tools to reach a wider audience.
+### 1. Download the Plugin
+1. **Click** the green **Code** button → **Download ZIP** if you want the lasted changes.
+2. **Click** the **Releases Page** link to **Download** the latest Stable **Releases ZIP** .
+---
+### 2. Install & Activate
+1. Log in to your WordPress Admin Dashboard.
+2. Go to **Plugins → Add New Plugin**.
+3. Click **Upload Plugin** at the top.
+4. Choose the downloaded `.zip` file and click **Install Now**.
+5. After installation, click **Activate Plugin**.
+---
+### 3. Access Settings
+#### Once activated, go to **Comments → Comment Settings** in the admin sidebar to configure the plugin.
+---
+### Tabs & Features
+### 1. Spam & Security
+- **Comment Character Limit** — Set the maximum number of characters allowed per comment.
+- **Comment Flood Delay** — Minimum wait time between comments from the same user.
+- **Disable Clickable Links** — Strip or disable hyperlinks in comments.
+- **Sanitize Comments** — Enforce safe HTML tags and strip unwanted HTML from fields.
+- **Enable Spam Protection** — Block bot POST requests to `wp-comments-post.php` via honeypot.
+- **Submit Button Name** — Customize the submit button attribute name used by the honeypot check.
+- **Enable Math Captcha** — Require users to solve a simple math question before submitting.
+- **Math Captcha Difficulty Level** — Adjust difficulty (1–15).
+---
+### 2. Privacy
+- **Comment Cookie Lifetime** — Control how long author information is stored in cookies.
+---
+### 3. Comment List
+- **Author Link Visibility** — Control who gets a clickable author link.
+- **Author Link Type** — Choose between external site links or internal author archive pages.
+- **Format Comment Text** — Choose formatting rule: `Auto` / `wpautop`, `nl2br`, or `None`.
+- **Enable Twitter Mentions Linking** — Automatically turn `@username` mentions into links.
+---
+### 4. Comment Form
+- **Enable HTML5 Validation** — Toggle native HTML5 form validation.
+- **Author Placeholder** — Choose the placeholder type for the author field.
+- **Comment Placeholder** — Custom placeholder text for the comment textarea.
+- **Comment Textarea Height** — Set the visible height / number of rows.
+- **Comment Notes Before** — Custom HTML/content shown before the form.
+- **Comment Notes After** — Custom HTML/content shown after the form.
+- **Comment Form Layout** — Reorder form components using: `[author]`, `[email]`, `[url]`, `[comment]`, `[cookies]`.
+- **Comment Cookies Message** — Customize the cookie compliance notice text.
+---
+### 5. Extras
+- **Enable Quick Tags Toolbar** — Inline formatting bar (Bold, Italic, etc.) above the comment field.
+- **Toolbar Style** — Light Mode or Dark Mode.
+- **Enable Character Count** — Real-time counter showing remaining characters.
+- **Disable Public Commenting** — Toggle commenting availability per post type (`Post`, `Cam`, `User Post`, `Video`, `Gallery`, `Product`, `Code Snippet`, etc.).
+---
+### 6. Admin
+- **Show Block IP Actions** — Adds a “Block IP” row action to the admin comments list.
+- **Enable All Sus Comments Button** — One-click scan/nuke button based on moderation key / link criteria.
+- **Disable Formatting** — Prevent HTML execution in the admin area for safer analysis.
+- **Enhance Comment List Tables** — Optional extra columns: `Comment Type`, `Comment Author Role`, `Comment ID`.
 
-## Installation
+### 7. Test Command
+- **Spam Test Command** — Generates a ready-to-use `curl` command so you can test the honeypot / spam protection from the terminal.
+---
+## Credits
+- Honeypot concept inspired by [Elazar’s WP Spam Honeypot](https://github.com/elazar/wp-spam-honeypot).
 
-1. Upload the plugin files to the `/wp-content/plugins/wp-comment-toolbox-settings/` directory.
-2. Activate the plugin through the 'Plugins' menu in WordPress.
-3. Go to **Appearance** > **Customize** to configure the plugin settings.
-
-## Settings
-
-### Spam & Security
-
-- **Comment Character Limit**: Set the maximum number of characters allowed in a comment.
-- **Disable Clickable Links**: Prevent links in comments from being clickable to reduce spam.
-- **Enable Spam Protection**: Prevent bots from sending comments via `wp-comments-post.php`, which can reduce spam & improve security.
-
-### Comment List
-
-- **Author Link Visibility**: Choose who can have a clickable author link in comments.
-- **Author Link Type**: Select whether the author link leads to the author’s website or the WordPress author page.
-- **Format Comment Text**: Choose the format for comment text:
-  - **Auto**: Applies `wpautop` for paragraph tags.
-  - **nl2br**: Converts newlines to `<br>` tags.
-  - **None**: No formatting.
-
-### Comment Form
-
-- **Author Placeholder**: Choose the placeholder for the author input field (Full Name, Username, or Both).
-- **Comment Textarea Row Count**: Set the number of rows in the comment textarea.
-- **Comment Form Layout**: Define the structure of the comment form using placeholders (`[author]`, `[email]`, `[url]`, `[comment]`, `[cookies]`).
-- **Comment Cookies Message**: Customize the message for cookie consent in the comment form.
-
-### Extra Settings
-
-- **Enable Quick Tags Toolbar**: Add a quick tags toolbar to the comment form for easier formatting with Bold, Italic, and Underline text.
-- **Toolbar Style**: Choose between a light or dark mode for the quick tags toolbar.
-- **Enable Character Count**: Add a Twitter-style character counter below the comment textarea, showing the number of characters remaining.
-- **CSS/JS Customization**: Add custom CSS or JavaScript to further personalize the comment form’s appearance and behavior.
-
-## Customizer Options
-
-- **Comment Character Limit**: Control the maximum number of characters in a comment.
-- **Comment Text Format**: Define how comment text is formatted (`wpautop`, `nl2br`, or no formatting).
-- **Comment Form Layout**: Structure the comment form using placeholders.
-- **Quick Tags Toolbar**: Enable or disable a toolbar for comment formatting.
-- **Preview Comment Layout**: See changes to the comment form layout in real-time as you customize it.
-
-## Credit
-
-- Elazar for the WP Spam Honeypot idea: https://github.com/elazar/wp-spam-honeypot
+## License
+GPL-3.0 (or later)
