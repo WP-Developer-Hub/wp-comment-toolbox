@@ -6,11 +6,11 @@
 }
 
 /* Remove the top border of the comment textarea */
-.wpct_toolbar #comment {
-    border-top: 0;
-    margin-top: 0;
-    border-top-left-radius: 0;
-    border-top-right-radius: 0;
+.wpct_toolbar textarea {
+    border-top: 0 !important;
+    margin-top: 0 !important;
+    border-top-left-radius: 0 !important;
+    border-top-right-radius: 0 !important;
 }
 
 /* Style for the custom toolbar buttons */

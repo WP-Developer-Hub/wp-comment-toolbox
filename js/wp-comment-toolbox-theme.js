@@ -1,19 +1,19 @@
 (function($){
   $(function(){
-       var $commentField = $("#comment");
-       var $statusBar;
+        var $commentField = $("textarea[name='comment']");
+        var $statusBar;
 
-       $commentField.wrap('<div class="wpct_toolbar"></div>');
+        $commentField.wrap('<div class="wpct_toolbar"></div>');
 
-       // Function to initialize Quicktags toolbar
-       $.fn.initializeQuicktags = function() {
-         quicktags({
-            id: "comment",
-            buttons: "em,strong",
-         });
+        // Function to initialize Quicktags toolbar
+        $.fn.initializeQuicktags = function() {
+            quicktags({
+               id: $commentField.attr('id') || 'comment',
+               buttons: "em,strong",
+            });
 
-         QTags.addButton("eg_underline", "u", "<u>", "</u>", "u", "Underline Text");
-       }
+            QTags.addButton("eg_underline", "u", "<u>", "</u>", "u", "Underline Text");
+        }
 
        // Function to update the status bar with remaining characters
        function updateStatusBar() {
@@ -38,12 +38,12 @@
          $commentField.on("input", updateStatusBar); // Update remaining characters when the user types
        }
 
-      function isEmpty(value) {
+       function isEmpty(value) {
           return (!value || value.trim() === '');
-      }
+       }
 
-      $.fn.initializeCaptchaValidation = function(options) {
-          var captchaField = $('input[name="wpct_math_captcha"]');
+       $.fn.initializeCaptchaValidation = function(options) {
+           var captchaField = $('input[name="wpct_math_captcha"]');
           if (captchaField.length > 0) {
               // Check if CAPTCHA field is empty
               if (isEmpty(captchaField.val())) {
@@ -69,7 +69,7 @@
                       captchaField[0].setCustomValidity('');
                   }
               });
-          }
+           }
       };
   });
 })(jQuery);
