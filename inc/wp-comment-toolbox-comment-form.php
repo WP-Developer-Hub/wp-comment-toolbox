@@ -6,17 +6,9 @@ if (!defined('ABSPATH')) {
 if (!class_exists('WP_Comment_Toolbox_Comment_Form')) {
     class WP_Comment_Toolbox_Comment_Form {
         public function __construct() {
-            add_filter('wp_head', [$this, 'wpct_add_custom_comment_css']);
             add_filter('wp_footer', [$this, 'toggle_html5_comment_form_validation']);
             add_filter('comment_form_fields', [$this, 'reorder_comment_form_fields']);
             add_filter('comment_form_defaults', [$this, 'override_comment_form_defaults']);
-        }
-
-        public function wpct_add_custom_comment_css() {
-            $height = intval(get_option('wpct_comment_textarea_height', 150));
-            ?>
-            <style>.comment-form textarea { min-height: <?php echo esc_attr($height); ?>px !important; }</style>
-            <?php
         }
 
         public function toggle_html5_comment_form_validation() {
@@ -29,6 +21,7 @@ if (!class_exists('WP_Comment_Toolbox_Comment_Form')) {
         }
 
         public function reorder_comment_form_fields($fields) {
+            $height = intval(get_option('wpct_comment_textarea_height', 150));
             $max_length = esc_html(intval(get_option('wpct_comment_message_limit', 280)));
             $name_or_username = get_option('wpct_author_placeholder', 'full_name');
             $custom_cookies_msg = esc_html(get_option('wpct_comment_form_cookies_msg'), '');
@@ -80,6 +73,8 @@ if (!class_exists('WP_Comment_Toolbox_Comment_Form')) {
                 if(!empty($comment_textarea_placeholder)){
                     $ordered_fields['comment'] = preg_replace('/\btextarea/', 'textarea placeholder="' . esc_attr($comment_textarea_placeholder) . '"', $ordered_fields['comment'], 1);
                 }
+
+                $ordered_fields['comment'] = preg_replace('/\btextarea/', 'textarea style="min-height: ' .  esc_attr($height) . 'px !important;"', $ordered_fields['comment'], 1);
             }
 
             if (isset($ordered_fields['cookies'])) {
