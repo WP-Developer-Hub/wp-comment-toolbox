@@ -6,11 +6,11 @@ if (!defined('ABSPATH')) {
 // Comment Character Limit
 WPCT_Helper::wpct_input_field(
     'wpct_comment_message_limit',
-    __( 'Comment Character Limit', 'wp-comment-toolbox' ),
+    __('Comment Character Limit', 'wp-comment-toolbox'),
     'number',
     280,
-    __( 'Set the maximum number of characters allowed in the comment text. This helps prevent overly long comments and spammy content.', 'wp-comment-toolbox' ),
-    array( 'min' => 240, 'max' => 480, 'inputmode' => 'numeric', 'pattern' => '[0-9]*', 'placeholder' => '280' )
+    __('Set the maximum number of characters allowed in the comment text. This helps prevent overly long comments and spammy content.', 'wp-comment-toolbox'),
+    array( 'min' => 280, 'max' => 1000, 'inputmode' => 'numeric', 'pattern' => '[0-9]*', 'placeholder' => '280' )
 );
 
 WPCT_Helper::wpct_select_box(

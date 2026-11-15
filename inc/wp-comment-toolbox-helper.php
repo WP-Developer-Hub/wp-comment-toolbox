@@ -404,16 +404,39 @@ if (!class_exists('WPCT_Helper')) {
 
         public static function wpct_allowed_tags() {
             return array(
+                // Core & Formatting
                 'q' => [],
                 'u' => [],
+                's' => [],
                 'em' => [],
+                'dfn' => [],
+                'sup' => [],
+                'sub' => [],
+                'kbd' => [],
+                'var' => [],
+                'bdi' => [],
+                'mark' => [],
                 'strong' => [],
+                'bdo' => array(
+                    'dir' => ['ltr', 'rtl', 'auto'],
+                ),
+                'abbr' => array(
+                    'title' => [],
+                ),
+                'del' => array(
+                    'cite' => [],
+                    'datetime' => [],
+                ),
+                'ins' => array(
+                    'cite' => [],
+                    'datetime' => [],
+                ),
+                'blockquote' => [],
                 'a' => array(
                     'href' => [],
                     'target' => ['_blank'],
                     'rel' => ['noopener', 'noreferrer', 'nofollow', 'ugc'],
                 ),
-                'blockquote' => [],
             );
         }
     }
