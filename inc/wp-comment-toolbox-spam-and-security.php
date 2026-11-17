@@ -10,12 +10,12 @@ if (!class_exists('WP_Comment_Toolbox_Span_And_Security')) {
             add_filter('comment_text', [$this, 'santize_comment_text'], 9);
             add_action('check_comment_flood', [$this, 'check_referrer'], 5);
             add_filter('preprocess_comment', [$this, 'limit_comment_length']);
-            add_action('pre_comment_on_post', [$this, 'verify_wp_nonce_field']);
             add_action('comment_form', [$this, 'add_wp_nonce_and_honeypot_field']);
             add_filter('pre_comment_author_url', [$this, 'santize_comment_meta'], 9);
             add_filter('pre_comment_content', [$this, 'santize_comment_content'], 9);
             add_filter('preprocess_comment', [$this, 'wpct_verify_math_captcha'], 8);
             add_filter('pre_comment_author_name', [$this, 'santize_comment_meta'], 9);
+            add_action('pre_comment_approved', [$this, 'verify_comment_author'], 9, 2);
             add_filter('pre_comment_author_email', [$this, 'santize_comment_meta'], 9);
             add_filter('comment_flood_filter', [$this, 'wpct_comment_flood_delay'], 10, 3);
             add_filter('comment_form_field_comment', [$this, 'wpct_math_captcha_field'], 9);
@@ -71,10 +71,10 @@ if (!class_exists('WP_Comment_Toolbox_Span_And_Security')) {
             if (!is_admin()) {
                 if (!get_option('wpct_disable_clickable_links', 0)) {
                     $comment_text = make_clickable($comment_text);
+                    $comment_text = WPCT_Helper::wpct_secure_links($comment_text);
                 }
 
                 if(get_option('wpct_enable_sanitize_comments', 0)) {
-                    $comment_text = WPCT_Helper::wpct_secure_links($comment_text);
                     $comment_text = wp_kses($comment_text, WPCT_Helper::wpct_allowed_tags());
                 }
             }
@@ -100,11 +100,25 @@ if (!class_exists('WP_Comment_Toolbox_Span_And_Security')) {
             return $content_meta;
         }
 
-        public function limit_comment_length($comment) {
+        public function verify_comment_author($approved, $commentdata) {
+            if (!is_admin()) {
+                if(get_option('wpct_enable_spam_protect', 0)){
+                    $comment_author = $commentdata['comment_author'];
+
+                    // Use filter_var to check for URLs or emails in the single-line author input
+                    if (!empty($comment_author) && (filter_var($comment_author, FILTER_VALIDATE_URL) || filter_var($comment_author, FILTER_VALIDATE_EMAIL))) {
+                        $approved = 'spam';
+                    }
+                }
+            }
+            return $approved;
+        }
+
+        public function limit_comment_length($content_meta) {
             $max_length = intval(get_option('wpct_comment_message_limit', 280));
 
             if (!is_admin()) {
-                if (strlen($comment['comment_content']) > $max_length) {
+                if (strlen($content_meta['comment_content']) > $max_length) {
                     $message = sprintf(
                         /* translators: 1: Warning label, 2: Comment length limit message */
                         '<strong>%s</strong> %s',
@@ -122,7 +136,7 @@ if (!class_exists('WP_Comment_Toolbox_Span_And_Security')) {
                 }
             }
 
-            return $comment;
+            return $content_meta;
         }
 
         public function check_referrer() {
