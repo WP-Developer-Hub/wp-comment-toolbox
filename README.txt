@@ -1,7 +1,7 @@
 === WP Comment Toolbox ===
 
 Contributors: DJABHipHop
-Stable tag: 9.6.2
+Stable tag: 10.0.1
 Requires at least: 6.0
 Requires PHP: 7.2
 Tested up to: 7.1
